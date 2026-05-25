@@ -1,0 +1,344 @@
+// app/coaching/dashboard/page.tsx
+
+"use client";
+
+import Image from "next/image";
+
+import { useEffect, useState } from "react";
+
+import {
+  Users,
+  IndianRupee,
+  TrendingUp,
+  FileText,
+  LogOut,
+} from "lucide-react";
+
+interface Student {
+  _id: string;
+
+  name: string;
+
+  exams: number;
+
+  avgScore: number;
+
+  weak: string;
+
+  strong: string;
+
+  improvement: string;
+}
+
+interface DashboardData {
+  coaching: {
+    name: string;
+
+    logo: string;
+
+    couponCode: string;
+
+    totalStudents: number;
+
+    revenue: number;
+
+    totalTests: number;
+  };
+
+  students: Student[];
+}
+
+export default function CoachingDashboard() {
+  const [loading, setLoading] =
+    useState(true);
+
+  const [data, setData] =
+    useState<DashboardData | null>(
+      null
+    );
+
+  // Fetch Dashboard
+  useEffect(() => {
+    const fetchDashboard =
+      async () => {
+        try {
+          const res = await fetch(
+            "/api/coaching/dashboard",
+            {
+              credentials:
+                "include",
+            }
+          );
+
+          const result =
+            await res.json();
+
+          setData(result.data);
+        } catch (error) {
+          console.log(error);
+        } finally {
+          setLoading(false);
+        }
+      };
+
+    void fetchDashboard();
+  }, []);
+
+  // Logout
+  const handleLogout =
+    async () => {
+      try {
+        await fetch(
+          "/api/admin/logout",
+          {
+            method: "POST",
+
+            credentials:
+              "include",
+          }
+        );
+
+        window.location.href =
+          "/admin-login";
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-2xl font-bold">
+        Loading Dashboard...
+      </div>
+    );
+  }
+
+  const stats = [
+    {
+      title: "Total Students",
+
+      value:
+        data?.coaching
+          .totalStudents || 0,
+
+      icon: Users,
+    },
+
+    {
+      title: "Revenue",
+
+      value: `₹${
+        data?.coaching
+          .revenue || 0
+      }`,
+
+      icon: IndianRupee,
+    },
+
+    {
+      title: "Total Tests",
+
+      value:
+        data?.coaching
+          .totalTests || 0,
+
+      icon: FileText,
+    },
+
+    {
+      title: "Growth",
+
+      value: "+18%",
+
+      icon: TrendingUp,
+    },
+  ];
+
+  return (
+    <div className="min-h-screen bg-gray-100">
+
+      {/* Navbar */}
+      <div className="bg-white border-b shadow-sm px-4 md:px-10 py-5 flex flex-col md:flex-row justify-between md:items-center gap-5">
+
+        {/* Left */}
+        <div className="flex items-center gap-4">
+
+          {data?.coaching
+            ?.logo && (
+            <Image
+              src={
+                data.coaching
+                  .logo
+              }
+              alt="logo"
+              width={70}
+              height={70}
+              className="rounded-2xl border object-cover"
+            />
+          )}
+
+          <div>
+            <h1 className="text-3xl font-bold">
+              {
+                data?.coaching
+                  ?.name
+              }
+            </h1>
+
+            <p className="text-gray-500 mt-1">
+              Coupon :
+              {" "}
+              <span className="font-semibold">
+                {
+                  data
+                    ?.coaching
+                    ?.couponCode
+                }
+              </span>
+            </p>
+          </div>
+        </div>
+
+        {/* Logout */}
+        <button
+          onClick={handleLogout}
+          className="bg-red-500 hover:bg-red-600 text-white px-5 py-3 rounded-xl flex items-center gap-2"
+        >
+          <LogOut size={18} />
+          Logout
+        </button>
+      </div>
+
+      {/* Stats */}
+      <div className="p-4 md:p-10">
+
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+
+          {stats.map(
+            (item, index) => {
+              const Icon =
+                item.icon;
+
+              return (
+                <div
+                  key={index}
+                  className="bg-white rounded-3xl p-7 shadow-sm"
+                >
+                  <div className="flex justify-between">
+
+                    <div>
+                      <p className="text-gray-500">
+                        {item.title}
+                      </p>
+
+                      <h2 className="text-4xl font-bold mt-4">
+                        {item.value}
+                      </h2>
+                    </div>
+
+                    <div className="bg-blue-100 h-fit p-4 rounded-2xl">
+                      <Icon className="text-blue-600" />
+                    </div>
+                  </div>
+                </div>
+              );
+            }
+          )}
+        </div>
+
+        {/* Students */}
+        <div className="mt-10 bg-white rounded-3xl shadow-sm p-6">
+
+          <h2 className="text-2xl font-bold mb-6">
+            Referred Students
+          </h2>
+
+          <div className="overflow-x-auto">
+
+            <table className="w-full min-w-[1000px]">
+
+              <thead>
+                <tr className="border-b">
+
+                  <th className="text-left py-4">
+                    Student
+                  </th>
+
+                  <th className="text-left py-4">
+                    Exams
+                  </th>
+
+                  <th className="text-left py-4">
+                    Avg Score
+                  </th>
+
+                  <th className="text-left py-4">
+                    Weak Area
+                  </th>
+
+                  <th className="text-left py-4">
+                    Strong Area
+                  </th>
+
+                  <th className="text-left py-4">
+                    Improvement
+                  </th>
+                </tr>
+              </thead>
+
+              <tbody>
+
+                {data?.students?.map(
+                  (student) => (
+                    <tr
+                      key={
+                        student._id
+                      }
+                      className="border-b last:border-none"
+                    >
+                      <td className="py-5 font-medium">
+                        {
+                          student.name
+                        }
+                      </td>
+
+                      <td className="py-5">
+                        {
+                          student.exams
+                        }
+                      </td>
+
+                      <td className="py-5">
+                        {
+                          student.avgScore
+                        }%
+                      </td>
+
+                      <td className="py-5 text-red-500 font-medium">
+                        {
+                          student.weak
+                        }
+                      </td>
+
+                      <td className="py-5 text-green-600 font-medium">
+                        {
+                          student.strong
+                        }
+                      </td>
+
+                      <td className="py-5 font-semibold">
+                        {
+                          student.improvement
+                        }
+                      </td>
+                    </tr>
+                  )
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
