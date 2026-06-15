@@ -7,8 +7,7 @@ import AuthProvider from "../providers/SessionProvider";
 export const metadata: Metadata = {
   title: "Coaching SaaS",
 
-  description:
-    "Online Mock Test Platform",
+  description: "Online Mock Test Platform",
 };
 
 export default function RootLayout({
@@ -19,9 +18,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="bg-gray-100 text-black">
-        <AuthProvider>
-          {children}
-        </AuthProvider>
+        <AuthProvider>{children}</AuthProvider>
       </body>
     </html>
   );
