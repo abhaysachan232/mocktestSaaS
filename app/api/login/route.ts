@@ -1,58 +1,43 @@
-import {
-  NextRequest,
-  NextResponse,
-} from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 import bcrypt from "bcryptjs";
 
 import jwt from "jsonwebtoken";
 
-import { connectDB }
-from "../../../lib/db";
+import { connectDB } from "../../../lib/db";
 
-import { User }
-from "../../../models/User";
+import { User } from "../../../models/User";
+import { prisma } from "@/lib/prisma";
 
-export async function POST(
-  req: NextRequest
-) {
+export async function POST(req: NextRequest) {
   try {
     // Connect DB
     await connectDB();
 
     // Body
-    const body =
-      await req.json();
+    const body = await req.json();
 
-    const {
-      email,
-      password,
-    } = body;
+    const { email, password } = body;
 
     // Validation
-    if (
-      !email ||
-      !password
-    ) {
+    if (!email || !password) {
       return NextResponse.json(
         {
           success: false,
 
-          error:
-            "Email and password are required",
+          error: "Email and password are required",
         },
 
         {
           status: 400,
-        }
+        },
       );
     }
 
     // Find User
-    const user =
-      await User.findOne({
-        email,
-      });
+    const user = await User.findOne({
+      email,
+    });
 
     // User Not Found
     if (!user) {
@@ -60,22 +45,17 @@ export async function POST(
         {
           success: false,
 
-          error:
-            "User not found",
+          error: "User not found",
         },
 
         {
           status: 404,
-        }
+        },
       );
     }
 
     // Password Check
-    const isMatch =
-      await bcrypt.compare(
-        password,
-        user.password
-      );
+    const isMatch = await bcrypt.compare(password, user.password);
 
     // Wrong Password
     if (!isMatch) {
@@ -83,13 +63,12 @@ export async function POST(
         {
           success: false,
 
-          error:
-            "Invalid password",
+          error: "Invalid password",
         },
 
         {
           status: 401,
-        }
+        },
       );
     }
 
@@ -101,95 +80,66 @@ export async function POST(
         role: user.role,
       },
 
-      process.env
-        .JWT_SECRET!,
+      process.env.JWT_SECRET!,
 
       {
         expiresIn: "7d",
-      }
+      },
     );
 
     // Decide Redirect
-    let redirectTo =
-      "/dashboard";
+    let redirectTo = "/dashboard";
 
-    if (
-      user.role ===
-      "admin"
-    ) {
-      redirectTo =
-        "/admin";
+    if (user.role === "admin") {
+      redirectTo = "/admin";
     }
 
-    if (
-      user.role ===
-      "owner"
-    ) {
-      redirectTo =
-        "/coaching/dashboard";
+    if (user.role === "owner") {
+      redirectTo = "/coaching/dashboard";
     }
 
     // Response
-    const response =
-      NextResponse.json({
-        success: true,
+    const response = NextResponse.json({
+      success: true,
 
-        message:
-          "Login Successful 🚀",
+      message: "Login Successful 🚀",
 
-        redirectTo,
+      redirectTo,
 
-        user: {
-          id: user._id,
+      user: {
+        id: user._id,
 
-          name:
-            user.name,
+        name: user.name,
 
-          email:
-            user.email,
+        email: user.email,
 
-          role:
-            user.role,
-        },
-      });
+        role: user.role,
+      },
+    });
 
     // JWT Cookie
-    response.cookies.set(
-      "token",
-      token,
-      {
-        httpOnly: true,
+    response.cookies.set("token", token, {
+      httpOnly: true,
 
-        secure: false,
+      secure: false,
 
-        sameSite:
-          "strict",
+      sameSite: "strict",
 
-        path: "/",
+      path: "/",
 
-        maxAge:
-          60 *
-          60 *
-          24 *
-          7,
-      }
-    );
+      maxAge: 60 * 60 * 24 * 7,
+    });
 
     // Role Cookie
-    response.cookies.set(
-      "role",
-      user.role,
-      {
-        httpOnly: true,
+    response.cookies.set("role", user.role, {
+      httpOnly: true,
 
-        secure: false,
+      secure: false,
 
-        sameSite:
-          "strict",
+      sameSite: "strict",
 
-        path: "/",
-      }
-    );
+      path: "/",
+    });
 
     return response;
   } catch (error: unknown) {
@@ -199,16 +149,12 @@ export async function POST(
       {
         success: false,
 
-        error:
-          error instanceof
-          Error
-            ? error.message
-            : "Server Error",
+        error: error instanceof Error ? error.message : "Server Error",
       },
 
       {
         status: 500,
-      }
+      },
     );
   }
 }
