@@ -1,104 +1,59 @@
-import type {
-  NextAuthOptions,
-} from "next-auth";
+import type { NextAuthOptions } from "next-auth";
+import GoogleProvider from "next-auth/providers/google";
+import { connectDB } from "./db";
+import { User } from "../models/User";
 
-import GoogleProvider
-from "next-auth/providers/google";
+export const authOptions: NextAuthOptions = {
+  providers: [
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+    }),
+  ],
 
-import { connectDB }
-from "./db";
+  callbacks: {
+    async signIn({ user }) {
+      await connectDB();
 
-import { User }
-from "../models/User";
+      const existingUser = await User.findOne({
+        email: user.email,
+      });
 
-export const authOptions:
-  NextAuthOptions = {
-    providers: [
-      GoogleProvider({
-        clientId:
-          process.env
-            .GOOGLE_CLIENT_ID!,
+      if (!existingUser) {
+        await User.create({
+          name: user.name,
 
-        clientSecret:
-          process.env
-            .GOOGLE_CLIENT_SECRET!,
-      }),
-    ],
+          email: user.email,
 
-    callbacks: {
-      async signIn({
-        user,
-      }) {
-        await connectDB();
+          image: user.image,
 
-        const existingUser =
-          await User.findOne(
-            {
-              email:
-                user.email,
-            }
-          );
+          role: "student",
+        });
+      }
 
-        if (
-          !existingUser
-        ) {
-          await User.create(
-            {
-              name:
-                user.name,
-
-              email:
-                user.email,
-
-              image:
-                user.image,
-
-              role:
-                "student",
-            }
-          );
-        }
-
-        return true;
-      },
-
-      async session({
-        session,
-      }) {
-        await connectDB();
-
-        const dbUser =
-          await User.findOne(
-            {
-              email:
-                session
-                  .user
-                  .email,
-            }
-          );
-
-        if (dbUser) {
-          (
-            session.user as any
-          ).id =
-            dbUser._id.toString();
-
-          (
-            session.user as any
-          ).role =
-            dbUser.role;
-        }
-
-        return session;
-      },
+      return true;
     },
 
-    pages: {
-      signIn:
-        "/login",
-    },
+    async session({ session }) {
+      await connectDB();
 
-    secret:
-      process.env
-        .NEXTAUTH_SECRET,
-  };
+      const dbUser = await User.findOne({
+        email: session.user.email,
+      });
+
+      if (dbUser) {
+        (session.user as any).id = dbUser._id.toString();
+
+        (session.user as any).role = dbUser.role;
+      }
+
+      return session;
+    },
+  },
+
+  pages: {
+    signIn: "/login",
+  },
+
+  secret: process.env.NEXTAUTH_SECRET,
+};
