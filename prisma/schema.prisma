@@ -12,9 +12,183 @@ datasource db {
   provider = "postgresql"
 }
 
-model User {
-  id        String   @id @default(cuid()) // Primary Key
-  name      String
-  email     String   @unique
-  createdAt DateTime @default(now())
+enum Role {
+  STUDENT
+  SALES
+  MAINTINACE
+  ADMIN
 }
+
+model User {
+  id          String       @id @default(cuid()) // Primary Key
+  name        String
+  email       String?      @unique
+  password    String
+  dob         String?
+  mobile      String?
+  role        Role         @default(STUDENT)
+  isActive    Boolean      @default(true)
+  enrollments Enrollment[]
+  attempts    Attempt[]
+  createdAt   DateTime     @default(now())
+}
+
+model Course {
+  id          String           @id @default(cuid())
+  name        CourseName
+  subjects    Subject[]
+  enrollments Enrollment[]
+  offerings   CourseCoaching[]
+  examPapers  ExamPaper[]
+  createdAt   DateTime         @default(now())
+}
+
+model Enrollment {
+  id         String   @id @default(cuid())
+  userId     String
+  courseId   String
+  enrolledAt DateTime @default(now())
+  user       User     @relation(fields: [userId], references: [id])
+  course     Course   @relation(fields: [courseId], references: [id])
+}
+
+model CourseCoaching {
+  id         String   @id @default(cuid())
+  courseId   String
+  coachingId String
+  price      Int // ✅ useful
+  discount   Int?
+  course     Course   @relation(fields: [courseId], references: [id])
+  coaching   Coaching @relation(fields: [coachingId], references: [id])
+}
+
+model Coaching {
+  id              String           @id @default(cuid()) // Primary Key
+  code            String           @unique // FK, coupon
+  name            String
+  logo            String?
+  address         String
+  ownerName       String
+  document        String //upload id proof doc
+  docNumber       String // input id number adhar/pancard
+  isActive        Boolean          @default(true)
+  courseCoachings CourseCoaching[]
+}
+
+model Subject {
+  id       String  @id @default(cuid())
+  name     String // Math, Reasoning, GK
+  courseId String
+  course   Course  @relation(fields: [courseId], references: [id])
+  topics   Topic[]
+}
+
+model Topic {
+  id        String     @id @default(cuid())
+  name      String // Algebra, Percentage etc.
+  subjectId String
+  subject   Subject    @relation(fields: [subjectId], references: [id])
+  questions Question[]
+}
+
+model Question {
+  id            String              @id @default(cuid())
+  question      String
+  options       String[]
+  correctAnswer String
+  explanation   String?
+  difficulty    Difficulty? // ✅ easy / medium / hard
+  marks         Int                 @default(1)      // added
+  negativeMark  Float               @default(0.25)
+  topicId       String
+  topic         Topic               @relation(fields: [topicId], references: [id])
+  papers        ExamPaperQuestion[]
+}
+
+model ExamPaper {
+  id        String              @id @default(cuid())
+  name      String
+  duration  Int // minutes
+  courseId  String
+  course    Course              @relation(fields: [courseId], references: [id])
+  questions ExamPaperQuestion[]
+  createdAt DateTime            @default(now())
+  attempts  Attempt[]
+}
+
+model ExamPaperQuestion {
+  id          String    @id @default(cuid())
+  examPaperId String
+  questionId  String
+  examPaper   ExamPaper @relation(fields: [examPaperId], references: [id])
+  question    Question  @relation(fields: [questionId], references: [id])
+}
+
+model Attempt {
+  id          String    @id @default(cuid())
+  userId      String
+  examPaperId String
+  score       Float // ✅ supports negative marking
+  totalMarks  Float
+  startedAt   DateTime  @default(now())
+  submittedAt DateTime?
+  user        User      @relation(fields: [userId], references: [id])
+  examPaper   ExamPaper @relation(fields: [examPaperId], references: [id])
+  answers     Answer[]
+}
+
+model Answer {
+  id           String  @id @default(cuid())
+  attemptId    String
+  questionId   String
+  selected     String
+  isCorrect    Boolean
+  marksAwarded Float // ✅ after evaluation
+  attempt      Attempt @relation(fields: [attemptId], references: [id])
+}
+
+enum CourseName {
+  CGL
+  SSC
+  SSC_GD
+  SSC_CGL
+  IBPS
+  RRB_NTPC
+  RRB_GROUP_D
+  RRB_JE
+  RRB_ALP
+  SSC_CHSL
+  SSC_NPS
+  AGNIVEER
+  UP_POLICE_CONSTABLE
+  UP_POLICE_SI
+  PET
+  TET
+  CET
+}
+
+enum Difficulty {
+  EASY
+  MEDIUM
+  HARD
+}
+
+model Coupon {
+  id         String   @id @default(cuid()) // Primary Key
+  name       String
+  discount   Int //in percent ex : 15, 20
+  expiryDate DateTime
+}
+
+// model ExamPaper {
+//   id              String   @id @default(cuid()) // Primary Key
+//   courseName      String[]
+//   subPaper        String? // Ex: paper stage like 1 or 2
+//   duration        Int // Ex: 30 minut, 60 minut
+//   isSectionalTime Boolean
+//   sectionalTime   Int // Ex: subject name with time duration
+//   question        String
+//   options         String[] // length of 4 answers
+//   correctAnswer   String // correct option
+//   explaination    String // explaination with respect to question and answer
+// }
