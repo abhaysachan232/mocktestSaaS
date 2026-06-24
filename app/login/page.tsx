@@ -1,135 +1,228 @@
 "use client";
 
 import { useState } from "react";
-
-import axios from "axios";
-
+import { api } from "@/lib/api";
 import { useRouter } from "next/navigation";
-
 import Link from "next/link";
 
 export default function LoginPage() {
   const router = useRouter();
 
-  const [formData, setFormData] =
-    useState({
-      email: "",
-      password: "",
-    });
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+  });
 
-  const [loading, setLoading] =
-    useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement>
   ) => {
-    setFormData({
-      ...formData,
-      [e.target.name]:
-        e.target.value,
-    });
+    setFormData((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
+
+    if (error) setError("");
   };
 
   const handleSubmit = async (
-    e: React.FormEvent
+    e: React.FormEvent<HTMLFormElement>
   ) => {
     e.preventDefault();
 
+    if (!formData.email.trim()) {
+      setError("Email is required");
+      return;
+    }
+
+    if (!formData.password.trim()) {
+      setError("Password is required");
+      return;
+    }
+
     try {
       setLoading(true);
+      setError("");
 
-      const response =
-        await axios.post(
-          "/api/login",
-          formData
-        );
+      const response = await api.post(
+        "/users/login",
+        formData
+      );
 
-      if (
-        response.data.success
-      ) {
-        alert(
-          response.data.message
-        );
+      const result = response.data;
 
-        localStorage.setItem(
-          "user",
-          JSON.stringify(
-            response.data.user
-          )
+      if (!result.success) {
+        setError(
+          result.message || "Login failed"
         );
-
-        router.push(
-          "/dashboard"
-        );
+        return;
       }
-    } catch (error: unknown) {
-      const message =
-        axios.isAxiosError(error) &&
-        error.response?.data?.error
-          ? error.response.data.error
-          : "Login Failed";
 
-      alert(message);
+      localStorage.setItem(
+        "user",
+        JSON.stringify(result.data.user)
+      );
+
+      router.push("/dashboard");
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("Something went wrong");
+      }
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-100 to-white flex items-center justify-center px-6">
-      <div className="bg-white p-10 rounded-3xl shadow-2xl w-full max-w-md">
-        <h1 className="text-4xl font-bold text-center text-blue-600 mb-8">
-          Login
+<div className="min-h-screen flex bg-slate-50">
+
+  {/* LEFT SIDE */}
+  <div className="relative hidden lg:flex w-1/2 overflow-hidden bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-700">
+
+    {/* Blur Effects */}
+    <div className="absolute top-20 left-20 h-72 w-72 rounded-full bg-white/10 blur-3xl" />
+    <div className="absolute bottom-20 right-20 h-80 w-80 rounded-full bg-purple-400/20 blur-3xl" />
+
+    <div className="relative z-10 flex items-center justify-center w-full p-20">
+      <div className="max-w-lg text-white">
+
+        <h1 className="text-6xl font-extrabold leading-tight tracking-tight">
+          Welcome Back 👋
         </h1>
 
+        <p className="mt-6 text-xl leading-relaxed text-blue-100">
+          Access your courses, exams, results and continue your
+          learning journey with our smart learning platform.
+        </p>
+
+        <div className="mt-12 bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl p-8 shadow-2xl">
+          <p className="text-sm uppercase tracking-wider text-blue-100">
+            Secure Authentication
+          </p>
+
+          <h3 className="mt-3 text-2xl font-semibold">
+            Next.js • Prisma • PostgreSQL
+          </h3>
+
+          <p className="mt-4 text-blue-100">
+            Fast, secure and scalable platform for online learning,
+            exams and assessments.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {/* RIGHT SIDE */}
+  <div className="flex w-full lg:w-1/2 items-center justify-center px-6 py-12">
+
+    <div className="w-full max-w-xl">
+
+      <div className="rounded-[32px] bg-white border border-slate-100 p-14 shadow-[0_25px_80px_rgba(0,0,0,0.08)]">
+
+        {/* Logo */}
+        <div className="flex justify-center">
+          <div className="flex h-24 w-24 items-center justify-center rounded-[28px] bg-gradient-to-r from-blue-600 to-indigo-600 text-4xl font-bold text-white shadow-xl">
+            A
+          </div>
+        </div>
+
+        {/* Heading */}
+        <div className="mt-8 text-center">
+          <h2 className="text-4xl font-bold text-slate-900">
+            Sign In
+          </h2>
+
+          <p className="mt-3 text-lg text-slate-500">
+            Enter your credentials to continue
+          </p>
+        </div>
+
+        {/* Error */}
+        {error && (
+          <div className="mt-8 rounded-2xl border border-red-200 bg-red-50 px-5 py-4 text-red-600">
+            {error}
+          </div>
+        )}
+
+        {/* Form */}
         <form
           onSubmit={handleSubmit}
-          className="space-y-5"
+          className="mt-10 space-y-7"
         >
-          <input
-            type="email"
-            name="email"
-            placeholder="Enter Email"
-            value={
-              formData.email
-            }
-            onChange={handleChange}
-            className="w-full border border-gray-300 p-4 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500"
-          />
+          <div>
+            <label className="mb-3 block text-sm font-semibold text-slate-700">
+              Email Address
+            </label>
 
-          <input
-            type="password"
-            name="password"
-            placeholder="Enter Password"
-            value={
-              formData.password
-            }
-            onChange={handleChange}
-            className="w-full border border-gray-300 p-4 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500"
-          />
+            <input
+              type="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              placeholder="john@example.com"
+              className="h-14 w-full rounded-2xl border border-slate-300 px-5 text-lg outline-none transition-all focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+            />
+          </div>
+
+          <div>
+            <div className="mb-3 flex items-center justify-between">
+              <label className="text-sm font-semibold text-slate-700">
+                Password
+              </label>
+
+              <Link
+                href="/forgot-password"
+                className="text-sm font-medium text-blue-600 hover:text-blue-700"
+              >
+                Forgot Password?
+              </Link>
+            </div>
+
+            <input
+              type="password"
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
+              placeholder="••••••••"
+              className="h-14 w-full rounded-2xl border border-slate-300 px-5 text-lg outline-none transition-all focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+            />
+          </div>
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-blue-600 hover:bg-blue-700 transition text-white py-4 rounded-2xl font-semibold"
+            className="flex h-14 w-full items-center justify-center rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 text-lg font-semibold text-white shadow-lg transition-all hover:scale-[1.01] hover:shadow-xl disabled:cursor-not-allowed disabled:opacity-70"
           >
-            {loading
-              ? "Logging in..."
-              : "Login"}
+            {loading ? (
+              <div className="flex items-center gap-3">
+                <div className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                Signing In...
+              </div>
+            ) : (
+              "Sign In"
+            )}
           </button>
         </form>
 
-        <p className="text-center text-gray-500 mt-6">
-          Don&apos;t have an
-          account?{" "}
+        {/* Register */}
+        <div className="mt-8 text-center text-base text-slate-500">
+          Don't have an account?{" "}
           <Link
             href="/register"
-            className="text-blue-600 font-semibold"
+            className="font-semibold text-blue-600 hover:text-blue-700"
           >
-            Register
+            Create Account
           </Link>
-        </p>
+        </div>
       </div>
+
     </div>
+  </div>
+</div>
   );
 }
