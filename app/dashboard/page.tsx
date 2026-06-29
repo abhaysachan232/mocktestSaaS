@@ -85,14 +85,14 @@ export default function DashboardPage() {
   //   void load();
   // }, []);
 
-  async function handleLogout() {
-    await fetch("/api/logout", {
-      method: "POST",
-      credentials: "include",
-    });
+  // async function handleLogout() {
+  //   await fetch("/api/logout", {
+  //     method: "POST",
+  //     credentials: "include",
+  //   });
 
-    window.location.href = "/";
-  }
+  //   window.location.href = "/";
+  // }
 
   if (loading) {
     return <Loading />;
@@ -105,13 +105,13 @@ export default function DashboardPage() {
           activeTab={activeTab}
           setActiveTab={setActiveTab}
           coaching={dashboard?.coaching}
-          onLogout={handleLogout}
+          onLogout={()=>{}}
         />
 
         <div className="flex-1 p-8">
           <Header
             studentName={dashboard?.student.name}
-            onLogout={handleLogout}
+            onLogout={()=>{}}
           />
 
           {activeTab === "dashboard" && <StatsCards dashboard={dashboard} />}
