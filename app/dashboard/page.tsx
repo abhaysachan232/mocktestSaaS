@@ -20,203 +20,113 @@ import {
 } from "@/components/dashboard/types";
 
 export default function DashboardPage() {
+  const [loading, setLoading] = useState(false);
 
-  const [loading,setLoading]=useState(true);
+  const [activeTab, setActiveTab] = useState("dashboard");
 
-  const [activeTab,setActiveTab]=
-    useState("dashboard");
+  const [dashboard, setDashboard] = useState<DashboardData | null>(null);
 
-  const [dashboard,setDashboard]=
-    useState<DashboardData|null>(null);
+  const [tests, setTests] = useState<Test[]>([]);
 
-  const [tests,setTests]=
-    useState<Test[]>([]);
+  const [results, setResults] = useState<ResultItem[]>([]);
 
-  const [results,setResults]=
-    useState<ResultItem[]>([]);
+  const [leaderboard, setLeaderboard] = useState<LeaderboardType | null>(null);
 
-  const [leaderboard,setLeaderboard]=
-    useState<LeaderboardType|null>(null);
+  const [profile, setProfile] = useState<ProfileType | null>(null);
 
-  const [profile,setProfile]=
-    useState<ProfileType|null>(null);
+  // useEffect(() => {
+  //   async function load() {
+  //     const [dashboardRes, testsRes, resultsRes, leaderboardRes, profileRes] =
+  //       await Promise.all([
+  //         fetch("/api/dashboard", {
+  //           credentials: "include",
+  //         }),
 
-  useEffect(()=>{
+  //         fetch("/api/student/tests", {
+  //           credentials: "include",
+  //         }),
 
-    async function load(){
+  //         fetch("/api/student/results", {
+  //           credentials: "include",
+  //         }),
 
-      const [
-        dashboardRes,
-        testsRes,
-        resultsRes,
-        leaderboardRes,
-        profileRes,
-      ]=await Promise.all([
+  //         fetch("/api/student/leaderboard", {
+  //           credentials: "include",
+  //         }),
 
-        fetch("/api/dashboard",{
-          credentials:"include",
-        }),
+  //         fetch("/api/student/profile", {
+  //           credentials: "include",
+  //         }),
+  //       ]);
 
-        fetch("/api/student/tests",{
-          credentials:"include",
-        }),
+  //     const dashboardJson = await dashboardRes.json();
 
-        fetch("/api/student/results",{
-          credentials:"include",
-        }),
+  //     const testsJson = await testsRes.json();
 
-        fetch("/api/student/leaderboard",{
-          credentials:"include",
-        }),
+  //     const resultsJson = await resultsRes.json();
 
-        fetch("/api/student/profile",{
-          credentials:"include",
-        }),
+  //     const leaderboardJson = await leaderboardRes.json();
 
-      ]);
+  //     const profileJson = await profileRes.json();
 
-      const dashboardJson=
-        await dashboardRes.json();
+  //     setDashboard(dashboardJson.data);
 
-      const testsJson=
-        await testsRes.json();
+  //     setTests(testsJson.tests || []);
 
-      const resultsJson=
-        await resultsRes.json();
+  //     setResults(resultsJson.results || []);
 
-      const leaderboardJson=
-        await leaderboardRes.json();
+  //     setLeaderboard(leaderboardJson);
 
-      const profileJson=
-        await profileRes.json();
+  //     setProfile(profileJson.profile);
 
-      setDashboard(dashboardJson.data);
+  //     setLoading(false);
+  //   }
 
-      setTests(
-        testsJson.tests||[]
-      );
+  //   void load();
+  // }, []);
 
-      setResults(
-        resultsJson.results||[]
-      );
-
-      setLeaderboard(
-        leaderboardJson
-      );
-
-      setProfile(
-        profileJson.profile
-      );
-
-      setLoading(false);
-
-    }
-
-    void load();
-
-  },[]);
-
-  async function handleLogout(){
-
-    await fetch("/api/logout",{
-      method:"POST",
-      credentials:"include",
+  async function handleLogout() {
+    await fetch("/api/logout", {
+      method: "POST",
+      credentials: "include",
     });
 
-    window.location.href="/";
-
+    window.location.href = "/";
   }
 
-  if(loading){
+  if (loading) {
     return <Loading />;
   }
 
-  return(
+  return (
+    <div className="min-h-screen bg-slate-50">
+      <div className="flex">
+        <Sidebar
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
+          coaching={dashboard?.coaching}
+          onLogout={handleLogout}
+        />
 
-<div className="min-h-screen bg-slate-50">
+        <div className="flex-1 p-8">
+          <Header
+            studentName={dashboard?.student.name}
+            onLogout={handleLogout}
+          />
 
-<div className="flex">
+          {activeTab === "dashboard" && <StatsCards dashboard={dashboard} />}
 
-<Sidebar
+          {activeTab === "tests" && <Tests tests={tests} />}
 
-activeTab={activeTab}
+          {activeTab === "results" && <Results results={results} />}
 
-setActiveTab={setActiveTab}
+          {activeTab === "leaderboard" && (
+            <Leaderboard leaderboard={leaderboard} />
+          )}
 
-coaching={dashboard?.coaching}
-
-onLogout={handleLogout}
-
-/>
-
-<div className="flex-1 p-8">
-
-<Header
-
-studentName={
-dashboard?.student.name
-}
-
-onLogout={handleLogout}
-
-/>
-
-{activeTab==="dashboard" && (
-
-<StatsCards
-
-dashboard={dashboard}
-
-/>
-
-)}
-
-{activeTab==="tests" && (
-
-<Tests
-
-tests={tests}
-
-/>
-
-)}
-
-{activeTab==="results" && (
-
-<Results
-
-results={results}
-
-/>
-
-)}
-
-{activeTab==="leaderboard" && (
-
-<Leaderboard
-
-leaderboard={leaderboard}
-
-/>
-
-)}
-
-{activeTab==="profile" && (
-
-<Profile
-
-profile={profile}
-
-/>
-
-)}
-
-</div>
-
-</div>
-
-</div>
-
+          {activeTab === "profile" && <Profile profile={profile} />}
+        </div>
+      </div>
+    </div>
   );
-
 }

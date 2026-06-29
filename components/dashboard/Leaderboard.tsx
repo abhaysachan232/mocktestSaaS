@@ -8,10 +8,10 @@ import {
   TrendingUp,
 } from "lucide-react";
 
-import { Leaderboard } from "./types";
+import { Leaderboard  as LeaderboardType } from "./types";
 
 interface Props {
-  leaderboard: Leaderboard | null;
+  leaderboard: LeaderboardType | null;
 }
 
 export default function Leaderboard({
