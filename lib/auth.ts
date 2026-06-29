@@ -1,52 +1,58 @@
-import type { NextAuthOptions } from "next-auth";
-import GoogleProvider from "next-auth/providers/google";
-import { connectDB } from "./db";
-import { User } from "../models/User";
+import { loginSchema } from "@/app/login/types";
+import NextAuth from "next-auth";
+import Credentials from "next-auth/providers/credentials";
 
-export const authOptions: NextAuthOptions = {
+export const { handlers, auth, signIn, signOut } = NextAuth({
+  secret: process.env.AUTH_SECRET,
+  session: {
+    strategy: "jwt",
+  },
+
   providers: [
-    GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID!,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+    Credentials({
+      credentials: {
+        email: {},
+        password: {},
+      },
+
+      async authorize(credentials) {
+        console.log("credentials:", credentials);
+        if (!credentials?.email || !credentials?.password) return null;
+
+        const parsed = loginSchema.safeParse(credentials);
+
+        if (!parsed.success) return null;
+
+        const { email, password } = parsed.data;
+
+        // mock DB check
+        if (email === "admin@test.com" && password === "123456") {
+          return {
+            id: "1",
+            email,
+            role: "admin",
+          };
+        }
+
+        return null;
+      },
     }),
   ],
 
   callbacks: {
-    async signIn({ user }) {
-      await connectDB();
-
-      const existingUser = await User.findOne({
-        email: user.email,
-      });
-
-      if (!existingUser) {
-        await User.create({
-          name: user.name,
-
-          email: user.email,
-
-          image: user.image,
-
-          role: "student",
-        });
+    async jwt({ token, user }) {
+      if (user) {
+        token.id = user.id;
+        token.role = (user as any).role;
       }
-
-      return true;
+      return token;
     },
 
-    async session({ session }) {
-      await connectDB();
-
-      const dbUser = await User.findOne({
-        email: session.user.email,
-      });
-
-      if (dbUser) {
-        (session.user as any).id = dbUser._id.toString();
-
-        (session.user as any).role = dbUser.role;
+    async session({ session, token }) {
+      if (session.user) {
+        session.user.id = token.id as string;
+        (session.user as any).role = token.role;
       }
-
       return session;
     },
   },
@@ -54,6 +60,4 @@ export const authOptions: NextAuthOptions = {
   pages: {
     signIn: "/login",
   },
-
-  secret: process.env.NEXTAUTH_SECRET,
-};
+});
