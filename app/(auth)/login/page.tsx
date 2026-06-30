@@ -3,7 +3,7 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { loginSchema, LoginInput } from "@/schemas/login";
-import { signIn } from "next-auth/react";
+import { signIn, getSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import Link from "next/link";
@@ -35,7 +35,21 @@ export default function Page() {
       if (!res?.error) {
         toast.success("Login successful");
 
-        router.replace("/dashboard");
+        const session = await getSession();
+
+        switch (session?.user?.role) {
+          case "ADMIN":
+            router.replace("/admin");
+            break;
+
+          case "COACHING":
+            router.replace("/coaching");
+            break;
+
+          default:
+            router.replace("/student");
+        }
+
         router.refresh();
 
         // setError("Invalid credentials");
@@ -43,7 +57,7 @@ export default function Page() {
         // return;
       }
 
-      router.push("/dashboard");
+      // router.push("/dashboard");
     } catch (err) {
       setError("Something went wrong");
     } finally {
