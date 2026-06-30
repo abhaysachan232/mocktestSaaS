@@ -7,6 +7,7 @@ import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import Link from "next/link";
+import toast from "react-hot-toast";
 
 export default function Page() {
   const router = useRouter();
@@ -25,7 +26,7 @@ const {
     try {
       setLoading(true);
       setError("");
-
+      console.log('data.email', data.email, data.password)
       // 👉 NextAuth login
       const res = await signIn("credentials", {
         email: data.email,
@@ -34,6 +35,7 @@ const {
       });
       if (res?.error) {
         setError("Invalid credentials");
+        toast.error(res.error);
         return;
       }
 
@@ -132,7 +134,7 @@ const {
                   </label>
 
                   <Link
-                    href="/forgot-password"
+                    href="/reset-password"
                     className="text-sm font-medium text-blue-600 hover:text-blue-700"
                   >
                     Forgot Password?

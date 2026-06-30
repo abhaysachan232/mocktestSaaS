@@ -20,17 +20,74 @@ enum Role {
 }
 
 model User {
-  id          String       @id @default(cuid()) // Primary Key
-  name        String
-  email       String?      @unique
-  password    String
-  dob         String?
-  mobile      String?
-  role        Role         @default(STUDENT)
-  isActive    Boolean      @default(true)
-  enrollments Enrollment[]
-  attempts    Attempt[]
-  createdAt   DateTime     @default(now())
+  id            String       @id @default(cuid()) // Primary Key
+  name          String
+  email         String?      @unique
+  mobile        String? @unique
+  dob           DateTime?
+  password      String
+  role          Role         @default(STUDENT)
+  isActive      Boolean      @default(true)
+  enrollments   Enrollment[]
+  attempts      Attempt[]
+  emailVerified DateTime?
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  accounts      Account[]
+  sessions      Session[]
+  auditLogs     AuditLog[]
+}
+
+model Account {
+  id                String @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  user              User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model EmailVerificationToken {
+  id        String   @id @default(cuid())
+  email     String
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}
+
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  email     String
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String?
+  action    String
+  metadata  Json?
+  createdAt DateTime @default(now())
+  user      User?    @relation(fields: [userId], references: [id])
 }
 
 model Course {
@@ -98,7 +155,7 @@ model Question {
   correctAnswer String
   explanation   String?
   difficulty    Difficulty? // ✅ easy / medium / hard
-  marks         Int                 @default(1)      // added
+  marks         Int                 @default(1) // added
   negativeMark  Float               @default(0.25)
   topicId       String
   topic         Topic               @relation(fields: [topicId], references: [id])

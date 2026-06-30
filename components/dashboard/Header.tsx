@@ -3,18 +3,19 @@
 import {
   Bell,
   Search,
-  LogOut,
 } from "lucide-react";
+import LogOut from "@/components/ui/logOut";
 
 interface Props {
-  studentName?: string;
-  onLogout: () => void;
+  studentName?: string | null;
+  // onLogout: () => void;
 }
 
 export default function Header({
   studentName,
-  onLogout,
+  // onLogout,
 }: Props) {
+  console.log('studentName', studentName)
   return (
     <header className="mb-10">
 
@@ -75,14 +76,7 @@ export default function Header({
             </div>
 
             {/* Logout */}
-            <button
-              onClick={onLogout}
-              className="h-14 px-6 rounded-2xl bg-gradient-to-r from-red-500 to-red-600 text-white font-semibold flex items-center gap-2 shadow-lg hover:scale-[1.02] transition"
-            >
-              <LogOut size={18} />
-
-              Logout
-            </button>
+            <LogOut />
 
           </div>
 

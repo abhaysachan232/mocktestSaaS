@@ -18,6 +18,7 @@ import {
   Building2,
   Trash2,
 } from "lucide-react";
+import { requireAdmin } from "@/lib/auth-guards"
 
 interface Coaching {
   _id: string;
@@ -67,8 +68,9 @@ interface DashboardData {
   students: Student[];
 }
 
-export default function AdminPage() {
+export default async function AdminPage() {
   const router = useRouter();
+  await requireAdmin();
 
   const [data, setData] =
     useState<DashboardData | null>(

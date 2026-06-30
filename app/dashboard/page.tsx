@@ -1,6 +1,6 @@
-"use client";
+// "use client";
 
-import { useEffect, useState } from "react";
+// import { useState } from "react";
 
 import Sidebar from "@/components/dashboard/Sidebar";
 import Header from "@/components/dashboard/Header";
@@ -18,21 +18,32 @@ import {
   Leaderboard as LeaderboardType,
   Profile as ProfileType,
 } from "@/components/dashboard/types";
+import { auth } from "@/lib/auth";
+import { redirect } from "next/navigation";
 
-export default function DashboardPage() {
-  const [loading, setLoading] = useState(false);
+export default async function DashboardPage() {
+  const session = await auth();
+  // const [loading, setLoading] = useState(false);
 
-  const [activeTab, setActiveTab] = useState("dashboard");
+  // const [activeTab, setActiveTab] = useState("dashboard");
 
-  const [dashboard, setDashboard] = useState<DashboardData | null>(null);
+  // const [dashboard, setDashboard] = useState<DashboardData | null>(null);
 
-  const [tests, setTests] = useState<Test[]>([]);
+  // const [tests, setTests] = useState<Test[]>([]);
 
-  const [results, setResults] = useState<ResultItem[]>([]);
+  // const [results, setResults] = useState<ResultItem[]>([]);
 
-  const [leaderboard, setLeaderboard] = useState<LeaderboardType | null>(null);
+  // const [leaderboard, setLeaderboard] = useState<LeaderboardType | null>(null);
 
-  const [profile, setProfile] = useState<ProfileType | null>(null);
+  // const [profile, setProfile] = useState<ProfileType | null>(null);
+
+  
+if (!session) {
+    redirect("/login");
+  }
+
+  console.log('session', session)
+
 
   // useEffect(() => {
   //   async function load() {
@@ -86,35 +97,30 @@ export default function DashboardPage() {
   // }, []);
 
   // async function handleLogout() {
-  //   await fetch("/api/logout", {
-  //     method: "POST",
-  //     credentials: "include",
+  //   await signOut({
+  //     callbackUrl: "/login", // logout ke baad redirect
   //   });
 
-  //   window.location.href = "/";
+  //   // window.location.href = "/";
   // }
 
-  if (loading) {
-    return <Loading />;
-  }
+  // if (loading) {
+  //   return <Loading />;
+  // }
 
   return (
     <div className="min-h-screen bg-slate-50">
       <div className="flex">
-        <Sidebar
+        {/* <Sidebar
           activeTab={activeTab}
           setActiveTab={setActiveTab}
           coaching={dashboard?.coaching}
-          onLogout={()=>{}}
-        />
+        /> */}
 
         <div className="flex-1 p-8">
-          <Header
-            studentName={dashboard?.student.name}
-            onLogout={()=>{}}
-          />
+          <Header studentName={session.user.name} />
 
-          {activeTab === "dashboard" && <StatsCards dashboard={dashboard} />}
+          {/* {activeTab === "dashboard" && <StatsCards dashboard={dashboard} />}
 
           {activeTab === "tests" && <Tests tests={tests} />}
 
@@ -124,7 +130,7 @@ export default function DashboardPage() {
             <Leaderboard leaderboard={leaderboard} />
           )}
 
-          {activeTab === "profile" && <Profile profile={profile} />}
+          {activeTab === "profile" && <Profile profile={profile} />} */}
         </div>
       </div>
     </div>

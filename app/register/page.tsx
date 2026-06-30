@@ -1,277 +1,151 @@
 "use client";
 
 import Link from "next/link";
-
 import { useState } from "react";
-
-import { useRouter }
-from "next/navigation";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { registerUser } from "./action";
+import { RegisterSchema, registerSchema } from "@/lib/validations/register";
+import { signIn } from "next-auth/react";
+import toast, { Toaster } from "react-hot-toast";
+import { useRouter } from "next/navigation";
+// import { logAudit } from "@/lib/audit";
 
 export default function RegisterPage() {
-  const router =
-    useRouter();
+  const router = useRouter();
+  const [loading, setLoading] = useState(false);
 
-  const [loading, setLoading] =
-    useState(false);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<RegisterSchema>({
+    resolver: zodResolver(registerSchema),
+  });
 
-  const exams = [
-    "SSC CGL",
-    "SSC GD",
-    "SSC CHSL",
-    "SSC MTS",
-    "Railway Group D",
-    "Railway NTPC",
-    "Railway ALP",
-    "UP Police",
-    "Bihar Police",
-    "Delhi Police",
-    "UPSI",
-    "Constable",
-    "Bank PO",
-    "Bank Clerk",
-    "CTET",
-    "Super TET",
-  ];
-
-  const [formData, setFormData] =
-    useState({
-      name: "",
-
-      email: "",
-
-      mobile: "",
-
-      password: "",
-
-      course: "",
-
-      couponCode: "",
-    });
-
-  const handleChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement |
-      HTMLSelectElement
-    >
-  ) => {
-    setFormData({
-      ...formData,
-
-      [e.target.name]:
-        e.target.value,
-    });
-  };
-
-const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-  e.preventDefault();
-  console.log("FORM SUBMITTED");
-  try {
+  const onSubmit = async (data: RegisterSchema) => {
     setLoading(true);
 
-    const response = await fetch(
-      "/api/register",
-      {
-        method: "POST",
+    try {
+      const formData = new FormData();
+      Object.entries(data).forEach(([key, value]) => {
+        formData.append(key, value as string);
+      });
 
-        headers: {
-          "Content-Type":
-            "application/json",
-        },
+      // ✅ Register
+      const result = await registerUser(formData);
 
-        body: JSON.stringify(
-          formData
-        ),
+      if (!result.success) {
+        const errorMessage =
+          result.errors?.general?.[0] ||
+          result.errors?.email?.[0] ||
+          result.errors?.mobile?.[0] ||
+          result.errors?.password?.[0] ||
+          result.errors?.dob?.[0];
+        toast.error(errorMessage || "Something went wrong");
+        return;
       }
-    );
 
-    const data =
-      await response.json();
+// await logAudit(
+//   user.id,
+//   "REGISTER"
+// );
 
-    if (!response.ok) {
-      alert(data.error);
+      // ✅ Auto Login
+      const loginResult = await signIn("credentials", {
+        email: data.email,
+        password: data.password,
+        redirect: false,
+      });
 
-      return;
+      if (loginResult?.error) {
+        toast.error("Account created but login failed");
+        return;
+      }
+      toast.success("Account created & logged in ✅");
+
+      // ✅ Redirect
+      router.push("/dashboard");
+    } catch (error: any) {
+      toast.error(error.message || "Something went wrong ❌");
+    } finally {
+      setLoading(false);
     }
-
-    alert(
-      "Registration Successful 🚀"
-    );
-
-    router.push("/login");
-  } catch (error) {
-    console.log(error);
-
-    alert(
-      "Something went wrong"
-    );
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 to-white flex items-center justify-center px-6 py-10">
-
       <div className="w-full max-w-lg bg-white shadow-2xl rounded-3xl p-8 border">
-
         {/* Heading */}
         <div className="text-center mb-8">
-
-          <h1 className="text-4xl font-bold text-purple-600">
-            Create Account
-          </h1>
+          <h1 className="text-4xl font-bold text-purple-600">Create Account</h1>
 
           <p className="text-gray-500 mt-3">
-            Start your exam
-            preparation today
+            Start your exam preparation today
           </p>
         </div>
-
+        <Toaster />
         {/* Form */}
-        <form
-          onSubmit={
-            handleSubmit
-          }
-          className="space-y-5"
-        >
-
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
           {/* Name */}
           <div>
-            <label className="text-sm font-medium">
-              Full Name
-            </label>
+            <label className="text-sm font-medium">Full Name</label>
 
             <input
-              type="text"
-              name="name"
-              value={
-                formData.name
-              }
-              onChange={
-                handleChange
-              }
+              {...register("name")}
               placeholder="Enter full name"
               className="w-full mt-2 p-4 border rounded-2xl outline-none focus:ring-2 focus:ring-purple-500"
-              required
             />
+            <p>{errors.name?.message as string}</p>
           </div>
 
           {/* Email */}
           <div>
-            <label className="text-sm font-medium">
-              Email
-            </label>
+            <label className="text-sm font-medium">Email</label>
 
             <input
-              type="email"
-              name="email"
-              value={
-                formData.email
-              }
-              onChange={
-                handleChange
-              }
+              {...register("email")}
               placeholder="Enter email"
               className="w-full mt-2 p-4 border rounded-2xl outline-none focus:ring-2 focus:ring-purple-500"
-              required
             />
+            {errors.email?.message as string}
           </div>
 
           {/* Mobile */}
           <div>
-            <label className="text-sm font-medium">
-              Mobile Number
-            </label>
+            <label className="text-sm font-medium">Mobile Number</label>
 
             <input
-              type="tel"
-              name="mobile"
-              value={
-                formData.mobile
-              }
-              onChange={
-                handleChange
-              }
+              {...register("mobile")}
               placeholder="Enter mobile number"
               className="w-full mt-2 p-4 border rounded-2xl outline-none focus:ring-2 focus:ring-purple-500"
-              required
             />
+            {errors.mobile?.message as string}
           </div>
 
-          {/* Course */}
           <div>
-            <label className="text-sm font-medium">
-              Select Course
-            </label>
-
-            <select
-              name="course"
-              value={
-                formData.course
-              }
-              onChange={
-                handleChange
-              }
-              className="w-full mt-2 p-4 border rounded-2xl outline-none focus:ring-2 focus:ring-purple-500"
-              required
-            >
-              <option value="">
-                Select Course
-              </option>
-
-              {exams.map(
-                (exam) => (
-                  <option
-                    key={exam}
-                    value={exam}
-                  >
-                    {exam}
-                  </option>
-                )
-              )}
-            </select>
-          </div>
-
-          {/* Referral Coupon */}
-          <div>
-            <label className="text-sm font-medium">
-              Coaching Coupon
-              Code
-            </label>
+            <label className="text-sm font-medium">Date of Birth</label>
 
             <input
-              type="text"
-              name="couponCode"
-              value={
-                formData.couponCode
-              }
-              onChange={
-                handleChange
-              }
-              placeholder="Enter referral code"
-              className="w-full mt-2 p-4 border rounded-2xl outline-none focus:ring-2 focus:ring-purple-500 uppercase"
+              type="date"
+              {...register("dob")}
+              placeholder="Enter mobile number"
+              className="w-full mt-2 p-4 border rounded-2xl outline-none focus:ring-2 focus:ring-purple-500"
             />
+            {errors.dob?.message as string}
           </div>
 
           {/* Password */}
           <div>
-            <label className="text-sm font-medium">
-              Password
-            </label>
+            <label className="text-sm font-medium">Password</label>
 
             <input
               type="password"
-              name="password"
-              value={
-                formData.password
-              }
-              onChange={
-                handleChange
-              }
+              {...register("password")}
               placeholder="Enter password"
               className="w-full mt-2 p-4 border rounded-2xl outline-none focus:ring-2 focus:ring-purple-500"
-              required
             />
+            {errors.password?.message as string}
           </div>
 
           {/* Submit */}
@@ -280,22 +154,14 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
             disabled={loading}
             className="w-full bg-purple-600 hover:bg-purple-700 text-white py-4 rounded-2xl font-semibold transition disabled:opacity-50"
           >
-            {loading
-              ? "Creating Account..."
-              : "Create Account"}
+            {loading ? "Creating Account..." : "Create Account"}
           </button>
         </form>
 
         {/* Login */}
         <p className="text-center text-gray-500 mt-6 text-sm">
-
-          Already have an
-          account?{" "}
-
-          <Link
-            href="/login"
-            className="text-purple-600 font-semibold"
-          >
+          Already have an account?{" "}
+          <Link href="/login" className="text-purple-600 font-semibold">
             Login
           </Link>
         </p>
