@@ -28,9 +28,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           });
 
           if (!user) return null;
-          // if (!user.emailVerified) {
-          //   throw new Error("Please verify your email before login.");
-          // }
 
           const isValid = await bcrypt.compare(
             credentials.password as string,
@@ -38,10 +35,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           );
 
           if (!isValid) return null;
-
-          
-
-          // await logAudit(user.id, "LOGIN");
 
           return {
             id: user.id,
@@ -56,16 +49,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       },
     }),
   ],
-
-  // callbacks: {
-  //   async session({ session, user }) {
-  //     if (session.user) {
-  //       session.user.id = user.id;
-  //     }
-
-  //     return session;
-  //   },
-  // },
 
   callbacks: {
     async jwt({ token, user }) {

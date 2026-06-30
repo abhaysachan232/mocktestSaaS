@@ -2,7 +2,7 @@
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { loginSchema, LoginInput } from "./types";
+import { loginSchema, LoginInput } from "@/schemas/login";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -26,7 +26,6 @@ const {
     try {
       setLoading(true);
       setError("");
-      console.log('data.email', data.email, data.password)
       // 👉 NextAuth login
       const res = await signIn("credentials", {
         email: data.email,
@@ -134,7 +133,7 @@ const {
                   </label>
 
                   <Link
-                    href="/reset-password"
+                    href="/forgot-password"
                     className="text-sm font-medium text-blue-600 hover:text-blue-700"
                   >
                     Forgot Password?

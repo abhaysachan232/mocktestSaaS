@@ -5,11 +5,10 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { registerUser } from "./action";
-import { RegisterSchema, registerSchema } from "@/lib/validations/register";
+import { RegisterSchema, registerSchema } from "@/schemas/register";
 import { signIn } from "next-auth/react";
 import toast, { Toaster } from "react-hot-toast";
 import { useRouter } from "next/navigation";
-// import { logAudit } from "@/lib/audit";
 
 export default function RegisterPage() {
   const router = useRouter();

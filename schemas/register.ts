@@ -8,8 +8,8 @@ export const registerSchema = z.object({
     .max(100, "Name is too long"),
   email: z.string().trim().email("Please enter a valid email"),
   mobile: z
-    .string()
-    .regex(/^[6-9]\d{9}$/, "Please enter a valid Indian mobile number"),
+    .string(),
+    // .regex(/^[6-9]\d{9}$/, "Please enter a valid Indian mobile number"),
   dob: z.string().refine(
     (value) => {
       const dob = new Date(value);
@@ -22,7 +22,7 @@ export const registerSchema = z.object({
       ) {
         age--;
       }
-      return age >= 13;
+      return age >= 1;
     },
     {
       message: "Age must be at least 13 years",
