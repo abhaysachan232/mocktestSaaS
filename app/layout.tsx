@@ -2,9 +2,10 @@ import type { Metadata } from "next";
 
 import "./globals.css";
 
-import AuthProvider from "../providers/SessionProvider";
+// import AuthProvider from "../providers/SessionProvider";
 import Header from "@/components/header/Header";
 import Footer from "@/components/footer/footer";
+import AuthProvider from "./(auth)/layout";
 
 export const metadata: Metadata = {
   title: "Coaching SaaS",
@@ -20,10 +21,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="bg-gray-100 text-black">
-        <Header/>
-
-        <AuthProvider>{children}</AuthProvider>
-        <Footer/>
+        <AuthProvider>
+          <Header />
+          {children}
+          <Footer />
+        </AuthProvider>
       </body>
     </html>
   );

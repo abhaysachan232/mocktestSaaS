@@ -1,87 +1,42 @@
 import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
+import { auth } from "@/lib/auth";
 
-export function proxy(
-  request: NextRequest
-) {
-  // const pathname =
-  //   request.nextUrl.pathname;
+export default auth((req) => {
+  const isLoggedIn = !!req.auth;
+  const pathname = req.nextUrl.pathname;
+  const protectedRoutes = ["/dashboard", "/admin"];
+  const authRoutes = ["/", "/register", "/login", "/forgot-password", "/reset-password", "/admin-login"];
+  const isProtectedRoute = protectedRoutes.some((route) =>
+    pathname.startsWith(route),
+  );
+  const isAuthRoute = authRoutes.includes(pathname);
 
-  // const token =
-  //   request.cookies.get(
-  //     "token"
-  //   )?.value;
+  // Not logged in -> protected routes blocked
+  if (!isLoggedIn && isProtectedRoute) {
+    return NextResponse.redirect(new URL("/login", req.url));
+  }
 
-  // const adminToken =
-  //   request.cookies.get(
-  //     "adminToken"
-  //   )?.value;
+  // Logged in -> prevent access to home/login pages
+  if (isLoggedIn && isAuthRoute) {
+    const role = req.auth?.user?.role;
 
-  // // Student routes
-  // if (
-  //   pathname === "/login" &&
-  //   token
-  // ) {
-  //   return NextResponse.redirect(
-  //     new URL(
-  //       "/dashboard",
-  //       request.url
-  //     )
-  //   );
-  // }
-
-  // if (
-  //   pathname.startsWith(
-  //     "/dashboard"
-  //   ) &&
-  //   !token
-  // ) {
-  //   return NextResponse.redirect(
-  //     new URL(
-  //       "/login",
-  //       request.url
-  //     )
-  //   );
-  // }
-
-  // // Admin routes
-  // if (
-  //   pathname ===
-  //     "/admin-login" &&
-  //   adminToken
-  // ) {
-  //   return NextResponse.redirect(
-  //     new URL(
-  //       "/admin",
-  //       request.url
-  //     )
-  //   );
-  // }
-
-  // if (
-  //   pathname.startsWith(
-  //     "/admin"
-  //   ) &&
-  //   pathname !==
-  //     "/admin-login" &&
-  //   !adminToken
-  // ) {
-  //   return NextResponse.redirect(
-  //     new URL(
-  //       "/admin-login",
-  //       request.url
-  //     )
-  //   );
-  // }
+    return NextResponse.redirect(
+      new URL(role === "ADMIN" ? "/admin" : "/dashboard", req.url),
+    );
+  }
 
   return NextResponse.next();
-}
+});
 
 export const config = {
   matcher: [
+    "/",
+    "/register",
+    "/login",
+    "/forgot-password",
+    "/reset-password",
+    "/admin-login",
     "/dashboard/:path*",
     "/admin/:path*",
-    "/login",
-    "/admin-login",
   ],
 };

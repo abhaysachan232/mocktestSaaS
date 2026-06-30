@@ -14,7 +14,7 @@ export default function Page() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-const {
+  const {
     register,
     handleSubmit,
     formState: { errors },
@@ -32,10 +32,15 @@ const {
         password: data.password,
         redirect: false,
       });
-      if (res?.error) {
-        setError("Invalid credentials");
-        toast.error(res.error);
-        return;
+      if (!res?.error) {
+        toast.success("Login successful");
+
+        router.replace("/dashboard");
+        router.refresh();
+
+        // setError("Invalid credentials");
+        // toast.error(res.error);
+        // return;
       }
 
       router.push("/dashboard");
