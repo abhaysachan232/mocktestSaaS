@@ -17,7 +17,7 @@ const roleComponents = {
 export default function DashboardPage() {
   const { data: session, status } = useSession();
 
-  console.log(session, status);
+  console.log('DashboardPage', session, status);
 
   if (status === "loading") {
     return (
