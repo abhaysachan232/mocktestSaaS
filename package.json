@@ -4,15 +4,17 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "npm run lint && next build",
+    "audit": "npm audit --audit-level=high",
     "start": "next start",
-    "lint": "next lint",
-    "clean": "rimraf .next",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "security": "npm run lint && npm run typecheck && npm run audit",
     "postinstall": "prisma generate",
-    "prisma:migrate:init": "prisma migrate dev --name init",
+    "prisma:migrate": "node --env-file=.env ./node_modules/prisma/build/index.js migrate dev",
     "prisma:reset": "prisma migrate reset",
-    "seed": "tsx prisma/seed.ts",
-    "db:seed": "prisma db seed"
+    "seed": "tsx --env-file=.env prisma/seed.ts",
+    "seed:undo": "tsx --env-file=.env prisma/seed.undo.ts"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.11.2",

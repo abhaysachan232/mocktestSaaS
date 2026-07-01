@@ -17,7 +17,7 @@ async function main() {
       name: "Coaching",
       email: "coaching@test.com",
       password,
-      role: ROLES.ADMIN,
+      role: ROLES.COACHING,
     },
     ]
   });

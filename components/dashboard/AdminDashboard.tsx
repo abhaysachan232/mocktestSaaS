@@ -11,10 +11,10 @@ import {
   IndianRupee,
   Activity,
   Plus,
-  LogOut,
   Building2,
   Trash2,
 } from "lucide-react";
+import LogOut from "../ui/logOut";
 
 export default function AdminPage() {
   const router = useRouter();
@@ -103,14 +103,8 @@ export default function AdminPage() {
             <Building2 size={18} />
             Create Coaching
           </Link>
-
-          <button
-            onClick={handleLogout}
-            className="bg-red-500 hover:bg-red-600 text-white px-5 py-3 rounded-xl flex items-center gap-2"
-          >
-            <LogOut size={18} />
-            Logout
-          </button>
+<LogOut />
+          
         </div>
       </div>
 
