@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import Link from "next/link";
 import toast from "react-hot-toast";
+import { MESSAGES, ROUTES } from "@/lib/constans";
 
 export default function Page() {
   const router = useRouter();
@@ -26,40 +27,29 @@ export default function Page() {
     try {
       setLoading(true);
       setError("");
-      // 👉 NextAuth login
+      
       const res = await signIn("credentials", {
         email: data.email,
         password: data.password,
         redirect: false,
       });
-      if (!res?.error) {
-        toast.success("Login successful");
 
-        const session = await getSession();
-
-        switch (session?.user?.role) {
-          case "ADMIN":
-            router.replace("/admin");
-            break;
-
-          case "COACHING":
-            router.replace("/coaching");
-            break;
-
-          default:
-            router.replace("/student");
-        }
-
-        router.refresh();
-
-        // setError("Invalid credentials");
-        // toast.error(res.error);
-        // return;
+      if (res?.error) {
+        setError(MESSAGES.INVALID_CREDENTIALS);
+        return;
       }
 
-      // router.push("/dashboard");
+      toast.success(MESSAGES.LOGIN_SUCCESS);
+
+      // Session refresh
+      const session = await getSession();
+
+      if (session) {
+        router.push(ROUTES.DASHBOARD);
+      }
+
     } catch (err) {
-      setError("Something went wrong");
+      setError(MESSAGES.SOMETHING_WENT_WRONG);
     } finally {
       setLoading(false);
     }
@@ -152,7 +142,7 @@ export default function Page() {
                   </label>
 
                   <Link
-                    href="/forgot-password"
+                    href={ROUTES.FORGOT_PASSWORD}
                     className="text-sm font-medium text-blue-600 hover:text-blue-700"
                   >
                     Forgot Password?
@@ -193,7 +183,7 @@ export default function Page() {
             <div className="mt-8 text-center text-base text-slate-500">
               Don't have an account?{" "}
               <Link
-                href="/register"
+                href={ROUTES.REGISTER}
                 className="font-semibold text-blue-600 hover:text-blue-700"
               >
                 Create Account
