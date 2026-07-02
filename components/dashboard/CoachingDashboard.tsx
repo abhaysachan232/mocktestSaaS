@@ -2,38 +2,19 @@
 
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import { Users, IndianRupee, TrendingUp, FileText, LogOut } from "lucide-react";
+import { Users, IndianRupee, TrendingUp, FileText,  } from "lucide-react";
+import LogOut from "../ui/logOut";
 
 export default function CoachingDashboard() {
 
   // Logout
-  const handleLogout = async () => {
-    // try {
-    //   await fetch("/api/admin/logout", {
-    //     method: "POST",
 
-    //     credentials: "include",
-    //   });
-
-    //   window.location.href = "/admin-login";
-    // } catch (error) {
-    //   console.log(error);
-    // }
-  };
-
-  // if (loading) {
-  //   return (
-  //     <div className="min-h-screen flex items-center justify-center text-2xl font-bold">
-  //       Loading Dashboard...
-  //     </div>
-  //   );
-  // }
 
   const stats = [
     {
       title: "Total Students",
 
-      value: data?.coaching.totalStudents || 0,
+      value:  0,
 
       icon: Users,
     },
@@ -41,7 +22,7 @@ export default function CoachingDashboard() {
     {
       title: "Revenue",
 
-      value: `₹${data?.coaching.revenue || 0}`,
+      value: `₹${0}`,
 
       icon: IndianRupee,
     },
@@ -49,7 +30,7 @@ export default function CoachingDashboard() {
     {
       title: "Total Tests",
 
-      value: data?.coaching.totalTests || 0,
+      value:  0,
 
       icon: FileText,
     },
@@ -93,13 +74,7 @@ export default function CoachingDashboard() {
         </div>
 
         {/* Logout */}
-        <button
-          onClick={handleLogout}
-          className="bg-red-500 hover:bg-red-600 text-white px-5 py-3 rounded-xl flex items-center gap-2"
-        >
-          <LogOut size={18} />
-          Logout
-        </button>
+<LogOut/>
       </div>
 
       {/* Stats */}

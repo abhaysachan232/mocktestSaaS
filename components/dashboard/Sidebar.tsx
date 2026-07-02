@@ -6,7 +6,6 @@ import {
   FileText,
   Trophy,
   User,
-  // LogOut,
 } from "lucide-react";
 import LogOut from "@/components/ui/logOut";
 
@@ -17,7 +16,6 @@ interface Props {
     name: string;
     logo: string;
   };
-  // onLogout: () => void;
 }
 
 const menus = [
@@ -48,12 +46,15 @@ const menus = [
   },
 ];
 
-export default function Sidebar({ activeTab, setActiveTab, coaching }: Props) {
+export default function Sidebar({
+  activeTab,
+  setActiveTab,
+  coaching,
+}: Props) {
   return (
     <aside className="hidden lg:flex w-80 min-h-screen bg-white border-r border-slate-200 p-6 flex-col">
-      <div className="rounded-[30px] bg-gradient-to-r from-blue-600 to-indigo-600 p-8 text-white shadow-xl">
+      <div className="rounded-[30px] bg-linear-to-r from-blue-600 to-indigo-600 p-8 text-white shadow-xl">
         <h1 className="text-3xl font-bold">MockTest</h1>
-
         <p className="mt-2 text-blue-100">Student Portal</p>
       </div>
 
@@ -70,7 +71,6 @@ export default function Sidebar({ activeTab, setActiveTab, coaching }: Props) {
 
             <div>
               <p className="text-sm text-slate-500">Joined Via</p>
-
               <h3 className="font-bold text-lg">{coaching.name}</h3>
             </div>
           </div>
@@ -80,23 +80,19 @@ export default function Sidebar({ activeTab, setActiveTab, coaching }: Props) {
       <nav className="mt-10 space-y-3 flex-1">
         {menus.map((item) => {
           const Icon = item.icon;
-
           const active = activeTab === item.key;
 
           return (
             <button
               key={item.key}
               onClick={() => setActiveTab(item.key)}
-              className={`w-full flex items-center gap-4 rounded-2xl px-5 py-4 transition-all font-semibold
-
-              ${
+              className={`w-full flex items-center gap-4 rounded-2xl px-5 py-4 transition-all font-semibold ${
                 active
-                  ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg"
+                  ? "bg-linear-to-r from-blue-600 to-indigo-600 text-white shadow-lg"
                   : "hover:bg-blue-50 text-slate-700"
               }`}
             >
               <Icon size={20} />
-
               {item.label}
             </button>
           );

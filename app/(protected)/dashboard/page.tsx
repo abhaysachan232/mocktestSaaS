@@ -28,6 +28,7 @@ export default function DashboardPage() {
   }
 
   const role = session?.user?.role;
+console.log(role)
 
   if (!role) {
     notFound();

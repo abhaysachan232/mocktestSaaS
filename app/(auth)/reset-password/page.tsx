@@ -34,10 +34,25 @@ export default function ResetPasswordPage() {
 
         router.replace("/login");
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error(error);
 
-      alert(error?.response?.data?.message ?? "Unable to reset password");
+      type ErrorResponse = {
+        response?: {
+          data?: {
+            message?: string;
+          };
+        };
+      };
+
+      const message =
+        error instanceof Error
+          ? error.message
+          : typeof error === "object" && error !== null
+          ? (error as ErrorResponse).response?.data?.message
+          : undefined;
+
+      alert(message ?? "Unable to reset password");
     }
   };
 
