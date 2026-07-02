@@ -7,7 +7,7 @@ import {
   Trophy,
   User,
 } from "lucide-react";
-import LogOut from "@/components/ui/logOut";
+import LogOutButton from "../ui/LogOutButton";
 
 interface Props {
   activeTab: string;
@@ -99,7 +99,7 @@ export default function Sidebar({
         })}
       </nav>
 
-      <LogOut />
+      <LogOutButton />
     </aside>
   );
 }

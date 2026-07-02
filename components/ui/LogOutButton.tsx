@@ -1,7 +1,7 @@
 import { LogOutIcon } from "lucide-react";
 import { signOut } from "next-auth/react";
 
-export default function LogOut() {
+export default function LogOutButton() {
   async function handleLogOut() {
     await signOut({
       callbackUrl: "/login", // logout ke baad redirect

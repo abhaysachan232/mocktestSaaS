@@ -2,19 +2,17 @@
 
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import { Users, IndianRupee, TrendingUp, FileText,  } from "lucide-react";
-import LogOut from "../ui/logOut";
+import { Users, IndianRupee, TrendingUp, FileText } from "lucide-react";
+import LogOutButton from "../ui/LogOutButton";
 
 export default function CoachingDashboard() {
-
   // Logout
-
 
   const stats = [
     {
       title: "Total Students",
 
-      value:  0,
+      value: 0,
 
       icon: Users,
     },
@@ -30,7 +28,7 @@ export default function CoachingDashboard() {
     {
       title: "Total Tests",
 
-      value:  0,
+      value: 0,
 
       icon: FileText,
     },
@@ -60,21 +58,17 @@ export default function CoachingDashboard() {
               className="rounded-2xl border object-cover"
             />
           )} */}
-
           <div>
             <h1 className="text-3xl font-bold">Choching Name</h1>
 
             <p className="text-gray-500 mt-1">
-              Coupon :{" "}
-              <span className="font-semibold">
-                Coupon_code
-              </span>
+              Coupon : <span className="font-semibold">Coupon_code</span>
             </p>
           </div>
         </div>
 
         {/* Logout */}
-<LogOut/>
+        <LogOutButton />
       </div>
 
       {/* Stats */}
@@ -125,23 +119,20 @@ export default function CoachingDashboard() {
 
               <tbody>
                 <tr className="border-b last:border-none">
-                    <td className="py-5 font-medium">student.name</td>
-                    <td className="py-5">student.exams</td>
-                    <td className="py-5">student.avgScore%</td>
+                  <td className="py-5 font-medium">student.name</td>
+                  <td className="py-5">student.exams</td>
+                  <td className="py-5">student.avgScore%</td>
 
-                    <td className="py-5 text-red-500 font-medium">
-                      student.weak
-                    </td>
+                  <td className="py-5 text-red-500 font-medium">
+                    student.weak
+                  </td>
 
-                    <td className="py-5 text-green-600 font-medium">
-                      student.strong
-                    </td>
+                  <td className="py-5 text-green-600 font-medium">
+                    student.strong
+                  </td>
 
-                    <td className="py-5 font-semibold">
-                      student.improvement
-                    </td>
-                    </tr>
-                
+                  <td className="py-5 font-semibold">student.improvement</td>
+                </tr>
               </tbody>
             </table>
           </div>

@@ -21,188 +21,41 @@ enum Role {
 }
 
 model User {
-  id            String       @id @default(cuid()) // Primary Key
-  name          String
-  email         String?      @unique
-  mobile        String? @unique
-  dob           DateTime?
-  password      String
-  role          Role         @default(STUDENT)
-  isActive      Boolean      @default(true)
-  enrollments   Enrollment[]
-  attempts      Attempt[]
-  emailVerified DateTime?
-  createdAt     DateTime     @default(now())
-  updatedAt     DateTime     @updatedAt
-  accounts      Account[]
-  sessions      Session[]
-  auditLogs     AuditLog[]
+  id        String    @id @default(cuid()) // Primary Key
+  email     String?   @unique
+  password  String
+  name      String
+  dob       DateTime?
+  mobile    String?   @unique
+  role      Role      @default(STUDENT)
+  isActive  Boolean   @default(true)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  // student   Student?
+
+  coachingId String?
+  coaching   Coaching? @relation(fields: [coachingId], references: [id])
 }
 
-model Account {
-  id                String @id @default(cuid())
-  userId            String
-  type              String
-  provider          String
-  providerAccountId String
-  user              User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([provider, providerAccountId])
-}
-
-model Session {
-  id           String   @id @default(cuid())
-  sessionToken String   @unique
-  userId       String
-  expires      DateTime
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-}
-
-model VerificationToken {
-  identifier String
-  token      String   @unique
-  expires    DateTime
-
-  @@unique([identifier, token])
-}
-
-model EmailVerificationToken {
-  id        String   @id @default(cuid())
-  email     String
-  token     String   @unique
-  expiresAt DateTime
-  createdAt DateTime @default(now())
-}
-
-model PasswordResetToken {
-  id        String   @id @default(cuid())
-  email     String
-  token     String   @unique
-  expiresAt DateTime
-  createdAt DateTime @default(now())
-}
-
-model AuditLog {
-  id        String   @id @default(cuid())
-  userId    String?
-  action    String
-  metadata  Json?
-  createdAt DateTime @default(now())
-  user      User?    @relation(fields: [userId], references: [id])
-}
-
-model Course {
-  id          String           @id @default(cuid())
-  name        CourseName
-  subjects    Subject[]
-  enrollments Enrollment[]
-  offerings   CourseCoaching[]
-  examPapers  ExamPaper[]
-  createdAt   DateTime         @default(now())
-}
-
-model Enrollment {
-  id         String   @id @default(cuid())
-  userId     String
-  courseId   String
-  enrolledAt DateTime @default(now())
-  user       User     @relation(fields: [userId], references: [id])
-  course     Course   @relation(fields: [courseId], references: [id])
-}
-
-model CourseCoaching {
-  id         String   @id @default(cuid())
-  courseId   String
-  coachingId String
-  price      Int // ✅ useful
-  discount   Int?
-  course     Course   @relation(fields: [courseId], references: [id])
-  coaching   Coaching @relation(fields: [coachingId], references: [id])
-}
+// model Student {
+//   id     String    @id @default(cuid()) // Primary Key
+//   userId String    @unique
+//   name   String
+//   dob    DateTime?
+//   mobile String?   @unique
+//   user   User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+// }
 
 model Coaching {
-  id              String           @id @default(cuid()) // Primary Key
-  code            String           @unique // FK, coupon
-  name            String
-  logo            String?
-  address         String
-  ownerName       String
-  document        String //upload id proof doc
-  docNumber       String // input id number adhar/pancard
-  isActive        Boolean          @default(true)
-  courseCoachings CourseCoaching[]
-}
-
-model Subject {
-  id       String  @id @default(cuid())
-  name     String // Math, Reasoning, GK
-  courseId String
-  course   Course  @relation(fields: [courseId], references: [id])
-  topics   Topic[]
-}
-
-model Topic {
-  id        String     @id @default(cuid())
-  name      String // Algebra, Percentage etc.
-  subjectId String
-  subject   Subject    @relation(fields: [subjectId], references: [id])
-  questions Question[]
-}
-
-model Question {
-  id            String              @id @default(cuid())
-  question      String
-  options       String[]
-  correctAnswer String
-  explanation   String?
-  difficulty    Difficulty? // ✅ easy / medium / hard
-  marks         Int                 @default(1) // added
-  negativeMark  Float               @default(0.25)
-  topicId       String
-  topic         Topic               @relation(fields: [topicId], references: [id])
-  papers        ExamPaperQuestion[]
-}
-
-model ExamPaper {
-  id        String              @id @default(cuid())
-  name      String
-  duration  Int // minutes
-  courseId  String
-  course    Course              @relation(fields: [courseId], references: [id])
-  questions ExamPaperQuestion[]
-  createdAt DateTime            @default(now())
-  attempts  Attempt[]
-}
-
-model ExamPaperQuestion {
-  id          String    @id @default(cuid())
-  examPaperId String
-  questionId  String
-  examPaper   ExamPaper @relation(fields: [examPaperId], references: [id])
-  question    Question  @relation(fields: [questionId], references: [id])
-}
-
-model Attempt {
-  id          String    @id @default(cuid())
-  userId      String
-  examPaperId String
-  score       Float // ✅ supports negative marking
-  totalMarks  Float
-  startedAt   DateTime  @default(now())
-  submittedAt DateTime?
-  user        User      @relation(fields: [userId], references: [id])
-  examPaper   ExamPaper @relation(fields: [examPaperId], references: [id])
-  answers     Answer[]
-}
-
-model Answer {
-  id           String  @id @default(cuid())
-  attemptId    String
-  questionId   String
-  selected     String
-  isCorrect    Boolean
-  marksAwarded Float // ✅ after evaluation
-  attempt      Attempt @relation(fields: [attemptId], references: [id])
+  id           String  @id @default(cuid()) // Primary Key
+  code         String  @unique
+  coachingName String
+  logo         String?
+  address      String
+  ownerName    String
+  idProof      String? //upload id proof doc
+  idNumber     String // input id number adhar/pancard
+  users        User[]
 }
 
 enum CourseName {

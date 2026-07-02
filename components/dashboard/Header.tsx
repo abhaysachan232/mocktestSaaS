@@ -4,7 +4,7 @@ import {
   Bell,
   Search,
 } from "lucide-react";
-import LogOut from "@/components/ui/logOut";
+import LogOutButton from "../ui/LogOutButton";
 
 interface Props {
   studentName?: string | null;
@@ -76,7 +76,7 @@ export default function Header({
             </div>
 
             {/* Logout */}
-            <LogOut />
+            <LogOutButton />
 
           </div>
 

@@ -4,8 +4,8 @@ import { auth } from "@/lib/auth";
 export default auth((req) => {
   const isLoggedIn = !!req.auth;
   const pathname = req.nextUrl.pathname;
-  const protectedRoutes = ["/dashboard", "/admin"];
-  const authRoutes = ["/", "/register", "/login", "/forgot-password", "/reset-password", "/admin-login"];
+  const protectedRoutes = ["/dashboard"];
+  const authRoutes = ["/", "/register", "/login", "/forgot-password", "/reset-password"];
   const isProtectedRoute = protectedRoutes.some((route) =>
     pathname.startsWith(route),
   );
@@ -17,13 +17,13 @@ export default auth((req) => {
   }
 
   // Logged in -> prevent access to home/login pages
-  if (isLoggedIn && isAuthRoute) {
-    const role = req.auth?.user?.role;
+  // if (isLoggedIn && isAuthRoute) {
+  //   const role = req.auth?.user?.role;
 
-    return NextResponse.redirect(
-      new URL(role === "ADMIN" ? "/admin" : "/dashboard", req.url),
-    );
-  }
+  //   return NextResponse.redirect(
+  //     new URL(role === "ADMIN" ? "/admin" : "/dashboard", req.url),
+  //   );
+  // }
 
   return NextResponse.next();
 });
@@ -35,8 +35,8 @@ export const config = {
     "/login",
     "/forgot-password",
     "/reset-password",
-    "/admin-login",
+    // "/admin-login",
     "/dashboard/:path*",
-    "/admin/:path*",
+    // "/admin/:path*",
   ],
 };

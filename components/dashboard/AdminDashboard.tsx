@@ -14,26 +14,22 @@ import {
   Building2,
   Trash2,
 } from "lucide-react";
-import LogOut from "../ui/logOut";
+import { ROUTES } from "@/lib/constans";
+import LogOutButton from "../ui/LogOutButton";
 
 export default function AdminPage() {
   const router = useRouter();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
 
-
   // Logout
   const handleLogout = async () => {};
 
   // Delete Coaching
-  const deleteCoaching = async (id: string) => {
-    
-  };
+  const deleteCoaching = async (id: string) => {};
 
   // Delete Student
-  const deleteStudent = async (id: string) => {
-    
-  };
+  const deleteStudent = async (id: string) => {};
 
   const stats = [
     {
@@ -97,14 +93,13 @@ export default function AdminPage() {
           </Link>
 
           <Link
-            href="/admin/create-coaching"
+            href={ROUTES.DASHBOARD + ROUTES.CREATE_COACHING}
             className="bg-green-600 hover:bg-green-700 text-white px-5 py-3 rounded-xl flex items-center gap-2"
           >
             <Building2 size={18} />
             Create Coaching
           </Link>
-<LogOut />
-          
+          <LogOutButton />
         </div>
       </div>
 

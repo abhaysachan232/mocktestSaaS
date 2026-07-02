@@ -10,7 +10,9 @@ export const ROUTES = {
   REGISTER: "/register",
   FORGOT_PASSWORD: "/forgot-password",
   DASHBOARD: "/dashboard",
+  CREATE_COACHING: "/create-coaching"
 } as const;
+
 
 export const MESSAGES = {
   LOGIN_SUCCESS: "Login successful",
