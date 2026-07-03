@@ -14,7 +14,6 @@ export const ROUTES = {
   CREATE_COACHING: "/create-coaching",
 } as const;
 
-
 export const MESSAGES = {
   LOGIN_SUCCESS: "Login successful",
   INVALID_CREDENTIALS: "Invalid email or password",

@@ -10,14 +10,31 @@ import Tests from "./Tests";
 import Results from "./Results";
 import Leaderboard from "./Leaderboard";
 import Profile from "./Profile";
+import { useApi } from "@/lib/use-api";
+import type { StudentDashboardData } from "@/services/dashboard.service";
 
-export default function StudentDashboard() {
-  const { data: session, status } = useSession();
+export default function StudentDashboardPage() {
+  // const { data: session, status } = useSession();
 
   const [activeTab, setActiveTab] = useState("dashboard");
 
-  if (status === "loading") {
-    return <div>Loading...</div>;
+  const {
+    data: student,
+    loading,
+    error,
+  } = useApi<StudentDashboardData>("/api/dashboard/student");
+  console.log("StudentDashboardPage", student);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-2xl font-bold">
+        Loading Dashboard...
+      </div>
+    );
+  }
+
+  if (error) {
+    return <p className="text-red-500">{error}</p>;
   }
 
   const user = session?.user;
@@ -34,25 +51,15 @@ export default function StudentDashboard() {
         <main className="flex-1 p-8">
           <Header studentName={user?.name} />
 
-          {activeTab === "dashboard" && (
-            <StatsCards dashboard={user} />
-          )}
+          {activeTab === "dashboard" && <StatsCards dashboard={user} />}
 
-          {activeTab === "tests" && (
-            <Tests tests={[]} />
-          )}
+          {activeTab === "tests" && <Tests tests={[]} />}
 
-          {activeTab === "results" && (
-            <Results results={[]} />
-          )}
+          {activeTab === "results" && <Results results={[]} />}
 
-          {activeTab === "leaderboard" && (
-            <Leaderboard leaderboard={null} />
-          )}
+          {activeTab === "leaderboard" && <Leaderboard leaderboard={null} />}
 
-          {activeTab === "profile" && (
-            <Profile profile={user} />
-          )}
+          {activeTab === "profile" && <Profile profile={user} />}
         </main>
       </div>
     </div>

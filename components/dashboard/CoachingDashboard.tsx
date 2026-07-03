@@ -4,8 +4,18 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import { Users, IndianRupee, TrendingUp, FileText } from "lucide-react";
 import LogOutButton from "../ui/LogOutButton";
+import { useApi } from "@/lib/use-api";
+import { CoachingDashboardData } from "@/services/dashboard.service";
 
-export default function CoachingDashboard() {
+export default function CoachingDashboardPage() {
+  
+const {
+  data,
+  loading,
+  error,
+} = useApi<CoachingDashboardData>("/api/dashboard/coaching");
+console.log('CoachingDashboardPage', data)
+
   // Logout
 
   const stats = [
@@ -41,6 +51,18 @@ export default function CoachingDashboard() {
       icon: TrendingUp,
     },
   ];
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-2xl font-bold">
+        Loading Dashboard...
+      </div>
+    );
+  }
+
+  if (error) {
+    return <p className="text-red-500">{error}</p>;
+  }
 
   return (
     <div className="min-h-screen bg-gray-100">

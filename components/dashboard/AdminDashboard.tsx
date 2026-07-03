@@ -1,77 +1,50 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
-import { useRouter } from "next/navigation";
 
-import {
-  Users,
-  FileText,
-  IndianRupee,
-  Activity,
-  Plus,
-  Building2,
-  Trash2,
-} from "lucide-react";
+import { Users, IndianRupee, Plus, Building2, BookOpen } from "lucide-react";
 import { ROUTES } from "@/lib/constans";
 import LogOutButton from "../ui/LogOutButton";
 import { useApi } from "@/lib/use-api";
-import { CoachingRegisterInput } from "@/schemas/coaching";
+
+import type { AdminDashboardData } from "@/services/dashboard.service";
+import { DataTable } from "../ui/DataTable";
+import { StatsGrid } from "../ui/StatsGrid";
 
 export default function AdminDashboardPage() {
-  const router = useRouter();
-
-  
-
-const {
-  data: coachings,
-  loading,
-  error,
-} = useApi<CoachingRegisterInput[]>("/api/coaching");
-console.log('data', coachings, loading, error)
-
-  
-
-  // Logout
-  const handleLogout = async () => {};
-
-  // Delete Coaching
-  const deleteCoaching = async (id: string) => {};
-
-  // Delete Student
-  const deleteStudent = async (id: string) => {};
+  const { data, loading, error } = useApi<AdminDashboardData>(
+    "/api/dashboard/admin",
+  );
+  console.log("AdminDashboardPage", data, loading, error);
 
   const stats = [
     {
       title: "Total Students",
-
-      value: 0,
-
+      value: data?.students?.length || 0,
       icon: Users,
+      iconBg: "bg-green-100",
+      iconColor: "text-green-600",
     },
-
+    {
+      title: "Total Coachings",
+      value: data?.coachings?.length || 0,
+      icon: Building2,
+      iconBg: "bg-blue-100",
+      iconColor: "text-blue-600",
+    },
     {
       title: "Total Tests",
-
-      value: 0,
-
-      icon: FileText,
+      value: 350,
+      icon: BookOpen,
+      iconBg: "bg-purple-100",
+      iconColor: "text-purple-600",
     },
-
     {
       title: "Revenue",
-
-      value: `₹${0}`,
-
+      value: "₹1,25,000",
       icon: IndianRupee,
-    },
-
-    {
-      title: "Active Users",
-
-      value: 0,
-
-      icon: Activity,
+      iconBg: "bg-orange-100",
+      iconColor: "text-orange-600",
     },
   ];
 
@@ -83,13 +56,16 @@ console.log('data', coachings, loading, error)
     );
   }
 
+  if (error) {
+    return <p className="text-red-500">{error}</p>;
+  }
+
   return (
     <div className="min-h-screen bg-gray-100">
       {/* Navbar */}
       <div className="bg-white border-b shadow-sm px-4 md:px-10 py-5 flex flex-col md:flex-row justify-between md:items-center gap-5">
         <div>
           <h1 className="text-3xl font-bold">Admin Dashboard</h1>
-
           <p className="text-gray-500 mt-1">Manage your platform</p>
         </div>
 
@@ -103,7 +79,7 @@ console.log('data', coachings, loading, error)
           </Link>
 
           <Link
-            href={ROUTES.DASHBOARD + ROUTES.CREATE_COACHING}
+            href={`${ROUTES.DASHBOARD}${ROUTES.CREATE_COACHING}`}
             className="bg-green-600 hover:bg-green-700 text-white px-5 py-3 rounded-xl flex items-center gap-2"
           >
             <Building2 size={18} />
@@ -115,125 +91,94 @@ console.log('data', coachings, loading, error)
 
       {/* Stats */}
       <div className="p-4 md:p-10">
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
-          {stats.map((item, index) => {
-            const Icon = item.icon;
-
-            return (
-              <div key={index} className="bg-white rounded-3xl p-7 shadow-sm">
-                <div className="flex justify-between">
-                  <div>
-                    <p className="text-gray-500">{item.title}</p>
-
-                    <h2 className="text-4xl font-bold mt-4">{item.value}</h2>
-                  </div>
-
-                  <div className="bg-blue-100 h-fit p-4 rounded-2xl">
-                    <Icon className="text-blue-600" />
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-
-        {/* Coaching List */}
+        <StatsGrid stats={stats} />
         <div className="mt-10 bg-white rounded-3xl shadow-sm p-6">
           <h2 className="text-2xl font-bold mb-6">Coachings</h2>
-
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[800px]">
-              <thead>
-                <tr className="border-b">
-                  <th className="text-left py-4">Logo</th>
-
-                  <th className="text-left py-4">Name</th>
-
-                  <th className="text-left py-4">Email</th>
-
-                  <th className="text-left py-4">Code</th>
-
-                  <th className="text-left py-4">Mobile</th>
-                  <th className="text-left py-4">Owner Name</th>
-
-                  <th className="text-left py-4">Action</th>
-                </tr>
-              </thead>
-
-              <tbody>
-                {coachings?.map((coaching, ind) => (
-                  <tr key={coaching.coachingName+ind} className="border-b">
-                    <td className="py-4">
-                      {coaching.logo && (
-                        <Image
-                          src={coaching.logo}
-                          alt="logo"
-                          width={55}
-                          height={55}
-                          className="rounded-2xl border object-cover"
-                        />
-                      )}
-                    </td>
-
-                    <td className="py-4 font-medium">{coaching.coachingName}</td>
-
-                    <td className="py-4">{coaching.email}</td>
-
-                    <td className="py-4">{coaching.code}</td>
-
-                    <td className="py-4">{coaching.mobile}</td>
-                    <td className="py-4">{coaching.ownerName}</td>
-
-                    <td className="py-4">
-                      <button
-                        onClick={() => deleteCoaching(coaching.id)}
-                        className="bg-red-100 hover:bg-red-200 text-red-600 p-3 rounded-xl"
-                      >
-                        <Trash2 size={18} />
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            <DataTable
+              loading={loading}
+              data={data?.coachings ?? []}
+              columns={[
+                {
+                  key: "code",
+                  header: "Code",
+                  sortable: true,
+                },
+                {
+                  key: "coachingName",
+                  header: "Coaching",
+                  sortable: true,
+                },
+                {
+                  key: "ownerName",
+                  header: "Owner",
+                  sortable: true,
+                },
+                {
+                  key: "email",
+                  header: "Email",
+                  sortable: true,
+                },
+                {
+                  key: "mobile",
+                  header: "Mobile",
+                  sortable: true,
+                },
+              ]}
+              pageSize={10}
+              onSelectionChange={(ids) => {
+                console.log(ids);
+              }}
+            />
           </div>
         </div>
 
-        {/* Student List */}
         <div className="mt-10 bg-white rounded-3xl shadow-sm p-6">
           <h2 className="text-2xl font-bold mb-6">Students</h2>
-
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[700px]">
-              <thead>
-                <tr className="border-b">
-                  <th className="text-left py-4">Name</th>
-
-                  <th className="text-left py-4">Email</th>
-
-                  <th className="text-left py-4">Action</th>
-                </tr>
-              </thead>
-
-              {/* <tbody>
-                {data?.students?.map((student) => (
-                  <tr key={student._id} className="border-b">
-                    <td className="py-4 font-medium">{student.name}</td>
-
-                    <td className="py-4">{student.email}</td>
-
-                    <td className="py-4">
-                      <button
-                        onClick={() => deleteStudent(student._id)}
-                        className="bg-red-100 hover:bg-red-200 text-red-600 p-3 rounded-xl"
-                      >
-                        <Trash2 size={18} />
+            <DataTable
+              data={data?.students ?? []}
+              columns={[
+                {
+                  key: "name",
+                  header: "Name",
+                  sortable: true,
+                },
+                {
+                  key: "email",
+                  header: "Email",
+                  render: (row) => row.user.email,
+                },
+                {
+                  key: "mobile",
+                  header: "Mobile",
+                  sortable: true,
+                },
+                {
+                  key: "dob",
+                  header: "DOB",
+                  sortable: true,
+                  render: (row) => new Date(row.dob).toLocaleDateString(),
+                },
+                {
+                  key: "actions",
+                  header: "Actions",
+                  render: (row) => (
+                    <div className="flex gap-2">
+                      <button onClick={() => console.log(row.id)}>Edit</button>
+                      <button onClick={() => console.log(row.id)}>
+                        Delete
                       </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody> */}
-            </table>
+                    </div>
+                  ),
+                },
+              ]}
+              loading={loading}
+              pageSize={10}
+              onSelectionChange={(ids) => {
+                console.log(ids);
+              }}
+            />
           </div>
         </div>
       </div>

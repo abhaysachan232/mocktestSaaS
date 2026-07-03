@@ -24,6 +24,13 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
           const user = await prisma.user.findUnique({
             where: { email: credentials.email as string },
+            select: {
+              id: true,
+              email: true,
+              password: true,
+              role: true,
+              coachingId: true,
+            },
           });
 
           if (!user) return null;
@@ -39,6 +46,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             id: user.id,
             email: user.email,
             role: user.role,
+            coachingId: user.coachingId,
           };
         } catch (error) {
           console.error("AUTHORIZE ERROR", error);
@@ -53,6 +61,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       if (user) {
         token.id = user.id;
         token.role = user.role;
+        token.coachingId = user.coachingId;
       }
       return token;
     },
@@ -61,6 +70,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       if (session.user) {
         session.user.id = token.id as string;
         session.user.role = token.role as string;
+        session.user.coachingId = token.coachingId as string | null;
       }
       return session;
     },
