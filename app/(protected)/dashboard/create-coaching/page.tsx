@@ -35,7 +35,7 @@ export default function CreateCoachingPage() {
       setServerError("");
       setSuccess("");
       console.log("CreateCoachingPage", data);
-      const response = await api.post("/api/create-coaching", data);
+      const response = await api.post("/api/coaching", data);
       setSuccess(response.data.message);
 
       reset();
@@ -75,6 +75,13 @@ export default function CreateCoachingPage() {
             <div className="bg-red-100 p-2 text-red-700">{serverError}</div>
           )}
           <div className="grid md:grid-cols-2 gap-5">
+            <InputField
+              type="file"
+              label="Logo"
+              name="logo"
+              register={register}
+              error={errors?.logo?.message as string}
+            />
             <InputField
               label="Coaching Name"
               name="coachingName"

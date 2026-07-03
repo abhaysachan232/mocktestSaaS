@@ -7,6 +7,7 @@ import {
 } from "@/schemas/shared";
 
 export const coachingRegisterSchema = z.object({
+  id: z.string(),
   coachingName: nameSchema,
   ownerName: nameSchema,
   email: emailSchema,
@@ -15,6 +16,8 @@ export const coachingRegisterSchema = z.object({
   address: z.string().min(10, "Address required"),
   idNumber: z.string().min(4, "ID Number required"),
   idProof: z.any().optional(),
+  logo: z.any().optional(),
+  code: z.string()
 });
 
 export type CoachingRegisterInput = z.infer<typeof coachingRegisterSchema>;

@@ -12,7 +12,7 @@
     "security": "npm run lint && npm run typecheck && npm run audit",
     "postinstall": "prisma generate",
     "prisma:migrate": "node --env-file=.env ./node_modules/prisma/build/index.js migrate dev",
-    "prisma:reset": "prisma migrate reset",
+    "prisma:reset": "node --env-file=.env ./node_modules/prisma/build/index.js migrate reset",
     "seed": "tsx --env-file=.env prisma/seed.ts",
     "seed:undo": "tsx --env-file=.env prisma/seed.undo.ts"
   },

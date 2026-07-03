@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { registerUser } from "./action";
@@ -9,46 +8,30 @@ import { RegisterSchema, registerSchema } from "@/schemas/register";
 import { signIn } from "next-auth/react";
 import toast, { Toaster } from "react-hot-toast";
 import { useRouter } from "next/navigation";
+import InputField from "@/components/ui/InputField";
+import SubmitButton from "@/components/ui/SubmitButton";
+import { ROUTES } from "@/lib/constans";
 
 export default function RegisterPage() {
   const router = useRouter();
-  const [loading, setLoading] = useState(false);
 
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm<RegisterSchema>({
     resolver: zodResolver(registerSchema),
   });
 
   const onSubmit = async (data: RegisterSchema) => {
-    setLoading(true);
-
     try {
-      const formData = new FormData();
-      Object.entries(data).forEach(([key, value]) => {
-        formData.append(key, value as string);
-      });
-
       // ✅ Register
-      const result = await registerUser(formData);
+      const result = await registerUser(data);
 
       if (!result.success) {
-        const errorMessage =
-          result.errors?.general?.[0] ||
-          result.errors?.email?.[0] ||
-          result.errors?.mobile?.[0] ||
-          result.errors?.password?.[0] ||
-          result.errors?.dob?.[0];
-        toast.error(errorMessage || "Something went wrong");
+        toast.error(result.message);
         return;
       }
-
-// await logAudit(
-//   user.id,
-//   "REGISTER"
-// );
 
       // ✅ Auto Login
       const loginResult = await signIn("credentials", {
@@ -64,11 +47,11 @@ export default function RegisterPage() {
       toast.success("Account created & logged in ✅");
 
       // ✅ Redirect
-      router.push("/dashboard");
-    } catch (error: any) {
-      toast.error(error.message || "Something went wrong ❌");
-    } finally {
-      setLoading(false);
+      router.push(ROUTES.DASHBOARD);
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : "Something went wrong",
+      );
     }
   };
 
@@ -86,81 +69,58 @@ export default function RegisterPage() {
         <Toaster />
         {/* Form */}
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-          {/* Name */}
-          <div>
-            <label className="text-sm font-medium">Full Name</label>
+          <InputField
+            label="Full Name"
+            name="name"
+            register={register}
+            error={errors.name?.message}
+            placeholder="Enter full name"
+          />
 
-            <input
-              {...register("name")}
-              placeholder="Enter full name"
-              className="w-full mt-2 p-4 border rounded-2xl outline-none focus:ring-2 focus:ring-purple-500"
-            />
-            <p>{errors.name?.message as string}</p>
-          </div>
+          <InputField
+            label="Email"
+            name="email"
+            register={register}
+            error={errors.email?.message}
+            placeholder="Enter email"
+          />
 
-          {/* Email */}
-          <div>
-            <label className="text-sm font-medium">Email</label>
+          <InputField
+            label="Mobile Number"
+            name="mobile"
+            register={register}
+            error={errors.mobile?.message}
+            placeholder="Enter mobile number"
+          />
 
-            <input
-              {...register("email")}
-              placeholder="Enter email"
-              className="w-full mt-2 p-4 border rounded-2xl outline-none focus:ring-2 focus:ring-purple-500"
-            />
-            {errors.email?.message as string}
-          </div>
+          <InputField
+            type="date"
+            label="Date of Birth"
+            name="dob"
+            register={register}
+            error={errors.dob?.message}
+          />
 
-          {/* Mobile */}
-          <div>
-            <label className="text-sm font-medium">Mobile Number</label>
+          <InputField
+            type="password"
+            label="Password"
+            name="password"
+            register={register}
+            error={errors.password?.message}
+            placeholder="Enter password"
+          />
 
-            <input
-              {...register("mobile")}
-              placeholder="Enter mobile number"
-              className="w-full mt-2 p-4 border rounded-2xl outline-none focus:ring-2 focus:ring-purple-500"
-            />
-            {errors.mobile?.message as string}
-          </div>
-
-          <div>
-            <label className="text-sm font-medium">Date of Birth</label>
-
-            <input
-              type="date"
-              {...register("dob")}
-              placeholder="Enter mobile number"
-              className="w-full mt-2 p-4 border rounded-2xl outline-none focus:ring-2 focus:ring-purple-500"
-            />
-            {errors.dob?.message as string}
-          </div>
-
-          {/* Password */}
-          <div>
-            <label className="text-sm font-medium">Password</label>
-
-            <input
-              type="password"
-              {...register("password")}
-              placeholder="Enter password"
-              className="w-full mt-2 p-4 border rounded-2xl outline-none focus:ring-2 focus:ring-purple-500"
-            />
-            {errors.password?.message as string}
-          </div>
-
-          {/* Submit */}
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-purple-600 hover:bg-purple-700 text-white py-4 rounded-2xl font-semibold transition disabled:opacity-50"
-          >
-            {loading ? "Creating Account..." : "Create Account"}
-          </button>
+          <SubmitButton
+            loading={isSubmitting}
+            loadingText="Creating Account..."
+            text="Create Account"
+          />
         </form>
 
         {/* Login */}
         <p className="text-center text-gray-500 mt-6 text-sm">
           Already have an account?{" "}
-          <Link href="/login" className="text-purple-600 font-semibold">
+          <Link href={ROUTES.LOGIN} className="text-purple-600 font-semibold">
             Login
           </Link>
         </p>

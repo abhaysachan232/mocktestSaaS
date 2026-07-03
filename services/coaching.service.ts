@@ -1,16 +1,17 @@
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcrypt";
 import { CoachingRegisterInput } from "@/schemas/coaching";
+import { ROLES } from "@/lib/constans";
 
 export async function getAllCoachings() {
   return prisma.coaching.findMany({
     include: {
       users: {
+        where: {
+          role: "COACHING",
+        },
         select: {
-          id: true,
-          name: true,
           email: true,
-          mobile: true,
         },
       },
     },
@@ -41,17 +42,26 @@ export async function getCoachingById(coachingId: string) {
 }
 
 export async function createCoaching(data: CoachingRegisterInput) {
-  const existingUser = await prisma.user.findFirst({
-    where: {
-      OR: [{ email: data.email }, { mobile: data.mobile }],
-    },
-  });
+  console.log("idProof", data.idProof, data.idProof[0])
+  const [existingEmail, existingMobile] = await Promise.all([
+    prisma.user.findUnique({
+      where: {
+        email: data.email,
+      },
+    }),
 
-  if (existingUser) {
-    throw new Error("Email or Mobile already exists");
+    prisma.coaching.findUnique({
+      where: {
+        mobile: data.mobile,
+      },
+    }),
+  ]);
+
+  if (existingEmail || existingMobile) {
+    throw new Error("Coaching already exists");
   }
 
-  const hashedPassword = await bcrypt.hash(data.password, 10);
+  const hashedPassword = await bcrypt.hash(data.password, 12);
 
   return prisma.$transaction(async (tx) => {
     const coaching = await tx.coaching.create({
@@ -60,18 +70,19 @@ export async function createCoaching(data: CoachingRegisterInput) {
 
         coachingName: data.coachingName,
         ownerName: data.ownerName,
+        mobile: data.mobile,
         address: data.address,
         idNumber: data.idNumber,
+        idProof: data.idProof[0].name,
+        logo: "",
       },
     });
 
     const user = await tx.user.create({
       data: {
-        name: data.ownerName,
         email: data.email,
-        mobile: data.mobile,
         password: hashedPassword,
-        role: "COACHING",
+        role: ROLES.COACHING,
         coachingId: coaching.id,
       },
     });

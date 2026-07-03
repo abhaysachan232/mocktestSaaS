@@ -3,7 +3,6 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
 
 import {
   Users,
@@ -16,11 +15,22 @@ import {
 } from "lucide-react";
 import { ROUTES } from "@/lib/constans";
 import LogOutButton from "../ui/LogOutButton";
+import { useApi } from "@/lib/use-api";
+import { CoachingRegisterInput } from "@/schemas/coaching";
 
-export default function AdminPage() {
+export default function AdminDashboardPage() {
   const router = useRouter();
-  const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(false);
+
+  
+
+const {
+  data: coachings,
+  loading,
+  error,
+} = useApi<CoachingRegisterInput[]>("/api/coaching");
+console.log('data', coachings, loading, error)
+
+  
 
   // Logout
   const handleLogout = async () => {};
@@ -35,7 +45,7 @@ export default function AdminPage() {
     {
       title: "Total Students",
 
-      value: data?.totalStudents || 0,
+      value: 0,
 
       icon: Users,
     },
@@ -43,7 +53,7 @@ export default function AdminPage() {
     {
       title: "Total Tests",
 
-      value: data?.totalTests || 0,
+      value: 0,
 
       icon: FileText,
     },
@@ -51,7 +61,7 @@ export default function AdminPage() {
     {
       title: "Revenue",
 
-      value: `₹${data?.revenue || 0}`,
+      value: `₹${0}`,
 
       icon: IndianRupee,
     },
@@ -59,7 +69,7 @@ export default function AdminPage() {
     {
       title: "Active Users",
 
-      value: data?.activeUsers || 0,
+      value: 0,
 
       icon: Activity,
     },
@@ -141,17 +151,18 @@ export default function AdminPage() {
 
                   <th className="text-left py-4">Email</th>
 
-                  <th className="text-left py-4">Coupon</th>
+                  <th className="text-left py-4">Code</th>
 
-                  <th className="text-left py-4">Commission</th>
+                  <th className="text-left py-4">Mobile</th>
+                  <th className="text-left py-4">Owner Name</th>
 
                   <th className="text-left py-4">Action</th>
                 </tr>
               </thead>
 
               <tbody>
-                {data?.coachings?.map((coaching) => (
-                  <tr key={coaching._id} className="border-b">
+                {coachings?.map((coaching, ind) => (
+                  <tr key={coaching.coachingName+ind} className="border-b">
                     <td className="py-4">
                       {coaching.logo && (
                         <Image
@@ -164,17 +175,18 @@ export default function AdminPage() {
                       )}
                     </td>
 
-                    <td className="py-4 font-medium">{coaching.name}</td>
+                    <td className="py-4 font-medium">{coaching.coachingName}</td>
 
                     <td className="py-4">{coaching.email}</td>
 
-                    <td className="py-4">{coaching.couponCode}</td>
+                    <td className="py-4">{coaching.code}</td>
 
-                    <td className="py-4">₹{coaching.commission}</td>
+                    <td className="py-4">{coaching.mobile}</td>
+                    <td className="py-4">{coaching.ownerName}</td>
 
                     <td className="py-4">
                       <button
-                        onClick={() => deleteCoaching(coaching._id)}
+                        onClick={() => deleteCoaching(coaching.id)}
                         className="bg-red-100 hover:bg-red-200 text-red-600 p-3 rounded-xl"
                       >
                         <Trash2 size={18} />
@@ -203,7 +215,7 @@ export default function AdminPage() {
                 </tr>
               </thead>
 
-              <tbody>
+              {/* <tbody>
                 {data?.students?.map((student) => (
                   <tr key={student._id} className="border-b">
                     <td className="py-4 font-medium">{student.name}</td>
@@ -220,7 +232,7 @@ export default function AdminPage() {
                     </td>
                   </tr>
                 ))}
-              </tbody>
+              </tbody> */}
             </table>
           </div>
         </div>

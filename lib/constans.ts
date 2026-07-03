@@ -9,8 +9,9 @@ export const ROUTES = {
   LOGIN: "/login",
   REGISTER: "/register",
   FORGOT_PASSWORD: "/forgot-password",
+  RESET_PASSWORD: "/reset-password",
   DASHBOARD: "/dashboard",
-  CREATE_COACHING: "/create-coaching"
+  CREATE_COACHING: "/create-coaching",
 } as const;
 
 
