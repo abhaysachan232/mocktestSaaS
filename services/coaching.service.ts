@@ -42,7 +42,7 @@ export async function getCoachingById(coachingId: string) {
 }
 
 export async function createCoaching(data: CoachingRegisterInput) {
-  console.log("idProof", data.idProof, data.idProof[0])
+  console.log('createCoaching', data)
   const [existingEmail, existingMobile] = await Promise.all([
     prisma.user.findUnique({
       where: {
@@ -52,6 +52,7 @@ export async function createCoaching(data: CoachingRegisterInput) {
 
     prisma.coaching.findUnique({
       where: {
+        code: data.code,
         mobile: data.mobile,
       },
     }),
@@ -66,15 +67,14 @@ export async function createCoaching(data: CoachingRegisterInput) {
   return prisma.$transaction(async (tx) => {
     const coaching = await tx.coaching.create({
       data: {
-        code: crypto.randomUUID().replace(/-/g, "").slice(0, 8).toUpperCase(),
-
+        code: data.code,
         coachingName: data.coachingName,
         ownerName: data.ownerName,
         mobile: data.mobile,
         address: data.address,
         idNumber: data.idNumber,
-        idProof: "",
-        logo: "",
+        idProof: data.idProof,
+        logo: data.logo,
       },
     });
 

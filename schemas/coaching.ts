@@ -10,6 +10,7 @@ export const coachingRegisterSchema = z.object({
   // id: z.string(),
   coachingName: nameSchema,
   ownerName: nameSchema,
+  code: z.string().trim().min(3, "Name must be at least 3 characters"),
   email: emailSchema,
   mobile: mobileSchema,
   password: passwordSchema,

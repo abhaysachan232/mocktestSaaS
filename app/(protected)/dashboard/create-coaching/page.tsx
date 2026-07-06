@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useEffect, useState } from "react";
+import { Controller, useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Building2 } from "lucide-react";
 import {
@@ -13,15 +13,42 @@ import { api } from "@/lib/api";
 import SubmitButton from "@/components/ui/SubmitButton";
 import { useRouter } from "next/navigation";
 import { ROUTES } from "@/lib/constans";
+import ImageUpload from "@/components/ui/ImageUpload";
+
+const generateCoachingCode = (
+  coachingName: string,
+  ownerName: string,
+  idNumber: string,
+) => {
+  const coachingPart = coachingName
+    .trim()
+    .replace(/[^a-zA-Z]/g, "")
+    .slice(0, 3)
+    .toUpperCase();
+
+  const ownerPart = ownerName
+    .trim()
+    .replace(/[^a-zA-Z]/g, "")
+    .slice(0, 3)
+    .toUpperCase();
+
+  const idPart = idNumber
+    .replace(/[^a-zA-Z0-9]/g, "")
+    .slice(-4)
+    .toUpperCase();
+
+  return `${coachingPart}${ownerPart}${idPart}`;
+};
 
 export default function CreateCoachingPage() {
   const router = useRouter();
-  const [loading, setLoading] = useState(false);
   const [serverError, setServerError] = useState("");
   const [success, setSuccess] = useState("");
 
   const {
+    control,
     register,
+    setValue,
     handleSubmit,
     reset,
     formState: { errors, isSubmitting },
@@ -29,25 +56,41 @@ export default function CreateCoachingPage() {
     resolver: zodResolver(coachingRegisterSchema),
   });
 
+  const [coachingName, ownerName, idNumber] = useWatch({
+    control,
+    name: ["coachingName", "ownerName", "idNumber"],
+  });
+
+  const coachingCode =
+    coachingName && ownerName && idNumber
+      ? generateCoachingCode(coachingName, ownerName, idNumber)
+      : "";
+
+  useEffect(() => {
+    if (!coachingCode) return;
+
+    setValue("code", coachingCode, {
+      shouldValidate: true,
+      shouldDirty: true,
+    });
+  }, [coachingCode, setValue]);
+
   const onSubmit = async (data: CoachingRegisterInput) => {
     try {
-      setLoading(true);
       setServerError("");
       setSuccess("");
       console.log("CreateCoachingPage", data);
       const response = await api.post("/api/dashboard/coaching", data);
       setSuccess(response.data.message);
 
-      // reset();
-      router.push(ROUTES.DASHBOARD);
+      reset();
+      // router.push(ROUTES.DASHBOARD);
     } catch (error) {
       if (error instanceof Error) {
         setServerError(error.message);
       } else {
         setServerError("Unexpected error occurred");
       }
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -80,12 +123,18 @@ export default function CreateCoachingPage() {
             <div className="bg-red-100 p-2 text-red-700">{serverError}</div>
           )}
           <div className="grid md:grid-cols-2 gap-5">
-            <InputField
-              type="file"
-              label="Logo"
+            <Controller
               name="logo"
-              register={register}
-              error={errors?.logo?.message as string}
+              control={control}
+              render={({ field }) => (
+                <ImageUpload
+                  label="Upload Coaching Logo"
+                  folder={`coaching/${coachingCode}`}
+                  value={field.value}
+                  onChange={field.onChange}
+                  error={errors.logo?.message as string}
+                />
+              )}
             />
             <InputField
               label="Coaching Name"
@@ -99,6 +148,14 @@ export default function CreateCoachingPage() {
               name="ownerName"
               register={register}
               error={errors.ownerName?.message}
+            />
+            <InputField
+              label="Coaching Code"
+              name="code"
+              register={register}
+              readOnly
+              error={errors.coachingName?.message}
+              placeholder="Coaching Name"
             />
             <InputField
               label="Email"
@@ -132,12 +189,18 @@ export default function CreateCoachingPage() {
               register={register}
               error={errors.idNumber?.message}
             />
-            <InputField
-              type="file"
-              label="ID Proof"
+            <Controller
               name="idProof"
-              register={register}
-              error={errors?.idProof?.message as string}
+              control={control}
+              render={({ field }) => (
+                <ImageUpload
+                  label="Upload Id Proof"
+                  folder={`coaching/${coachingCode}`}
+                  value={field.value}
+                  onChange={field.onChange}
+                  error={errors.logo?.message as string}
+                />
+              )}
             />
           </div>
           <SubmitButton

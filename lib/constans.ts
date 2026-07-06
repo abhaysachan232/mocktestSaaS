@@ -19,3 +19,10 @@ export const MESSAGES = {
   INVALID_CREDENTIALS: "Invalid email or password",
   SOMETHING_WENT_WRONG: "Something went wrong",
 } as const;
+
+export const MAX_IMAGE_SIZE = 2 * 1024 * 1024; // 2MB
+export const ALLOWED_IMAGE_TYPES = [
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+];

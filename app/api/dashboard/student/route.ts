@@ -11,7 +11,6 @@ export async function GET() {
     }
 
     const data = await getStudentDashboard(session.user.id);
-
     return successResponse(data);
   } catch (error) {
     return errorResponse(error);
