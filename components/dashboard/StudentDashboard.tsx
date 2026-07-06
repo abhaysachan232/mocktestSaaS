@@ -12,8 +12,6 @@ import Profile from "./Profile";
 
 import { useApi } from "@/lib/use-api";
 import type { StudentDashboardData } from "@/services/dashboard.service";
-import { StatsGrid } from "../ui/StatsGrid";
-import { AlertTriangle, BookOpen, Target, Trophy } from "lucide-react";
 
 export default function StudentDashboardPage() {
   const { data: session, status } = useSession();
@@ -25,41 +23,41 @@ export default function StudentDashboardPage() {
   const user = session?.user;
   console.log("StudentDashboardPage", data, loading, error, user);
 
-  const stats = [
-    {
-      title: "Tests Attempted",
-      value: 0,
-      icon: BookOpen,
-      iconBg: "bg-green-100",
-      iconColor: "from-blue-500 to-indigo-600",
-    },
-    {
-      title: "Average Score",
-      value: `${0}%`,
-      icon: Target,
-      iconBg: "bg-orange-100",
-      iconColor: "from-green-500 to-emerald-600",
-    },
-    {
-      title: "Best Rank",
-      value: `#${0}`,
-      icon: Trophy,
-      iconBg: "bg-purple-100",
-      iconColor: "from-purple-500 to-violet-600",
-    },
-    {
-      title: "Weak Subjects",
-      value: 0,
-      icon: AlertTriangle,
-      iconBg: "bg-blue-100",
-      iconColor: "from-red-500 to-pink-600",
-    },
-  ];
+  // const stats = [
+  //   {
+  //     title: "Tests Attempted",
+  //     value: 0,
+  //     icon: BookOpen,
+  //     iconBg: "bg-green-100",
+  //     iconColor: "from-blue-500 to-indigo-600",
+  //   },
+  //   {
+  //     title: "Average Score",
+  //     value: `${0}%`,
+  //     icon: Target,
+  //     iconBg: "bg-orange-100",
+  //     iconColor: "from-green-500 to-emerald-600",
+  //   },
+  //   {
+  //     title: "Best Rank",
+  //     value: `#${0}`,
+  //     icon: Trophy,
+  //     iconBg: "bg-purple-100",
+  //     iconColor: "from-purple-500 to-violet-600",
+  //   },
+  //   {
+  //     title: "Weak Subjects",
+  //     value: 0,
+  //     icon: AlertTriangle,
+  //     iconBg: "bg-blue-100",
+  //     iconColor: "from-red-500 to-pink-600",
+  //   },
+  // ];
 
   const activeContent = useMemo(() => {
     switch (activeTab) {
-      case "dashboard":
-        return <StatsGrid stats={stats} />;
+      // case "dashboard":
+      //   return <StatsGrid stats={stats} />;
 
       case "tests":
         return <Tests tests={[]} />;
