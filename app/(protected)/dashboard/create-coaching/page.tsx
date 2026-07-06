@@ -24,7 +24,7 @@ export default function CreateCoachingPage() {
     register,
     handleSubmit,
     reset,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm<CoachingRegisterInput>({
     resolver: zodResolver(coachingRegisterSchema),
   });
@@ -35,10 +35,10 @@ export default function CreateCoachingPage() {
       setServerError("");
       setSuccess("");
       console.log("CreateCoachingPage", data);
-      const response = await api.post("/api/coaching", data);
+      const response = await api.post("/api/dashboard/coaching", data);
       setSuccess(response.data.message);
 
-      reset();
+      // reset();
       router.push(ROUTES.DASHBOARD);
     } catch (error) {
       if (error instanceof Error) {
@@ -66,7 +66,12 @@ export default function CreateCoachingPage() {
           </div>
         </div>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="">
+        <form
+          onSubmit={handleSubmit(onSubmit, (errors) => {
+            console.log("Validation Errors", errors);
+          })}
+          className=""
+        >
           {success && (
             <div className="bg-green-100 p-2 text-green-700">{success}</div>
           )}
@@ -137,7 +142,7 @@ export default function CreateCoachingPage() {
           </div>
           <SubmitButton
             className="mt-8"
-            loading={loading}
+            loading={isSubmitting}
             text="Create Coaching"
             loadingText="Creating Coaching..."
             icon={<Building2 size={20} />}

@@ -73,7 +73,7 @@ export async function createCoaching(data: CoachingRegisterInput) {
         mobile: data.mobile,
         address: data.address,
         idNumber: data.idNumber,
-        idProof: data.idProof[0].name,
+        idProof: "",
         logo: "",
       },
     });

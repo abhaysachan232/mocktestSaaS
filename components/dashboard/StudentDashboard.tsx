@@ -1,31 +1,84 @@
 "use client";
 
 import { useSession } from "next-auth/react";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 
 import Header from "./Header";
 import Sidebar from "./Sidebar";
-import StatsCards from "./StatsCards";
 import Tests from "./Tests";
 import Results from "./Results";
 import Leaderboard from "./Leaderboard";
 import Profile from "./Profile";
+
 import { useApi } from "@/lib/use-api";
 import type { StudentDashboardData } from "@/services/dashboard.service";
+import { StatsGrid } from "../ui/StatsGrid";
+import { AlertTriangle, BookOpen, Target, Trophy } from "lucide-react";
 
 export default function StudentDashboardPage() {
-  // const { data: session, status } = useSession();
-
+  const { data: session, status } = useSession();
   const [activeTab, setActiveTab] = useState("dashboard");
 
-  const {
-    data: student,
-    loading,
-    error,
-  } = useApi<StudentDashboardData>("/api/dashboard/student");
-  console.log("StudentDashboardPage", student);
+  const { data, loading, error } = useApi<StudentDashboardData>(
+    "/api/dashboard/student",
+  );
+  const user = session?.user;
+  console.log("StudentDashboardPage", data, loading, error, user);
 
-  if (loading) {
+  const stats = [
+    {
+      title: "Tests Attempted",
+      value: 0,
+      icon: BookOpen,
+      iconBg: "bg-green-100",
+      iconColor: "from-blue-500 to-indigo-600",
+    },
+    {
+      title: "Average Score",
+      value: `${0}%`,
+      icon: Target,
+      iconBg: "bg-orange-100",
+      iconColor: "from-green-500 to-emerald-600",
+    },
+    {
+      title: "Best Rank",
+      value: `#${0}`,
+      icon: Trophy,
+      iconBg: "bg-purple-100",
+      iconColor: "from-purple-500 to-violet-600",
+    },
+    {
+      title: "Weak Subjects",
+      value: 0,
+      icon: AlertTriangle,
+      iconBg: "bg-blue-100",
+      iconColor: "from-red-500 to-pink-600",
+    },
+  ];
+
+  const activeContent = useMemo(() => {
+    switch (activeTab) {
+      case "dashboard":
+        return <StatsGrid stats={stats} />;
+
+      case "tests":
+        return <Tests tests={[]} />;
+
+      case "results":
+        return <Results results={[]} />;
+
+      case "leaderboard":
+        return <Leaderboard leaderboard={null} />;
+
+      case "profile":
+        return <Profile profile={user} />;
+
+      default:
+        return null;
+    }
+  }, [activeTab, user]);
+
+  if (status === "loading" || loading) {
     return (
       <div className="min-h-screen flex items-center justify-center text-2xl font-bold">
         Loading Dashboard...
@@ -34,10 +87,12 @@ export default function StudentDashboardPage() {
   }
 
   if (error) {
-    return <p className="text-red-500">{error}</p>;
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-red-500">{error}</p>
+      </div>
+    );
   }
-
-  const user = session?.user;
 
   return (
     <div className="min-h-screen bg-slate-100">
@@ -45,21 +100,12 @@ export default function StudentDashboardPage() {
         <Sidebar
           activeTab={activeTab}
           setActiveTab={setActiveTab}
-          coaching={user?.coaching}
+          coaching={data?.coaching}
         />
 
         <main className="flex-1 p-8">
-          <Header studentName={user?.name} />
-
-          {activeTab === "dashboard" && <StatsCards dashboard={user} />}
-
-          {activeTab === "tests" && <Tests tests={[]} />}
-
-          {activeTab === "results" && <Results results={[]} />}
-
-          {activeTab === "leaderboard" && <Leaderboard leaderboard={null} />}
-
-          {activeTab === "profile" && <Profile profile={user} />}
+          <Header studentName={data?.name} />
+          {activeContent}
         </main>
       </div>
     </div>
