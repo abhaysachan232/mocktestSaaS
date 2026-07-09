@@ -1,10 +1,10 @@
 "use client";
 
 import { useSession } from "next-auth/react";
-import { useState, useMemo } from "react";
+import { useMemo, useState } from "react";
 
 import Header from "./Header";
-import Sidebar from "./Sidebar";
+import CategoryPage from "./CategoryPage";
 import Tests from "./Tests";
 import Results from "./Results";
 import Leaderboard from "./Leaderboard";
@@ -18,47 +18,13 @@ export default function StudentDashboardPage() {
   const [activeTab, setActiveTab] = useState("dashboard");
 
   const { data, loading, error } = useApi<StudentDashboardData>(
-    "/api/dashboard/student",
+    "/api/dashboard/student"
   );
-  const user = session?.user;
-  console.log("StudentDashboardPage", data, loading, error, user);
 
-  // const stats = [
-  //   {
-  //     title: "Tests Attempted",
-  //     value: 0,
-  //     icon: BookOpen,
-  //     iconBg: "bg-green-100",
-  //     iconColor: "from-blue-500 to-indigo-600",
-  //   },
-  //   {
-  //     title: "Average Score",
-  //     value: `${0}%`,
-  //     icon: Target,
-  //     iconBg: "bg-orange-100",
-  //     iconColor: "from-green-500 to-emerald-600",
-  //   },
-  //   {
-  //     title: "Best Rank",
-  //     value: `#${0}`,
-  //     icon: Trophy,
-  //     iconBg: "bg-purple-100",
-  //     iconColor: "from-purple-500 to-violet-600",
-  //   },
-  //   {
-  //     title: "Weak Subjects",
-  //     value: 0,
-  //     icon: AlertTriangle,
-  //     iconBg: "bg-blue-100",
-  //     iconColor: "from-red-500 to-pink-600",
-  //   },
-  // ];
+  const user = session?.user;
 
   const activeContent = useMemo(() => {
     switch (activeTab) {
-      // case "dashboard":
-      //   return <StatsGrid stats={stats} />;
-
       case "tests":
         return <Tests tests={[]} />;
 
@@ -69,16 +35,27 @@ export default function StudentDashboardPage() {
         return <Leaderboard leaderboard={null} />;
 
       case "profile":
-        return <Profile profile={user} />;
+        return <Profile profile={data?.user ?? null} />;
 
+      case "dashboard":
       default:
-        return null;
+        return (
+          <div className="rounded-3xl bg-white p-8 shadow-sm">
+            <h2 className="text-2xl font-bold">
+              Welcome, {data?.name}
+            </h2>
+
+            <p className="mt-2 text-slate-500">
+              Select any option above to continue.
+            </p>
+          </div>
+        );
     }
-  }, [activeTab, user]);
+  }, [activeTab, user, data?.name, data?.user]);
 
   if (status === "loading" || loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center text-2xl font-bold">
+      <div className="flex min-h-screen items-center justify-center text-lg font-semibold">
         Loading Dashboard...
       </div>
     );
@@ -86,26 +63,29 @@ export default function StudentDashboardPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="flex min-h-screen items-center justify-center">
         <p className="text-red-500">{error}</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-slate-100">
-      <div className="flex">
-        <Sidebar
-          activeTab={activeTab}
-          setActiveTab={setActiveTab}
-          coaching={data?.coaching}
-        />
+    <main className="min-h-screen bg-slate-100">
 
-        <main className="flex-1 p-8">
-          <Header studentName={data?.name} />
-          {activeContent}
-        </main>
-      </div>
-    </div>
+      {/* Header */}
+      {/* <Header studentName={data?.name} /> */}
+
+      {/* Flipkart Style Category Navigation */}
+      <CategoryPage
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+      />
+
+      {/* Content */}
+      <section className="p-4 sm:p-5 md:p-6 lg:p-8">
+        {activeContent}
+      </section>
+
+    </main>
   );
 }
