@@ -85,7 +85,7 @@ export default function AdminDashboardPage() {
             <Building2 size={18} />
             Create Coaching
           </Link>
-          <LogOutButton />
+          {/* <LogOutButton /> */}
         </div>
       </div>
 
