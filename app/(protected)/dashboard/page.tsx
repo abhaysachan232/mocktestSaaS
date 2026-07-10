@@ -36,6 +36,7 @@ console.log(role)
 
   const DashboardComponent =
     roleComponents[role as keyof typeof roleComponents];
+console.log(DashboardComponent);
 
   return (
     <main className="min-h-screen bg-slate-50">
