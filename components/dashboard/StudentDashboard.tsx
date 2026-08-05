@@ -1,27 +1,25 @@
 "use client";
 
-import { useSession } from "next-auth/react";
+// import { useSession } from "next-auth/react";
 import { useMemo, useState } from "react";
-
-import Header from "./Header";
 import CategoryPage from "./CategoryPage";
 import Tests from "./Tests";
 import Results from "./Results";
 import Leaderboard from "./Leaderboard";
-import Profile from "./Profile";
+// import Profile from "./Profile";
 
 import { useApi } from "@/lib/use-api";
 import type { StudentDashboardData } from "@/services/dashboard.service";
 
 export default function StudentDashboardPage() {
-  const { data: session, status } = useSession();
+  // const { data: session, status } = useSession();
   const [activeTab, setActiveTab] = useState("dashboard");
 
   const { data, loading, error } = useApi<StudentDashboardData>(
     "/api/dashboard/student"
   );
 
-  const user = session?.user;
+  // const user = session?.user;
 
   const activeContent = useMemo(() => {
     switch (activeTab) {
@@ -34,8 +32,8 @@ export default function StudentDashboardPage() {
       case "leaderboard":
         return <Leaderboard leaderboard={null} />;
 
-      case "profile":
-        return <Profile profile={data?.user ?? null} />;
+      // case "profile":
+      //   return <Profile profile={data?.user ?? null} />;
 
       case "dashboard":
       default:
@@ -51,7 +49,7 @@ export default function StudentDashboardPage() {
           </div>
         );
     }
-  }, [activeTab, user, data?.name, data?.user]);
+  }, [activeTab, data?.name]); // [activeTab, user, data?.name, data?.user]
 
   if (status === "loading" || loading) {
     return (

@@ -11,8 +11,6 @@ import {
 import InputField from "@/components/ui/InputField";
 import { api } from "@/lib/api";
 import SubmitButton from "@/components/ui/SubmitButton";
-import { useRouter } from "next/navigation";
-import { ROUTES } from "@/lib/constans";
 import ImageUpload from "@/components/ui/ImageUpload";
 
 const generateCoachingCode = (
@@ -41,7 +39,6 @@ const generateCoachingCode = (
 };
 
 export default function CreateCoachingPage() {
-  const router = useRouter();
   const [serverError, setServerError] = useState("");
   const [success, setSuccess] = useState("");
 

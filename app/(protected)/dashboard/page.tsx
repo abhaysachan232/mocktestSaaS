@@ -1,12 +1,9 @@
-"use client";
-
-import { useSession } from "next-auth/react";
-import { Loader2 } from "lucide-react";
+import { auth } from "@/lib/auth";
 import { ROLES } from "@/lib/constans";
 import CoachingDashboard from "@/components/dashboard/CoachingDashboard";
 import AdminDashboard from "@/components/dashboard/AdminDashboard";
 import StudentDashboard from "@/components/dashboard/StudentDashboard";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 
 const roleComponents = {
   [ROLES.ADMIN]: AdminDashboard,
@@ -14,21 +11,16 @@ const roleComponents = {
   [ROLES.STUDENT]: StudentDashboard,
 };
 
-export default function DashboardPage() {
-  const { data: session, status } = useSession();
+export default async function DashboardPage() {
+  const session = await auth();
 
-  console.log('DashboardPage', session, status);
-
-  if (status === "loading") {
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin" />
-      </div>
-    );
+  console.log("DashboardPage", session);
+  if (!session) {
+    redirect("/login");
   }
 
   const role = session?.user?.role;
-console.log(role)
+  console.log(role);
 
   if (!role) {
     notFound();
@@ -36,7 +28,6 @@ console.log(role)
 
   const DashboardComponent =
     roleComponents[role as keyof typeof roleComponents];
-console.log(DashboardComponent);
 
   return (
     <main className="min-h-screen bg-slate-50">

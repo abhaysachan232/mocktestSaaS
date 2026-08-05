@@ -17,7 +17,7 @@ export default function CoachingDashboardPage() {
   const { data, loading, error } = useApi<CoachingDashboardData>(
     "/api/dashboard/coaching",
   );
-  console.log('CoachingDashboardPage', data)
+  console.log('CoachingDashboardPage', data, loading)
   const stats = [
     {
       title: "Total Students",

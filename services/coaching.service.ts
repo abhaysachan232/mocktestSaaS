@@ -22,25 +22,6 @@ export async function getAllCoachings() {
   });
 }
 
-export async function getCoachingById(coachingId: string) {
-  return prisma.coaching.findUnique({
-    where: {
-      id: coachingId,
-    },
-
-    include: {
-      users: {
-        select: {
-          id: true,
-          name: true,
-          email: true,
-          mobile: true,
-        },
-      },
-    },
-  });
-}
-
 export async function createCoaching(data: CoachingRegisterInput) {
   console.log('createCoaching', data)
   const [existingEmail, existingMobile] = await Promise.all([

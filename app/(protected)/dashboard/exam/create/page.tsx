@@ -1,13 +1,11 @@
-"use client";
+import { getSubjects } from "@/actions/exam";
+import ExamForm from "@/components/exam-form";
 
-import CreateTestForm from "@/components/adminTest/createTest/CreateTestForm";
-
-export default function CreateTestPage() {
+export default async function CreateTestPage() {
+  const subjects = await getSubjects();
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
+    <div className="min-h-screen bg-linear-to-br from-slate-50 via-blue-50 to-indigo-100">
       <div className="max-w-7xl mx-auto px-4 py-8">
-
-        {/* Header */}
         <div className="mb-8">
           <h1 className="text-4xl font-bold text-slate-800">
             Create Mock Test
@@ -18,10 +16,8 @@ export default function CreateTestPage() {
             from the Question Bank according to selected topics.
           </p>
         </div>
-
-        <CreateTestForm />
-
       </div>
+      <ExamForm subjects={subjects} />
     </div>
   );
 }

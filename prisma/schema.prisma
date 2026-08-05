@@ -31,6 +31,7 @@ model User {
   student    Student?
   coachingId String?
   coaching   Coaching? @relation(fields: [coachingId], references: [id])
+  exams      Exam[]
 }
 
 model Student {
@@ -75,12 +76,6 @@ enum CourseName {
   CET
 }
 
-enum Difficulty {
-  EASY
-  MEDIUM
-  HARD
-}
-
 model Coupon {
   id         String   @id @default(cuid()) // Primary Key
   name       String
@@ -88,15 +83,53 @@ model Coupon {
   expiryDate DateTime
 }
 
-// model ExamPaper {
-//   id              String   @id @default(cuid()) // Primary Key
-//   courseName      String[]
-//   subPaper        String? // Ex: paper stage like 1 or 2
-//   duration        Int // Ex: 30 minut, 60 minut
-//   isSectionalTime Boolean
-//   sectionalTime   Int // Ex: subject name with time duration
-//   question        String
-//   options         String[] // length of 4 answers
-//   correctAnswer   String // correct option
-//   explaination    String // explaination with respect to question and answer
-// }
+model Subject {
+  id           String        @id @default(cuid())
+  name         String        @unique
+  topics       Topic[]
+  examSubjects ExamSubject[]
+  examTopics   ExamTopic[]
+}
+
+model Topic {
+  id         String      @id @default(cuid())
+  subjectId  String
+  subject    Subject     @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  name       String
+  examTopics ExamTopic[]
+}
+
+model ExamSubject {
+  examId    String
+  subjectId String
+  exam      Exam    @relation(fields: [examId], references: [id], onDelete: Cascade)
+  subject   Subject @relation(fields: [subjectId], references: [id])
+
+  @@id([examId, subjectId])
+}
+
+model ExamTopic {
+  examId    String
+  subjectId String
+  topicId   String
+  exam      Exam    @relation(fields: [examId], references: [id], onDelete: Cascade)
+  subject   Subject @relation(fields: [subjectId], references: [id])
+  topic     Topic   @relation(fields: [topicId], references: [id])
+
+  @@id([examId, topicId])
+}
+
+model Exam {
+  id             String        @id @default(cuid())
+  coachingId     String
+  coaching       User          @relation(fields: [coachingId], references: [id], onDelete: Cascade)
+  name           String
+  examDate       DateTime
+  duration       Int
+  totalMarks     Float
+  totalQuestions Int
+  subjects       ExamSubject[]
+  topics         ExamTopic[]
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+}

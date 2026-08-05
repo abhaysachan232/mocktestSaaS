@@ -18,7 +18,7 @@ interface Props {
   profile: Profile | null;
 }
 
-export default function Profile({ profile }: Props) {
+export default function ProfileComponent({ profile }: Props) {
   if (!profile) {
     return (
       <div className="rounded-[32px] bg-white border border-slate-100 shadow-[0_25px_80px_rgba(0,0,0,0.08)] p-16 text-center">

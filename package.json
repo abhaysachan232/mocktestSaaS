@@ -10,10 +10,14 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "security": "npm run lint && npm run typecheck && npm run audit",
-    "postinstall": "prisma generate",
+    "postinstall": "npm run prisma:generate",
+    "prisma:generate": "node --env-file=.env ./node_modules/prisma/build/index.js generate",
     "prisma:migrate": "node --env-file=.env ./node_modules/prisma/build/index.js migrate dev",
+    "prisma:deploy": "node --env-file=.env ./node_modules/prisma/build/index.js migrate deploy",
+    "prisma:status": "node --env-file=.env ./node_modules/prisma/build/index.js migrate status",
     "prisma:reset": "node --env-file=.env ./node_modules/prisma/build/index.js migrate reset",
-    "seed": "tsx --env-file=.env prisma/seed.ts",
+    "prisma:studio": "node --env-file=.env ./node_modules/prisma/build/index.js studio",
+    "seed": "tsx --env-file=.env prisma/exam-sub-topic-seed.ts",
     "seed:undo": "tsx --env-file=.env prisma/seed.undo.ts"
   },
   "dependencies": {
