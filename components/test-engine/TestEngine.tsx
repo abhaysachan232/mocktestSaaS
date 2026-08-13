@@ -1,13 +1,12 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 
 import TestHeader from "./header/TestHeader";
 
 import QuestionSection from "./question/QuestionSection";
 
 import QuestionPalette from "./palette/QuestionPalette";
-import { PaletteStatus } from "./palette/PaletteItem";
 
 import NavigationButtons from "./navigation/NavigationButtons";
 import MarkForReviewButton from "./navigation/MarkForReviewButton";
@@ -21,6 +20,12 @@ import SubmitModal from "./submit/SubmitModal";
 
 import Calculator from "./tools/Calculator";
 
+import { useTestSession } from "@/hooks/useTestSession";
+
+/* =========================================================
+   TYPES
+========================================================= */
+
 export interface TestEngineOption {
   id: string;
   text: string;
@@ -29,21 +34,37 @@ export interface TestEngineOption {
 export interface TestEngineQuestion {
   id: string;
   question: string;
+
   options: TestEngineOption[];
 
   image?: string;
   imageAlt?: string;
 
+  /*
+   * Static version:
+   * correctAnswer is available.
+   *
+   * Later API version:
+   * Do NOT send correctAnswer to client.
+   */
   correctAnswer?: string;
+
   marks?: number;
   negativeMarks?: number;
 }
 
 export interface TestEngineData {
   id: string;
+
   title: string;
+
   subtitle?: string;
+
+  /*
+   * Duration in minutes
+   */
   duration: number;
+
   questions: TestEngineQuestion[];
 }
 
@@ -51,24 +72,19 @@ interface TestEngineProps {
   test: TestEngineData;
 }
 
+/* =========================================================
+   COMPONENT
+========================================================= */
+
 export default function TestEngine({
   test,
 }: TestEngineProps) {
-  const [currentQuestion, setCurrentQuestion] = useState(0);
+  /* =======================================================
+     UI STATE
+  ======================================================= */
 
-  const [answers, setAnswers] = useState<
-    Record<string, string>
-  >({});
-
-  const [markedQuestions, setMarkedQuestions] =
-    useState<Set<string>>(new Set());
-
-  const [visitedQuestions, setVisitedQuestions] =
-    useState<Set<string>>(new Set([test.questions[0]?.id]));
-
-  const [timeRemaining, setTimeRemaining] = useState(
-    test.duration * 60
-  );
+  const [testStarted, setTestStarted] =
+    useState(false);
 
   const [submitModalOpen, setSubmitModalOpen] =
     useState(false);
@@ -79,228 +95,282 @@ export default function TestEngine({
   const [calculatorOpen, setCalculatorOpen] =
     useState(false);
 
-  const question =
-    test.questions[currentQuestion];
+  /* =======================================================
+     TIMER EXPIRED
+  ======================================================= */
 
-  const totalQuestions = test.questions.length;
-
-  const selectedAnswer = question
-    ? answers[question.id] ?? null
-    : null;
-
-  /*
-   * Statistics
-   */
-  const attempted = useMemo(() => {
-    return Object.keys(answers).filter(
-      (questionId) => answers[questionId]
-    ).length;
-  }, [answers]);
-
-  const unanswered = totalQuestions - attempted;
-
-  const marked = markedQuestions.size;
-
-  /*
-   * Question status
-   */
-  const getQuestionStatus = (
-    index: number
-  ): PaletteStatus => {
-    const current =
-      test.questions[index];
-
-    if (!current) {
-      return "not-visited";
-    }
-
-    const isCurrent =
-      index === currentQuestion;
-
-    const isAnswered =
-      Boolean(answers[current.id]);
-
-    const isMarked =
-      markedQuestions.has(current.id);
-
-    if (isCurrent) {
-      return "current";
-    }
-
-    if (isAnswered && isMarked) {
-      return "answered-marked";
-    }
-
-    if (isMarked) {
-      return "marked";
-    }
-
-    if (isAnswered) {
-      return "answered";
-    }
-
-    if (visitedQuestions.has(current.id)) {
-      return "visited";
-    }
-
-    return "not-visited";
-  };
-
-  /*
-   * Navigate to question
-   */
-  const goToQuestion = (index: number) => {
-    if (
-      index < 0 ||
-      index >= totalQuestions
-    ) {
-      return;
-    }
-
-    setCurrentQuestion(index);
-
-    const questionId =
-      test.questions[index]?.id;
-
-    if (questionId) {
-      setVisitedQuestions((previous) => {
-        const next = new Set(previous);
-        next.add(questionId);
-        return next;
-      });
-    }
-
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth",
-    });
-  };
-
-  /*
-   * Previous
-   */
-  const handlePrevious = () => {
-    if (currentQuestion > 0) {
-      goToQuestion(currentQuestion - 1);
-    }
-  };
-
-  /*
-   * Next
-   */
-  const handleNext = () => {
-    if (
-      currentQuestion <
-      totalQuestions - 1
-    ) {
-      goToQuestion(currentQuestion + 1);
-    }
-  };
-
-  /*
-   * Select answer
-   */
-  const handleSelectAnswer = (
-    optionId: string
-  ) => {
-    if (!question) {
-      return;
-    }
-
-    setAnswers((previous) => ({
-      ...previous,
-      [question.id]: optionId,
-    }));
-  };
-
-  /*
-   * Clear answer
-   */
-  const handleClearAnswer = () => {
-    if (!question) {
-      return;
-    }
-
-    setAnswers((previous) => {
-      const next = {
-        ...previous,
-      };
-
-      delete next[question.id];
-
-      return next;
-    });
-  };
-
-  /*
-   * Mark / unmark
-   */
-  const handleMarkQuestion = () => {
-    if (!question) {
-      return;
-    }
-
-    setMarkedQuestions((previous) => {
-      const next = new Set(previous);
-
-      if (next.has(question.id)) {
-        next.delete(question.id);
-      } else {
-        next.add(question.id);
-      }
-
-      return next;
-    });
-  };
-
-  /*
-   * Submit
-   */
-  const handleSubmit = () => {
-    console.log("Test submitted", {
-      testId: test.id,
-      answers,
-      marked: Array.from(markedQuestions),
-    });
-
-    setSubmitModalOpen(false);
-
-    // Later:
-    // router.push(`/mock-test-result/${attemptId}`)
-  };
-
-  /*
-   * Timer expired
-   */
   const handleTimeExpired = () => {
     handleSubmit();
   };
 
-  if (!question) {
+  /* =======================================================
+     TEST SESSION
+  ======================================================= */
+
+  const session = useTestSession(
+    test,
+    handleTimeExpired
+  );
+
+  const {
+    questions,
+
+    currentIndex,
+    currentQuestion,
+
+    goTo,
+
+    nextQuestion,
+    previousQuestion,
+
+    isFirstQuestion,
+    isLastQuestion,
+
+    answers,
+
+    attempted,
+
+    selectCurrentAnswer,
+
+    clearCurrentAnswer,
+
+    markedQuestions,
+    markedCount,
+
+    toggleCurrentMark,
+    isMarked,
+
+    getStatus,
+
+    remainingSeconds,
+
+    startTimer,
+    pauseTimer,
+
+    result,
+
+    submit,
+
+    isSubmitting,
+  } = session;
+
+  const totalQuestions =
+    questions.length;
+
+  /* =======================================================
+     SUBMIT
+  ======================================================= */
+
+  const handleSubmit = async () => {
+    pauseTimer();
+
+    const response = await submit({
+      testId: test.id,
+
+      answers,
+
+      markedQuestions:
+        Array.from(markedQuestions),
+
+      timeRemaining:
+        remainingSeconds,
+    });
+
+    if (response.success) {
+      setSubmitModalOpen(false);
+
+      /*
+       * Static version:
+       * Result available in `result`.
+       *
+       * Later:
+       *
+       * router.push(
+       *   `/mock-test-result/${test.id}`
+       * );
+       */
+
+      console.log(
+        "Test submitted successfully"
+      );
+
+      console.log(
+        "Result:",
+        result
+      );
+    }
+  };
+
+  /* =======================================================
+     START TEST
+  ======================================================= */
+
+  const handleStartTest = () => {
+    setTestStarted(true);
+
+    /*
+     * Timer starts only after
+     * user clicks Start Test.
+     */
+    startTimer();
+  };
+
+  /* =======================================================
+     EMPTY TEST
+  ======================================================= */
+
+  if (!questions.length) {
     return (
-      <div className="flex min-h-[50vh] items-center justify-center p-6">
-        <div className="rounded-2xl border border-red-200 bg-red-50 p-6 text-center">
-          <h2 className="font-bold text-red-700">
-            No questions available
+      <div className="flex min-h-screen items-center justify-center bg-slate-50 p-6">
+        <div className="w-full max-w-md rounded-2xl border border-red-200 bg-red-50 p-6 text-center">
+          <h2 className="text-lg font-bold text-red-700">
+            No Questions Available
           </h2>
 
-          <p className="mt-1 text-sm text-red-600">
-            This test does not contain any questions.
+          <p className="mt-2 text-sm leading-6 text-red-600">
+            This test does not contain any
+            questions.
           </p>
         </div>
       </div>
     );
   }
 
+  /* =======================================================
+     START SCREEN
+  ======================================================= */
+
+  if (!testStarted) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-blue-50 via-white to-indigo-100 p-4">
+        <div className="w-full max-w-md rounded-3xl border border-white bg-white p-6 shadow-xl sm:p-8">
+          {/* Logo */}
+          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-600 text-2xl font-bold text-white shadow-lg">
+            T
+          </div>
+
+          {/* Title */}
+          <div className="mt-5 text-center">
+            <h1 className="text-xl font-bold text-slate-900 sm:text-2xl">
+              {test.title}
+            </h1>
+
+            {test.subtitle && (
+              <p className="mt-2 text-sm leading-6 text-slate-500">
+                {test.subtitle}
+              </p>
+            )}
+          </div>
+
+          {/* Test Information */}
+          <div className="mt-6 grid grid-cols-2 gap-3">
+            <div className="rounded-2xl bg-slate-50 p-4 text-center">
+              <p className="text-2xl font-bold text-indigo-600">
+                {totalQuestions}
+              </p>
+
+              <p className="mt-1 text-xs font-medium text-slate-500">
+                Questions
+              </p>
+            </div>
+
+            <div className="rounded-2xl bg-slate-50 p-4 text-center">
+              <p className="text-2xl font-bold text-indigo-600">
+                {test.duration}
+              </p>
+
+              <p className="mt-1 text-xs font-medium text-slate-500">
+                Minutes
+              </p>
+            </div>
+          </div>
+
+          {/* Instructions */}
+          <div className="mt-5 rounded-2xl border border-amber-200 bg-amber-50 p-4">
+            <h2 className="text-sm font-bold text-amber-800">
+              Test Instructions
+            </h2>
+
+            <ul className="mt-2 space-y-1.5 text-xs leading-5 text-amber-700">
+              <li>
+                • Timer starts after clicking Start
+                Test.
+              </li>
+
+              <li>
+                • You can navigate between questions.
+              </li>
+
+              <li>
+                • You can mark questions for review.
+              </li>
+
+              <li>
+                • You can clear your selected answer.
+              </li>
+
+              <li>
+                • Test automatically submits when
+                time ends.
+              </li>
+            </ul>
+          </div>
+
+          {/* Start Button */}
+          <button
+            type="button"
+            onClick={handleStartTest}
+            className="mt-6 flex w-full items-center justify-center rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 px-5 py-3.5 text-sm font-bold text-white shadow-lg transition-all hover:shadow-xl active:scale-[0.98]"
+          >
+            Start Test
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  /* =======================================================
+     CURRENT QUESTION SAFETY CHECK
+  ======================================================= */
+
+  if (!currentQuestion) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-slate-50 p-6">
+        <div className="rounded-2xl border border-red-200 bg-red-50 p-6 text-center">
+          <h2 className="font-bold text-red-700">
+            Question Not Found
+          </h2>
+
+          <p className="mt-1 text-sm text-red-600">
+            Unable to load the current question.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  /* =======================================================
+     MAIN TEST UI
+  ======================================================= */
+
   return (
     <div className="min-h-screen bg-slate-50">
-      {/* Header */}
+      {/* =================================================
+          HEADER
+      ================================================= */}
+
       <TestHeader
         title={test.title}
         subtitle={test.subtitle}
-        currentQuestion={currentQuestion + 1}
-        totalQuestions={totalQuestions}
-        timeRemaining={timeRemaining}
+        currentQuestion={
+          currentIndex + 1
+        }
+        totalQuestions={
+          totalQuestions
+        }
+        timeRemaining={
+          remainingSeconds
+        }
         onMenuClick={() =>
           setMobilePaletteOpen(true)
         }
@@ -309,100 +379,138 @@ export default function TestEngine({
         }
       />
 
-      {/* Main */}
+      {/* =================================================
+          MAIN CONTENT
+      ================================================= */}
+
       <div className="mx-auto max-w-7xl px-3 py-4 pb-24 sm:px-5 sm:py-6 md:pb-8 lg:px-6">
         <div className="grid grid-cols-1 gap-5 lg:grid-cols-[minmax(0,1fr)_300px]">
-          {/* Question Area */}
+          {/* =============================================
+              QUESTION AREA
+          ============================================= */}
+
           <div className="min-w-0">
             <QuestionSection
               questionNumber={
-                currentQuestion + 1
+                currentIndex + 1
               }
               questionText={
-                question.question
+                currentQuestion.question
               }
-              options={question.options}
+              options={
+                currentQuestion.options
+              }
               selectedOption={
-                selectedAnswer
+                answers[
+                  currentQuestion.id
+                ] ?? null
               }
-              image={question.image}
+              image={
+                currentQuestion.image
+              }
               imageAlt={
-                question.imageAlt
+                currentQuestion.imageAlt
               }
               onSelectOption={
-                handleSelectAnswer
+                selectCurrentAnswer
               }
             />
 
-            {/* Desktop Actions */}
+            {/* =========================================
+                DESKTOP QUESTION CONTROLS
+            ========================================= */}
+
             <div className="mt-4 hidden items-center justify-between gap-3 md:flex">
+              {/* Left Actions */}
               <div className="flex items-center gap-2">
                 <MarkForReviewButton
-                  isMarked={markedQuestions.has(
-                    question.id
+                  isMarked={isMarked(
+                    currentQuestion.id
                   )}
                   onClick={
-                    handleMarkQuestion
+                    toggleCurrentMark
                   }
                 />
 
                 <ClearResponseButton
                   disabled={
-                    !selectedAnswer
+                    !answers[
+                      currentQuestion.id
+                    ]
                   }
                   onClick={
-                    handleClearAnswer
+                    clearCurrentAnswer
                   }
                 />
               </div>
 
+              {/* Navigation */}
               <NavigationButtons
                 isFirstQuestion={
-                  currentQuestion === 0
+                  isFirstQuestion
                 }
                 isLastQuestion={
-                  currentQuestion ===
-                  totalQuestions - 1
+                  isLastQuestion
                 }
                 onPrevious={
-                  handlePrevious
+                  previousQuestion
                 }
-                onNext={handleNext}
+                onNext={
+                  nextQuestion
+                }
               />
             </div>
           </div>
 
-          {/* Desktop Sidebar */}
+          {/* =============================================
+              DESKTOP SIDEBAR
+          ============================================= */}
+
           <aside className="hidden space-y-4 lg:block">
+            {/* Question Palette */}
             <QuestionPalette
               totalQuestions={
                 totalQuestions
               }
               currentQuestion={
-                currentQuestion
+                currentIndex
               }
               getQuestionStatus={
-                getQuestionStatus
+                (index) =>
+                  getStatus(
+                    index,
+                    currentIndex
+                  )
               }
-              onQuestionClick={
-                goToQuestion
-              }
+              onQuestionClick={goTo}
             />
 
+            {/* Sidebar Actions */}
             <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
               <SubmitButton
                 onClick={() =>
-                  setSubmitModalOpen(true)
+                  setSubmitModalOpen(
+                    true
+                  )
                 }
-                label="Submit Test"
+                disabled={
+                  isSubmitting
+                }
+                label={
+                  isSubmitting
+                    ? "Submitting..."
+                    : "Submit Test"
+                }
               />
 
               <button
                 type="button"
                 onClick={() =>
-                  setCalculatorOpen(true)
+                  setCalculatorOpen(
+                    true
+                  )
                 }
-                className="mt-2.5 w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+                className="mt-2.5 w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:border-indigo-200 hover:bg-indigo-50 hover:text-indigo-700"
               >
                 Open Calculator
               </button>
@@ -411,67 +519,110 @@ export default function TestEngine({
         </div>
       </div>
 
-      {/* Mobile Footer */}
+      {/* =================================================
+          MOBILE FOOTER
+      ================================================= */}
+
       <TestFooter
         isFirstQuestion={
-          currentQuestion === 0
+          isFirstQuestion
         }
         isLastQuestion={
-          currentQuestion ===
-          totalQuestions - 1
+          isLastQuestion
         }
-        isMarked={markedQuestions.has(
-          question.id
+        isMarked={isMarked(
+          currentQuestion.id
         )}
         hasAnswer={Boolean(
-          selectedAnswer
+          answers[
+            currentQuestion.id
+          ]
         )}
-        onPrevious={handlePrevious}
-        onNext={handleNext}
-        onMark={handleMarkQuestion}
-        onClear={handleClearAnswer}
+        onPrevious={
+          previousQuestion
+        }
+        onNext={
+          nextQuestion
+        }
+        onMark={
+          toggleCurrentMark
+        }
+        onClear={
+          clearCurrentAnswer
+        }
       />
 
-      {/* Mobile Palette */}
+      {/* =================================================
+          MOBILE QUESTION PALETTE
+      ================================================= */}
+
       <MobileQuestionPalette
-        isOpen={mobilePaletteOpen}
+        isOpen={
+          mobilePaletteOpen
+        }
         onClose={() =>
-          setMobilePaletteOpen(false)
+          setMobilePaletteOpen(
+            false
+          )
         }
         totalQuestions={
           totalQuestions
         }
         currentQuestion={
-          currentQuestion
+          currentIndex
         }
         getQuestionStatus={
-          getQuestionStatus
+          (index) =>
+            getStatus(
+              index,
+              currentIndex
+            )
         }
-        onQuestionClick={
-          goToQuestion
-        }
+        onQuestionClick={goTo}
       />
 
-      {/* Submit Modal */}
+      {/* =================================================
+          SUBMIT MODAL
+      ================================================= */}
+
       <SubmitModal
-        isOpen={submitModalOpen}
+        isOpen={
+          submitModalOpen
+        }
         onClose={() =>
-          setSubmitModalOpen(false)
+          setSubmitModalOpen(
+            false
+          )
         }
-        onConfirm={handleSubmit}
+        onConfirm={
+          handleSubmit
+        }
         totalQuestions={
-          totalQuestions
+          result.totalQuestions
         }
-        attempted={attempted}
-        unanswered={unanswered}
-        marked={marked}
+        attempted={
+          result.attempted
+        }
+        unanswered={
+          result.unanswered
+        }
+        marked={
+          markedCount
+        }
       />
 
-      {/* Calculator */}
+      {/* =================================================
+          CALCULATOR
+      ================================================= */}
+
       <Calculator
-        isOpen={calculatorOpen}
+        isOpen={
+          calculatorOpen
+        }
         onClose={() =>
-          setCalculatorOpen(false)
+          setCalculatorOpen(
+            false
+          )
         }
       />
     </div>
