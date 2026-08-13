@@ -68,7 +68,7 @@ export default function AdminDashboardPage() {
 
         <div className="flex flex-wrap gap-3">
           <Link
-            href="/admin/create-test"
+            href="/dashboard/exams/create"
             className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-3 rounded-xl flex items-center gap-2"
           >
             <Plus size={18} />

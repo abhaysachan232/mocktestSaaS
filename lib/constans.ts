@@ -12,6 +12,7 @@ export const ROUTES = {
   RESET_PASSWORD: "/reset-password",
   DASHBOARD: "/dashboard",
   CREATE_COACHING: "/create-coaching",
+  
 } as const;
 
 export const MESSAGES = {
