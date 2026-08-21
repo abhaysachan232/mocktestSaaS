@@ -21,17 +21,18 @@ enum Role {
 }
 
 model User {
-  id         String    @id @default(cuid()) // Primary Key
-  email      String    @unique
+  id         String     @id @default(cuid()) // Primary Key
+  email      String     @unique
   password   String
-  role       Role      @default(STUDENT)
-  isActive   Boolean   @default(true)
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
+  role       Role       @default(STUDENT)
+  isActive   Boolean    @default(true)
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
   student    Student?
   coachingId String?
-  coaching   Coaching? @relation(fields: [coachingId], references: [id])
+  coaching   Coaching?  @relation(fields: [coachingId], references: [id])
   exams      Exam[]
+  questions  Question[]
 }
 
 model Student {
@@ -89,6 +90,7 @@ model Subject {
   topics       Topic[]
   examSubjects ExamSubject[]
   examTopics   ExamTopic[]
+  questions    Question[]
 }
 
 model Topic {
@@ -97,6 +99,10 @@ model Topic {
   subject    Subject     @relation(fields: [subjectId], references: [id], onDelete: Cascade)
   name       String
   examTopics ExamTopic[]
+  questions  Question[]
+
+  @@unique([subjectId, name])
+  @@index([subjectId])
 }
 
 model ExamSubject {
@@ -117,19 +123,105 @@ model ExamTopic {
   topic     Topic   @relation(fields: [topicId], references: [id])
 
   @@id([examId, topicId])
+  @@index([subjectId])
+  @@index([topicId])
 }
 
 model Exam {
-  id             String        @id @default(cuid())
-  coachingId     String
-  coaching       User          @relation(fields: [coachingId], references: [id], onDelete: Cascade)
-  name           String
-  examDate       DateTime
-  duration       Int
-  totalMarks     Float
-  totalQuestions Int
-  subjects       ExamSubject[]
-  topics         ExamTopic[]
-  createdAt      DateTime      @default(now())
-  updatedAt      DateTime      @updatedAt
+  id           String        @id @default(cuid())
+  name         String
+  slug         String        @unique
+  description  String?
+  userId       String?
+  user         User?         @relation(fields: [userId], references: [id], onDelete: SetNull)
+  examSubjects ExamSubject[]
+  examTopics   ExamTopic[]
+  tests        Test[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  @@index([userId])
+}
+
+enum QuestionType {
+  SINGLE_CHOICE
+  MULTIPLE_CHOICE
+}
+
+model Question {
+  id            String           @id @default(cuid())
+  userId        String?
+  user          User?            @relation(fields: [userId], references: [id])
+  subjectId     String
+  subject       Subject          @relation(fields: [subjectId], references: [id])
+  topicId       String
+  topic         Topic            @relation(fields: [topicId], references: [id])
+  type          QuestionType     @default(SINGLE_CHOICE)
+  content       Json
+  options       QuestionOption[]
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+  testQuestions TestQuestion[]
+
+  @@index([userId])
+  @@index([subjectId])
+  @@index([topicId])
+}
+
+model QuestionOption {
+  id         String   @id @default(cuid())
+  questionId String
+  question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  content    Json
+  isCorrect  Boolean  @default(false)
+
+  @@index([questionId])
+}
+
+enum TestType {
+  PRACTICE
+  MOCK
+  FULL_LENGTH
+  SUBJECT_WISE
+  TOPIC_WISE
+}
+
+enum TestStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+model Test {
+  id              String         @id @default(cuid())
+  name            String
+  slug            String         @unique
+  description     String?
+  testType        TestType       @default(MOCK)
+  status          TestStatus     @default(DRAFT)
+  examId          String
+  exam            Exam           @relation(fields: [examId], references: [id], onDelete: Cascade)
+  duration        Int
+  totalMarks      Int
+  totalQuestions  Int
+  negativeMarking Boolean        @default(false)
+  negativeMarks   Float?
+  publishedAt     DateTime?
+  testQuestions   TestQuestion[]
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  @@index([examId])
+}
+
+model TestQuestion {
+  testId     String
+  questionId String
+  order      Int
+  test       Test     @relation(fields: [testId], references: [id], onDelete: Cascade)
+  question   Question @relation(fields: [questionId], references: [id])
+
+  @@id([testId, questionId])
+  @@index([testId, order])
+  @@index([questionId])
 }

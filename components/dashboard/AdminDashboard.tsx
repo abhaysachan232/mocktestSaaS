@@ -68,11 +68,25 @@ export default function AdminDashboardPage() {
 
         <div className="flex flex-wrap gap-3">
           <Link
-            href="/dashboard/exams/create"
+            href="/subjects"
             className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-3 rounded-xl flex items-center gap-2"
           >
             <Plus size={18} />
-            Create Test
+            Subjects
+          </Link>
+          <Link
+            href="/questions"
+            className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-3 rounded-xl flex items-center gap-2"
+          >
+            <Plus size={18} />
+            Add Question
+          </Link>
+          <Link
+            href="/exams"
+            className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-3 rounded-xl flex items-center gap-2"
+          >
+            <Plus size={18} />
+            Exams
           </Link>
 
           <Link
