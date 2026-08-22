@@ -1,6 +1,5 @@
 "use client";
 
-// import { useSession } from "next-auth/react";
 import { useMemo, useState } from "react";
 import CategoryPage from "./CategoryPage";
 import Tests from "./Tests";
@@ -8,18 +7,13 @@ import Results from "./Results";
 import Leaderboard from "./Leaderboard";
 // import Profile from "./Profile";
 
-import { useApi } from "@/lib/use-api";
-import type { StudentDashboardData } from "@/services/dashboard.service";
+type Props = {
+  userId: string;
+  data: any;
+};
 
-export default function StudentDashboardPage() {
-  // const { data: session, status } = useSession();
+export default function StudentDashboardPage({ userId, data }: Props) {
   const [activeTab, setActiveTab] = useState("dashboard");
-
-  const { data, loading, error } = useApi<StudentDashboardData>(
-    "/api/dashboard/student"
-  );
-
-  // const user = session?.user;
 
   const activeContent = useMemo(() => {
     switch (activeTab) {
@@ -51,21 +45,21 @@ export default function StudentDashboardPage() {
     }
   }, [activeTab, data?.name]); // [activeTab, user, data?.name, data?.user]
 
-  if (status === "loading" || loading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center text-lg font-semibold">
-        Loading Dashboard...
-      </div>
-    );
-  }
+  // if (status === "loading" || loading) {
+  //   return (
+  //     <div className="flex min-h-screen items-center justify-center text-lg font-semibold">
+  //       Loading Dashboard...
+  //     </div>
+  //   );
+  // }
 
-  if (error) {
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        <p className="text-red-500">{error}</p>
-      </div>
-    );
-  }
+  // if (error) {
+  //   return (
+  //     <div className="flex min-h-screen items-center justify-center">
+  //       <p className="text-red-500">{error}</p>
+  //     </div>
+  //   );
+  // }
 
   return (
     <main className="min-h-screen bg-slate-100">

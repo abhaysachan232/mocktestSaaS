@@ -1,26 +1,9 @@
+"use server";
+
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcrypt";
 import { CoachingRegisterInput } from "@/schemas/coaching";
 import { ROLES } from "@/lib/constans";
-
-export async function getAllCoachings() {
-  return prisma.coaching.findMany({
-    include: {
-      users: {
-        where: {
-          role: "COACHING",
-        },
-        select: {
-          email: true,
-        },
-      },
-    },
-
-    orderBy: {
-      coachingName: "asc",
-    },
-  });
-}
 
 export async function createCoaching(data: CoachingRegisterInput) {
   console.log('createCoaching', data)

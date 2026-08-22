@@ -9,9 +9,9 @@ import {
   coachingRegisterSchema,
 } from "@/schemas/coaching";
 import InputField from "@/components/ui/InputField";
-import { api } from "@/lib/api";
 import SubmitButton from "@/components/ui/SubmitButton";
 import ImageUpload from "@/components/ui/ImageUpload";
+import { createCoaching } from "@/actions/coaching.actions";
 
 const generateCoachingCode = (
   coachingName: string,
@@ -41,7 +41,6 @@ const generateCoachingCode = (
 export default function CreateCoachingPage() {
   const [serverError, setServerError] = useState("");
   const [success, setSuccess] = useState("");
-
   const {
     control,
     register,
@@ -52,12 +51,10 @@ export default function CreateCoachingPage() {
   } = useForm<CoachingRegisterInput>({
     resolver: zodResolver(coachingRegisterSchema),
   });
-
   const [coachingName, ownerName, idNumber] = useWatch({
     control,
     name: ["coachingName", "ownerName", "idNumber"],
   });
-
   const coachingCode =
     coachingName && ownerName && idNumber
       ? generateCoachingCode(coachingName, ownerName, idNumber)
@@ -77,7 +74,7 @@ export default function CreateCoachingPage() {
       setServerError("");
       setSuccess("");
       console.log("CreateCoachingPage", data);
-      const response = await api.post("/api/dashboard/coaching", data);
+      const response = await createCoaching(data)
       setSuccess(response.data.message);
 
       reset();

@@ -8,16 +8,20 @@ import {
   BookOpen,
 } from "lucide-react";
 import LogOutButton from "../ui/LogOutButton";
-import { useApi } from "@/lib/use-api";
-import { CoachingDashboardData } from "@/services/dashboard.service";
 import { DataTable } from "../ui/DataTable";
 import { StatsGrid } from "../ui/StatsGrid";
 
-export default function CoachingDashboardPage() {
-  const { data, loading, error } = useApi<CoachingDashboardData>(
-    "/api/dashboard/coaching",
-  );
-  console.log('CoachingDashboardPage', data, loading)
+type Props = {
+  userId: string;
+  data: any;
+};
+
+export default function CoachingDashboardPage({ userId, data }: Props) {
+  // const { data, loading, error } = useApi<CoachingDashboardData>(
+  //   "/api/dashboard/coaching",
+  // );
+  // const data = await getCoachingDashboard(userId)
+  console.log('CoachingDashboardPage', data)
   const stats = [
     {
       title: "Total Students",
@@ -52,17 +56,17 @@ export default function CoachingDashboardPage() {
     },
   ];
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center text-2xl font-bold">
-        Loading Dashboard...
-      </div>
-    );
-  }
+  // if (loading) {
+  //   return (
+  //     <div className="min-h-screen flex items-center justify-center text-2xl font-bold">
+  //       Loading Dashboard...
+  //     </div>
+  //   );
+  // }
 
-  if (error) {
-    return <p className="text-red-500">{error}</p>;
-  }
+  // if (error) {
+  //   return <p className="text-red-500">{error}</p>;
+  // }
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -140,7 +144,7 @@ export default function CoachingDashboardPage() {
                   ),
                 },
               ]}
-              loading={loading}
+              // loading={loading}
               pageSize={10}
               onSelectionChange={(ids) => {
                 console.log(ids);

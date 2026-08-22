@@ -1,3 +1,5 @@
+"use server";
+
 import { prisma } from "@/lib/prisma";
 
 export async function getAdminDashboard() {
@@ -41,8 +43,6 @@ export async function getAdminDashboard() {
   };
 }
 
-export type AdminDashboardData = Awaited<ReturnType<typeof getAdminDashboard>>;
-
 export async function getCoachingDashboard(coachingId: string) {
   const coaching = await prisma.coaching.findUnique({
     where: {
@@ -72,9 +72,6 @@ export async function getCoachingDashboard(coachingId: string) {
   };
 }
 
-export type CoachingDashboardData = Awaited<
-  ReturnType<typeof getCoachingDashboard>
->;
 
 export async function getStudentDashboard(userId: string) {
   return prisma.student.findFirst({
@@ -92,6 +89,3 @@ export async function getStudentDashboard(userId: string) {
   });
 }
 
-export type StudentDashboardData = Awaited<
-  ReturnType<typeof getStudentDashboard>
->;

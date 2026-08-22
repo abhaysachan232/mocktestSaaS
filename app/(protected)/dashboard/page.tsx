@@ -3,35 +3,71 @@ import { ROLES } from "@/lib/constans";
 import CoachingDashboard from "@/components/dashboard/CoachingDashboard";
 import AdminDashboard from "@/components/dashboard/AdminDashboard";
 import StudentDashboard from "@/components/dashboard/StudentDashboard";
+import {
+  getAdminDashboard,
+  getCoachingDashboard,
+  getStudentDashboard,
+} from "@/actions/dashboard.actions";
 import { notFound, redirect } from "next/navigation";
-
-const roleComponents = {
-  [ROLES.ADMIN]: AdminDashboard,
-  [ROLES.COACHING]: CoachingDashboard,
-  [ROLES.STUDENT]: StudentDashboard,
-};
 
 export default async function DashboardPage() {
   const session = await auth();
 
-  console.log("DashboardPage", session);
-  if (!session) {
+  if (!session?.user) {
     redirect("/login");
   }
 
-  const role = session?.user?.role;
-  console.log(role);
+  const userId = session.user.id;
+  const role = session.user.role;
 
-  if (!role) {
+  if (!userId || !role) {
     notFound();
   }
 
-  const DashboardComponent =
-    roleComponents[role as keyof typeof roleComponents];
+  // -------------------------
+  // ADMIN
+  // -------------------------
+  if (role === ROLES.ADMIN) {
+    const data = await getAdminDashboard();
+    if (!data) {
+      notFound();
+    }
+    return (
+      <main className="min-h-screen bg-slate-50">
+        <AdminDashboard userId={userId} data={data} />
+      </main>
+    );
+  }
 
-  return (
-    <main className="min-h-screen bg-slate-50">
-      <DashboardComponent />
-    </main>
-  );
+  // -------------------------
+  // COACHING
+  // -------------------------
+  if (role === ROLES.COACHING) {
+    const data = await getCoachingDashboard(userId);
+    if (!data) {
+      notFound();
+    }
+    return (
+      <main className="min-h-screen bg-slate-50">
+        <CoachingDashboard userId={userId} data={data} />
+      </main>
+    );
+  }
+
+  // -------------------------
+  // STUDENT
+  // -------------------------
+  if (role === ROLES.STUDENT) {
+    const data = await getStudentDashboard(userId);
+    if (!data) {
+      notFound();
+    }
+    return (
+      <main className="min-h-screen bg-slate-50">
+        <StudentDashboard userId={userId} data={data} />
+      </main>
+    );
+  }
+
+  notFound();
 }

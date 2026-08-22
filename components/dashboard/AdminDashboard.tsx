@@ -3,17 +3,14 @@
 import Link from "next/link";
 import { Users, IndianRupee, Plus, Building2, BookOpen } from "lucide-react";
 import { ROUTES } from "@/lib/constans";
-import { useApi } from "@/lib/use-api";
-import type { AdminDashboardData } from "@/services/dashboard.service";
 import { DataTable } from "../ui/DataTable";
 import { StatsGrid } from "../ui/StatsGrid";
 
-export default function AdminDashboardPage() {
-  const { data, loading, error } = useApi<AdminDashboardData>(
-    "/api/dashboard/admin",
-  );
-  console.log("AdminDashboardPage", data, loading, error);
-
+type Props = {
+  userId: string;
+  data: any;
+};
+export default function AdminDashboardPage({ userId, data }: Props) {
   const stats = [
     {
       title: "Total Students",
@@ -45,17 +42,17 @@ export default function AdminDashboardPage() {
     },
   ];
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center text-2xl font-bold">
-        Loading Dashboard...
-      </div>
-    );
-  }
+  // if (loading) {
+  //   return (
+  //     <div className="min-h-screen flex items-center justify-center text-2xl font-bold">
+  //       Loading Dashboard...
+  //     </div>
+  //   );
+  // }
 
-  if (error) {
-    return <p className="text-red-500">{error}</p>;
-  }
+  // if (error) {
+  //   return <p className="text-red-500">{error}</p>;
+  // }
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -107,7 +104,7 @@ export default function AdminDashboardPage() {
           <h2 className="text-2xl font-bold mb-6">Coachings</h2>
           <div className="overflow-x-auto">
             <DataTable
-              loading={loading}
+              // loading={loading}
               data={data?.coachings ?? []}
               columns={[
                 {
@@ -184,7 +181,7 @@ export default function AdminDashboardPage() {
                   ),
                 },
               ]}
-              loading={loading}
+              // loading={loading}
               pageSize={10}
               onSelectionChange={(ids) => {
                 console.log(ids);
