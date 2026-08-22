@@ -8,7 +8,7 @@ import {
   forgotPasswordSchema,
   type ForgotPasswordFormData,
 } from "@/schemas/forgot-password";
-import { forgotPasswordAction } from "./actions";
+import { forgotPasswordAction } from "@/actions/forgotPassword.actions";
 import InputField from "@/components/ui/InputField";
 import SubmitButton from "@/components/ui/SubmitButton";
 import { ROUTES } from "@/lib/constans";

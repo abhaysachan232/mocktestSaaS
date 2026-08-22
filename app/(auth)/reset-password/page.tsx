@@ -8,7 +8,7 @@ import {
   resetPasswordSchema,
   type ResetPasswordFormData,
 } from "@/schemas/reset-password";
-import { resetPasswordAction } from "./actions";
+import { resetPasswordAction } from "@/actions/resetPassword.actions";
 import InputField from "@/components/ui/InputField";
 import SubmitButton from "@/components/ui/SubmitButton";
 import { ROUTES } from "@/lib/constans";

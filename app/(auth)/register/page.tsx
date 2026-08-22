@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { registerUser } from "./action";
+import { registerUser } from "@/actions/register.actions";
 import { RegisterSchema, registerSchema } from "@/schemas/register";
 import { signIn } from "next-auth/react";
 import toast, { Toaster } from "react-hot-toast";
