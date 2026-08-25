@@ -1,31 +1,18 @@
 "use client";
 
 import { useState } from "react";
-
 import TestHeader from "./header/TestHeader";
-
 import QuestionSection from "./question/QuestionSection";
-
 import QuestionPalette from "./palette/QuestionPalette";
-
 import NavigationButtons from "./navigation/NavigationButtons";
 import MarkForReviewButton from "./navigation/MarkForReviewButton";
 import ClearResponseButton from "./navigation/ClearResponseButton";
-
 import TestFooter from "./mobile/TestFooter";
 import MobileQuestionPalette from "./mobile/MobileQuestionPalette";
-
 import SubmitButton from "./submit/SubmitButton";
 import SubmitModal from "./submit/SubmitModal";
-
 import Calculator from "./tools/Calculator";
-
 import { useTestSession } from "@/hooks/useTestSession";
-
-/* =========================================================
-   TYPES
-========================================================= */
-
 export interface TestEngineOption {
   id: string;
   text: string;
@@ -34,146 +21,71 @@ export interface TestEngineOption {
 export interface TestEngineQuestion {
   id: string;
   question: string;
-
   options: TestEngineOption[];
-
   image?: string;
   imageAlt?: string;
-
-  /*
-   * Static version:
-   * correctAnswer is available.
-   *
-   * Later API version:
-   * Do NOT send correctAnswer to client.
-   */
   correctAnswer?: string;
-
   marks?: number;
   negativeMarks?: number;
 }
 
 export interface TestEngineData {
   id: string;
-
   title: string;
-
   subtitle?: string;
-
-  /*
-   * Duration in minutes
-   */
   duration: number;
-
-  questions: TestEngineQuestion[];
+  testQuestions: TestEngineQuestion[];
 }
 
 interface TestEngineProps {
   test: TestEngineData;
 }
 
-/* =========================================================
-   COMPONENT
-========================================================= */
+export default function TestEngine({ test }: any) {
+  const [testStarted, setTestStarted] = useState(false);
+  const [submitModalOpen, setSubmitModalOpen] = useState(false);
+  const [mobilePaletteOpen, setMobilePaletteOpen] = useState(false);
+  const [calculatorOpen, setCalculatorOpen] = useState(false);
 
-export default function TestEngine({
-  test,
-}: TestEngineProps) {
-  /* =======================================================
-     UI STATE
-  ======================================================= */
-
-  const [testStarted, setTestStarted] =
-    useState(false);
-
-  const [submitModalOpen, setSubmitModalOpen] =
-    useState(false);
-
-  const [mobilePaletteOpen, setMobilePaletteOpen] =
-    useState(false);
-
-  const [calculatorOpen, setCalculatorOpen] =
-    useState(false);
-
-  /* =======================================================
-     TIMER EXPIRED
-  ======================================================= */
-
+  console.log('test', test)
   const handleTimeExpired = () => {
     handleSubmit();
   };
-
-  /* =======================================================
-     TEST SESSION
-  ======================================================= */
-
-  const session = useTestSession(
-    test,
-    handleTimeExpired
-  );
-
+  const session = useTestSession(test, handleTimeExpired);
   const {
     questions,
-
     currentIndex,
     currentQuestion,
-
     goTo,
-
     nextQuestion,
     previousQuestion,
-
     isFirstQuestion,
     isLastQuestion,
-
     answers,
-
     attempted,
-
     selectCurrentAnswer,
-
     clearCurrentAnswer,
-
     markedQuestions,
     markedCount,
-
     toggleCurrentMark,
     isMarked,
-
     getStatus,
-
     remainingSeconds,
-
     startTimer,
     pauseTimer,
-
     result,
-
     submit,
-
     isSubmitting,
   } = session;
-
-  const totalQuestions =
-    questions.length;
-
-  /* =======================================================
-     SUBMIT
-  ======================================================= */
+  const totalQuestions = questions.length;
 
   const handleSubmit = async () => {
     pauseTimer();
-
     const response = await submit({
       testId: test.id,
-
       answers,
-
-      markedQuestions:
-        Array.from(markedQuestions),
-
-      timeRemaining:
-        remainingSeconds,
+      markedQuestions: Array.from(markedQuestions),
+      timeRemaining: remainingSeconds,
     });
 
     if (response.success) {
@@ -190,14 +102,8 @@ export default function TestEngine({
        * );
        */
 
-      console.log(
-        "Test submitted successfully"
-      );
-
-      console.log(
-        "Result:",
-        result
-      );
+      console.log("Test submitted successfully");
+      console.log("Result:", result);
     }
   };
 
@@ -207,11 +113,6 @@ export default function TestEngine({
 
   const handleStartTest = () => {
     setTestStarted(true);
-
-    /*
-     * Timer starts only after
-     * user clicks Start Test.
-     */
     startTimer();
   };
 
@@ -228,8 +129,7 @@ export default function TestEngine({
           </h2>
 
           <p className="mt-2 text-sm leading-6 text-red-600">
-            This test does not contain any
-            questions.
+            This test does not contain any questions.
           </p>
         </div>
       </div>
@@ -279,9 +179,7 @@ export default function TestEngine({
                 {test.duration}
               </p>
 
-              <p className="mt-1 text-xs font-medium text-slate-500">
-                Minutes
-              </p>
+              <p className="mt-1 text-xs font-medium text-slate-500">Minutes</p>
             </div>
           </div>
 
@@ -292,27 +190,11 @@ export default function TestEngine({
             </h2>
 
             <ul className="mt-2 space-y-1.5 text-xs leading-5 text-amber-700">
-              <li>
-                • Timer starts after clicking Start
-                Test.
-              </li>
-
-              <li>
-                • You can navigate between questions.
-              </li>
-
-              <li>
-                • You can mark questions for review.
-              </li>
-
-              <li>
-                • You can clear your selected answer.
-              </li>
-
-              <li>
-                • Test automatically submits when
-                time ends.
-              </li>
+              <li>• Timer starts after clicking Start Test.</li>
+              <li>• You can navigate between questions.</li>
+              <li>• You can mark questions for review.</li>
+              <li>• You can clear your selected answer.</li>
+              <li>• Test automatically submits when time ends.</li>
             </ul>
           </div>
 
@@ -337,10 +219,7 @@ export default function TestEngine({
     return (
       <div className="flex min-h-screen items-center justify-center bg-slate-50 p-6">
         <div className="rounded-2xl border border-red-200 bg-red-50 p-6 text-center">
-          <h2 className="font-bold text-red-700">
-            Question Not Found
-          </h2>
-
+          <h2 className="font-bold text-red-700">Question Not Found</h2>
           <p className="mt-1 text-sm text-red-600">
             Unable to load the current question.
           </p>
@@ -355,109 +234,46 @@ export default function TestEngine({
 
   return (
     <div className="min-h-screen bg-slate-50">
-      {/* =================================================
-          HEADER
-      ================================================= */}
-
       <TestHeader
         title={test.title}
         subtitle={test.subtitle}
-        currentQuestion={
-          currentIndex + 1
-        }
-        totalQuestions={
-          totalQuestions
-        }
-        timeRemaining={
-          remainingSeconds
-        }
-        onMenuClick={() =>
-          setMobilePaletteOpen(true)
-        }
-        onSubmit={() =>
-          setSubmitModalOpen(true)
-        }
+        currentQuestion={currentIndex + 1}
+        totalQuestions={totalQuestions}
+        timeRemaining={remainingSeconds}
+        onMenuClick={() => setMobilePaletteOpen(true)}
+        onSubmit={() => setSubmitModalOpen(true)}
       />
-
-      {/* =================================================
-          MAIN CONTENT
-      ================================================= */}
-
       <div className="mx-auto max-w-7xl px-3 py-4 pb-24 sm:px-5 sm:py-6 md:pb-8 lg:px-6">
         <div className="grid grid-cols-1 gap-5 lg:grid-cols-[minmax(0,1fr)_300px]">
-          {/* =============================================
-              QUESTION AREA
-          ============================================= */}
-
           <div className="min-w-0">
             <QuestionSection
-              questionNumber={
-                currentIndex + 1
-              }
-              questionText={
-                currentQuestion.question
-              }
-              options={
-                currentQuestion.options
-              }
-              selectedOption={
-                answers[
-                  currentQuestion.id
-                ] ?? null
-              }
-              image={
-                currentQuestion.image
-              }
-              imageAlt={
-                currentQuestion.imageAlt
-              }
-              onSelectOption={
-                selectCurrentAnswer
-              }
+              questionNumber={currentIndex + 1}
+              questionText={currentQuestion.question}
+              options={currentQuestion.options}
+              selectedOption={answers[currentQuestion.id] ?? null}
+              image={currentQuestion.image}
+              imageAlt={currentQuestion.imageAlt}
+              onSelectOption={selectCurrentAnswer}
             />
-
-            {/* =========================================
-                DESKTOP QUESTION CONTROLS
-            ========================================= */}
-
             <div className="mt-4 hidden items-center justify-between gap-3 md:flex">
               {/* Left Actions */}
               <div className="flex items-center gap-2">
                 <MarkForReviewButton
-                  isMarked={isMarked(
-                    currentQuestion.id
-                  )}
-                  onClick={
-                    toggleCurrentMark
-                  }
+                  isMarked={isMarked(currentQuestion.id)}
+                  onClick={toggleCurrentMark}
                 />
-
                 <ClearResponseButton
-                  disabled={
-                    !answers[
-                      currentQuestion.id
-                    ]
-                  }
-                  onClick={
-                    clearCurrentAnswer
-                  }
+                  disabled={!answers[currentQuestion.id]}
+                  onClick={clearCurrentAnswer}
                 />
               </div>
 
               {/* Navigation */}
               <NavigationButtons
-                isFirstQuestion={
-                  isFirstQuestion
-                }
-                isLastQuestion={
-                  isLastQuestion
-                }
-                onPrevious={
-                  previousQuestion
-                }
-                onNext={
-                  nextQuestion
-                }
+                isFirstQuestion={isFirstQuestion}
+                isLastQuestion={isLastQuestion}
+                onPrevious={previousQuestion}
+                onNext={nextQuestion}
               />
             </div>
           </div>
@@ -469,47 +285,22 @@ export default function TestEngine({
           <aside className="hidden space-y-4 lg:block">
             {/* Question Palette */}
             <QuestionPalette
-              totalQuestions={
-                totalQuestions
-              }
-              currentQuestion={
-                currentIndex
-              }
-              getQuestionStatus={
-                (index) =>
-                  getStatus(
-                    index,
-                    currentIndex
-                  )
-              }
+              totalQuestions={totalQuestions}
+              currentQuestion={currentIndex}
+              getQuestionStatus={(index) => getStatus(index, currentIndex)}
               onQuestionClick={goTo}
             />
 
             {/* Sidebar Actions */}
             <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
               <SubmitButton
-                onClick={() =>
-                  setSubmitModalOpen(
-                    true
-                  )
-                }
-                disabled={
-                  isSubmitting
-                }
-                label={
-                  isSubmitting
-                    ? "Submitting..."
-                    : "Submit Test"
-                }
+                onClick={() => setSubmitModalOpen(true)}
+                disabled={isSubmitting}
+                label={isSubmitting ? "Submitting..." : "Submit Test"}
               />
-
               <button
                 type="button"
-                onClick={() =>
-                  setCalculatorOpen(
-                    true
-                  )
-                }
+                onClick={() => setCalculatorOpen(true)}
                 className="mt-2.5 w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:border-indigo-200 hover:bg-indigo-50 hover:text-indigo-700"
               >
                 Open Calculator
@@ -518,112 +309,36 @@ export default function TestEngine({
           </aside>
         </div>
       </div>
-
-      {/* =================================================
-          MOBILE FOOTER
-      ================================================= */}
-
       <TestFooter
-        isFirstQuestion={
-          isFirstQuestion
-        }
-        isLastQuestion={
-          isLastQuestion
-        }
-        isMarked={isMarked(
-          currentQuestion.id
-        )}
-        hasAnswer={Boolean(
-          answers[
-            currentQuestion.id
-          ]
-        )}
-        onPrevious={
-          previousQuestion
-        }
-        onNext={
-          nextQuestion
-        }
-        onMark={
-          toggleCurrentMark
-        }
-        onClear={
-          clearCurrentAnswer
-        }
+        isFirstQuestion={isFirstQuestion}
+        isLastQuestion={isLastQuestion}
+        isMarked={isMarked(currentQuestion.id)}
+        hasAnswer={Boolean(answers[currentQuestion.id])}
+        onPrevious={previousQuestion}
+        onNext={nextQuestion}
+        onMark={toggleCurrentMark}
+        onClear={clearCurrentAnswer}
       />
-
-      {/* =================================================
-          MOBILE QUESTION PALETTE
-      ================================================= */}
-
       <MobileQuestionPalette
-        isOpen={
-          mobilePaletteOpen
-        }
-        onClose={() =>
-          setMobilePaletteOpen(
-            false
-          )
-        }
-        totalQuestions={
-          totalQuestions
-        }
-        currentQuestion={
-          currentIndex
-        }
-        getQuestionStatus={
-          (index) =>
-            getStatus(
-              index,
-              currentIndex
-            )
-        }
+        isOpen={mobilePaletteOpen}
+        onClose={() => setMobilePaletteOpen(false)}
+        totalQuestions={totalQuestions}
+        currentQuestion={currentIndex}
+        getQuestionStatus={(index) => getStatus(index, currentIndex)}
         onQuestionClick={goTo}
       />
-
-      {/* =================================================
-          SUBMIT MODAL
-      ================================================= */}
-
       <SubmitModal
-        isOpen={
-          submitModalOpen
-        }
-        onClose={() =>
-          setSubmitModalOpen(
-            false
-          )
-        }
-        onConfirm={
-          handleSubmit
-        }
-        totalQuestions={
-          result.totalQuestions
-        }
-        attempted={
-          result.attempted
-        }
-        unanswered={
-          result.unanswered
-        }
-        marked={
-          markedCount
-        }
+        isOpen={submitModalOpen}
+        onClose={() => setSubmitModalOpen(false)}
+        onConfirm={handleSubmit}
+        totalQuestions={result.totalQuestions}
+        attempted={result.attempted}
+        unanswered={result.unanswered}
+        marked={markedCount}
       />
-
-      {/* =================================================
-          CALCULATOR
-      ================================================= */}
-
       <Calculator
-        isOpen={
-          calculatorOpen
-        }
-        onClose={() =>
-          setCalculatorOpen(
-            false
-          )
-        }
+        isOpen={calculatorOpen}
+        onClose={() => setCalculatorOpen(false)}
       />
     </div>
   );

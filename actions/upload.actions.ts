@@ -3,7 +3,24 @@
 import { auth } from "@/lib/auth";
 import cloudinary from "@/lib/cloudinary";
 
-export async function uploadQuestionImage(formData: FormData) {
+type UploadQuestionImageResult =
+  | {
+      success: true;
+      data: {
+        secure_url: string;
+        width?: number;
+        public_id: string;
+      };
+    }
+  | {
+      success: false;
+      error: string;
+    };
+
+export async function uploadQuestionImage(
+  formData: FormData,
+): Promise<UploadQuestionImageResult> {
+  console.log("formData", formData);
   try {
     const session = await auth();
 

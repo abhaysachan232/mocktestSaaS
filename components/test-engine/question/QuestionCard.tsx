@@ -3,23 +3,16 @@
 import QuestionNumber from "./QuestionNumber";
 import QuestionText from "./QuestionText";
 import QuestionImage from "./QuestionImage";
-import OptionsList, {
-  TestOption,
-} from "../options/OptionsList";
+import OptionsList, { TestOption } from "../options/OptionsList";
 
 interface QuestionCardProps {
   questionNumber: number;
   questionText: string;
-
   options: TestOption[];
-
   selectedOption?: string | null;
-
   image?: string;
   imageAlt?: string;
-
   onSelectOption: (optionId: string) => void;
-
   disabled?: boolean;
 }
 
@@ -38,19 +31,12 @@ export default function QuestionCard({
       {/* Question Header */}
       <div className="flex items-start gap-3">
         <QuestionNumber number={questionNumber} />
-
         <div className="min-w-0 flex-1">
           <QuestionText text={questionText} />
         </div>
       </div>
-
       {/* Question Image */}
-      {image && (
-        <QuestionImage
-          src={image}
-          alt={imageAlt}
-        />
-      )}
+      {image && <QuestionImage src={image} alt={imageAlt} />}
 
       {/* Divider */}
       <div className="my-5 border-t border-slate-100" />

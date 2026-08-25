@@ -657,3 +657,56 @@ export async function getPublishedTests() {
     },
   });
 }
+
+export async function getTestForEngine(id: string) {
+  return prisma.test.findUnique({
+    where: {
+      id,
+      status: "PUBLISHED",
+    },
+
+    select: {
+      id: true,
+      name: true,
+      description: true,
+      duration: true,
+      totalMarks: true,
+      totalQuestions: true,
+      negativeMarking: true,
+      negativeMarks: true,
+
+      testQuestions: {
+        orderBy: {
+          order: "asc",
+        },
+
+        select: {
+          order: true,
+
+          question: {
+            select: {
+              id: true,
+              type: true,
+              content: true,
+              options: true, // agar Question model me options field hai
+
+              subject: {
+                select: {
+                  id: true,
+                  name: true,
+                },
+              },
+
+              topic: {
+                select: {
+                  id: true,
+                  name: true,
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  });
+}

@@ -1,3 +1,5 @@
+"use server";
+
 import { auth } from "@/lib/auth";
 import { ROLES } from "@/lib/constans";
 import CoachingDashboard from "@/components/dashboard/CoachingDashboard";

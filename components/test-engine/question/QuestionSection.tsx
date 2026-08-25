@@ -6,16 +6,11 @@ import { TestOption } from "../options/OptionsList";
 interface QuestionSectionProps {
   questionNumber: number;
   questionText: string;
-
   options: TestOption[];
-
   selectedOption?: string | null;
-
   image?: string;
   imageAlt?: string;
-
   onSelectOption: (optionId: string) => void;
-
   disabled?: boolean;
 }
 

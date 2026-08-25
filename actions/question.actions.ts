@@ -2,8 +2,7 @@
 
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { questionSchema } from "@/schemas/question";
-import type { QuestionInput } from "@/types/question";
+import { QuestionFormValues, questionSchema } from "@/schemas/question";
 import { revalidatePath } from "next/cache";
 
 async function getUserId() {
@@ -50,7 +49,17 @@ export async function getQuestionSubjects() {
   };
 }
 
-export async function createQuestion(input: QuestionInput) {
+
+
+export async function createQuestion(payload: QuestionFormValues) {
+  console.log(
+    "========== CREATE QUESTION ACTION ==========",
+  );
+
+  console.log(
+    "createQuestion received:",
+    JSON.stringify(payload, null, 2),
+  );
   try {
     const userId = await getUserId();
 
@@ -61,16 +70,20 @@ export async function createQuestion(input: QuestionInput) {
       };
     }
 
-    const parsed = questionSchema.safeParse(input);
+    const parsed = questionSchema.safeParse(payload);
 
     if (!parsed.success) {
+      console.error("Question validation error:", parsed.error.flatten());
       return {
         success: false,
         error: parsed.error.issues[0]?.message ?? "Invalid question",
       };
     }
 
-    const { subjectId, topicId, type, content, options } = parsed.data;
+    const data = payload;
+
+    const { subjectId, topicId, type, content, options } = data;
+    console.log("Parsed question:", subjectId, topicId, type, content, options);
 
     const topic = await prisma.topic.findFirst({
       where: {
@@ -86,19 +99,25 @@ export async function createQuestion(input: QuestionInput) {
       };
     }
 
+    // Convert Tiptap JSON into plain JSON
+    const plainContent = JSON.parse(JSON.stringify(content));
+
+    console.log("plainContent", plainContent);
+
+    const plainOptions = options.map((option) => ({
+      content: JSON.parse(JSON.stringify(option.content)),
+      isCorrect: option.isCorrect,
+    }));
+
     const question = await prisma.question.create({
       data: {
         userId,
         subjectId,
         topicId,
         type,
-        content,
+        content: plainContent,
         options: {
-          create: options.map((option) => ({
-            content: option.content,
-
-            isCorrect: option.isCorrect,
-          })),
+          create: plainOptions,
         },
       },
     });
@@ -310,6 +329,10 @@ export async function deleteQuestion(id: string) {
         id,
         userId,
       },
+
+      select: {
+        id: true,
+      },
     });
 
     if (!question) {
@@ -319,10 +342,20 @@ export async function deleteQuestion(id: string) {
       };
     }
 
-    await prisma.question.delete({
-      where: {
-        id,
-      },
+    await prisma.$transaction(async (tx) => {
+      // Delete options first
+      await tx.questionOption.deleteMany({
+        where: {
+          questionId: id,
+        },
+      });
+
+      // Then delete question
+      await tx.question.delete({
+        where: {
+          id,
+        },
+      });
     });
 
     revalidatePath("/questions");
@@ -331,11 +364,12 @@ export async function deleteQuestion(id: string) {
       success: true,
     };
   } catch (error) {
-    console.error(error);
+    console.error("deleteQuestion error:", error);
 
     return {
       success: false,
-      error: "Failed to delete question",
+      error:
+        error instanceof Error ? error.message : "Failed to delete question",
     };
   }
 }

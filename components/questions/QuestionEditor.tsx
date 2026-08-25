@@ -1,18 +1,20 @@
 "use client";
 
-import { useEditor, EditorContent } from "@tiptap/react";
+import { useEffect } from "react";
+import { EditorContent, useEditor } from "@tiptap/react";
+
 import StarterKit from "@tiptap/starter-kit";
-import Image from "@tiptap/extension-image";
-import { Link as TiptapLink } from "@tiptap/extension-link";
+import { Link } from "@tiptap/extension-link";
 import { Table } from "@tiptap/extension-table";
 import { TableRow } from "@tiptap/extension-table-row";
 import { TableCell } from "@tiptap/extension-table-cell";
 import { TableHeader } from "@tiptap/extension-table-header";
 import { Subscript } from "@tiptap/extension-subscript";
 import { Superscript } from "@tiptap/extension-superscript";
+
 import type { JSONContent } from "@tiptap/react";
+
 import EditorToolbar from "./EditorToolbar";
-import { MathNode } from "./MathNode";
 import { ImageResizeNode } from "./ImageResizeNode";
 
 type Props = {
@@ -24,35 +26,77 @@ type Props = {
 export default function QuestionEditor({
   value,
   onChange,
-  minHeight = "220px",
+  minHeight = "180px",
 }: Props) {
   const editor = useEditor({
     immediatelyRender: false,
+
     extensions: [
-      StarterKit,
-      Image,
-      TiptapLink.configure({
+      // Link is disabled inside StarterKit
+      // because we configure it separately below.
+      StarterKit.configure({
+        link: false,
+      }),
+
+      Link.configure({
         openOnClick: false,
       }),
+
       Table.configure({
         resizable: true,
       }),
+
       TableRow,
       TableHeader,
       TableCell,
+
       Subscript,
       Superscript,
-      MathNode,
+
       ImageResizeNode,
     ],
+
     content: value,
+
     onUpdate({ editor }) {
-      onChange(editor.getJSON());
+      const json = editor.getJSON();
+
+      console.log("QuestionEditor onUpdate:", json);
+
+      onChange(json);
     },
   });
 
+  /**
+   * Sync external value -> Tiptap
+   *
+   * Important for React Hook Form / edit forms.
+   */
+  useEffect(() => {
+    if (!editor) {
+      return;
+    }
+
+    const currentContent = editor.getJSON();
+
+    const currentString = JSON.stringify(currentContent);
+    const valueString = JSON.stringify(value);
+
+    if (currentString === valueString) {
+      return;
+    }
+
+    editor.commands.setContent(value, {
+      emitUpdate: false,
+    });
+  }, [editor, value]);
+
   if (!editor) {
-    return <div className="rounded-lg border p-5">Loading editor...</div>;
+    return (
+      <div className="rounded-lg border p-4">
+        Loading editor...
+      </div>
+    );
   }
 
   return (
@@ -61,10 +105,10 @@ export default function QuestionEditor({
 
       <EditorContent
         editor={editor}
+        className="question-editor p-4"
         style={{
           minHeight,
         }}
-        className="question-editor p-4"
       />
     </div>
   );

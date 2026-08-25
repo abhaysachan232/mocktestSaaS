@@ -1,9 +1,14 @@
+"use server";
+
 import Link from "next/link";
-import { getQuestions, deleteQuestion } from "@/actions/question.actions";
+import type { JSONContent } from "@tiptap/react";
+import { getQuestions } from "@/actions/question.actions";
 import DeleteQuestionButton from "@/components/questions/DeleteQuestionButton";
+import QuestionContentRenderer from "@/components/questions/QuestionContentRenderer";
 
 export default async function QuestionsPage() {
   const result = await getQuestions();
+  console.log("result", result);
 
   if (!result.success) {
     return <div className="p-6 text-red-500">{result.error}</div>;
@@ -11,9 +16,12 @@ export default async function QuestionsPage() {
 
   return (
     <div className="space-y-6 p-6">
+      {/* Header */}
+
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold">Questions</h1>
+
           <p className="text-sm text-gray-500">Manage your question bank</p>
         </div>
 
@@ -25,10 +33,14 @@ export default async function QuestionsPage() {
         </Link>
       </div>
 
+      {/* Question List */}
+
       <div className="overflow-hidden rounded-xl border bg-white">
         <table className="w-full">
           <thead className="border-b bg-gray-50">
             <tr>
+              <th className="px-4 py-3 text-left">Question</th>
+
               <th className="px-4 py-3 text-left">Subject</th>
 
               <th className="px-4 py-3 text-left">Topic</th>
@@ -43,18 +55,55 @@ export default async function QuestionsPage() {
 
           <tbody>
             {result.data.map((question) => (
-              <tr key={question.id} className="border-b">
-                <td className="px-4 py-3">{question.subject.name}</td>
+              <tr key={question.id} className="border-b align-top">
+                <td className="px-4 py-4">
+                  <QuestionContentRenderer
+                    content={question.content as JSONContent}
+                  />
+                </td>
+                {/* Subject */}
 
-                <td className="px-4 py-3">{question.topic.name}</td>
+                <td className="px-4 py-4">{question.subject.name}</td>
 
-                <td className="px-4 py-3">
+                {/* Topic */}
+
+                <td className="px-4 py-4">{question.topic.name}</td>
+
+                {/* Type */}
+
+                <td className="px-4 py-4">
                   {question.type === "SINGLE_CHOICE" ? "Single" : "Multiple"}
                 </td>
 
-                <td className="px-4 py-3">{question.options.length}</td>
+                {/* Options */}
 
-                <td className="px-4 py-3 text-right">
+                <td className="px-4 py-4">
+                  <div className="space-y-2">
+                    {question.options.map((option, index) => (
+                      <div
+                        key={option.id}
+                        className={`rounded-md border p-2 text-sm ${
+                          option.isCorrect
+                            ? "border-green-300 bg-green-50"
+                            : "bg-white"
+                        }`}
+                      >
+                        <div className="flex gap-2">
+                          <span className="font-medium">
+                            {String.fromCharCode(65 + index)}.
+                          </span>
+                          <QuestionContentRenderer
+                            content={option.content as JSONContent}
+                          />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </td>
+
+                {/* Actions */}
+
+                <td className="px-4 py-4 text-right">
                   <div className="flex justify-end gap-2">
                     <Link
                       href={`/questions/${question.id}/edit`}

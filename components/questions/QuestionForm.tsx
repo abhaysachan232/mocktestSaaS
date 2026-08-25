@@ -1,37 +1,34 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useForm } from "react-hook-form";
 import type { JSONContent } from "@tiptap/react";
+import { Controller, useFieldArray, useForm, useWatch } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import QuestionEditor from "./QuestionEditor";
-import OptionEditor from "./OptionEditor";
-import { createQuestion, updateQuestion } from "@/actions/question.actions";
-import type { QuestionInput } from "@/types/question";
+import {
+  createQuestion,
+  updateQuestion,
+  getQuestionSubjects,
+} from "@/actions/question.actions";
+import {
+  questionFormSchema,
+  type QuestionFormValues,
+} from "@/schemas/question";
 
 type Subject = {
   id: string;
   name: string;
+
   topics: {
     id: string;
     name: string;
   }[];
 };
 
-type Props = {
-  subjects: Subject[];
-  initialData?: {
-    id: string;
-    subjectId: string;
-    topicId: string;
-    type: "SINGLE_CHOICE" | "MULTIPLE_CHOICE";
-    content: JSONContent;
-    options: {
-      id: string;
-      content: JSONContent;
-      isCorrect: boolean;
-    }[];
-  };
+type QuestionFormProps = {
+  subjects?: Subject[];
+  initialData?: QuestionFormValues & { id: string };
 };
 
 const emptyContent: JSONContent = {
@@ -43,180 +40,178 @@ const emptyContent: JSONContent = {
   ],
 };
 
-type FormValues = {
-  subjectId: string;
-  topicId: string;
-  type: "SINGLE_CHOICE" | "MULTIPLE_CHOICE";
-};
+function createOption() {
+  return {
+    content: structuredClone(emptyContent),
+    isCorrect: false,
+  };
+}
 
-export default function QuestionForm({ subjects, initialData }: Props) {
+export default function QuestionForm({
+  subjects: initialSubjects,
+  initialData,
+}: QuestionFormProps) {
   const router = useRouter();
-  const isEdit = Boolean(initialData);
-  const [questionContent, setQuestionContent] = useState<JSONContent>(
-    initialData?.content ?? emptyContent,
-  );
-  const [options, setOptions] = useState(
-    initialData?.options ?? [
-      {
-        id: crypto.randomUUID(),
-        content: emptyContent,
-        isCorrect: false,
-      },
-      {
-        id: crypto.randomUUID(),
-        content: emptyContent,
-        isCorrect: false,
-      },
-    ],
-  );
-
-  const [error, setError] = useState("");
+  const isEditMode = Boolean(initialData?.id);
+  const [subjects, setSubjects] = useState<Subject[]>(initialSubjects ?? []);
+  const [loadingSubjects, setLoadingSubjects] = useState(!initialSubjects);
   const {
+    control,
     register,
     handleSubmit,
-    watch,
     setValue,
-    formState: { isSubmitting },
-  } = useForm<FormValues>({
-    defaultValues: {
-      subjectId: initialData?.subjectId ?? "",
-      topicId: initialData?.topicId ?? "",
-      type: initialData?.type ?? "SINGLE_CHOICE",
+    reset,
+    formState: { errors, isSubmitting },
+  } = useForm<QuestionFormValues>({
+    resolver: zodResolver(questionFormSchema),
+    defaultValues: initialData ?? {
+      subjectId: "",
+      topicId: "",
+      type: "SINGLE_CHOICE",
+      content: structuredClone(emptyContent),
+      options: [createOption(), createOption()],
     },
   });
 
-  const subjectId = watch("subjectId");
-  const type = watch("type");
-  const selectedSubject = subjects.find((subject) => subject.id === subjectId);
-
-  function handleTypeChange(nextType: "SINGLE_CHOICE" | "MULTIPLE_CHOICE") {
-    setValue("type", nextType);
-
-    if (nextType === "SINGLE_CHOICE") {
-      let found = false;
-
-      setOptions((current) =>
-        current.map((option) => {
-          if (option.isCorrect && !found) {
-            found = true;
-            return option;
-          }
-
-          return {
-            ...option,
-            isCorrect: false,
-          };
-        }),
-      );
+  useEffect(() => {
+    if (initialData) {
+      reset(initialData);
     }
+  }, [initialData, reset]);
+
+  const {
+    fields: optionFields,
+    append,
+    remove,
+  } = useFieldArray({
+    control,
+    name: "options",
+  });
+
+  const subjectId = useWatch({
+    control,
+    name: "subjectId",
+  });
+
+  const questionType = useWatch({
+    control,
+    name: "type",
+  });
+
+  const options = useWatch({
+    control,
+    name: "options",
+  });
+
+  const selectedSubject = useMemo(
+    () => subjects.find((subject) => subject.id === subjectId),
+    [subjects, subjectId],
+  );
+
+  const topics = selectedSubject?.topics ?? [];
+
+  useEffect(() => {
+    if (initialSubjects) return;
+    async function loadSubjects() {
+      try {
+        const result = await getQuestionSubjects();
+        if (!result.success) {
+          console.error(result.error);
+          return;
+        }
+        setSubjects(result.data);
+      } catch (error) {
+        console.error("Failed to load subjects:", error);
+      } finally {
+        setLoadingSubjects(false);
+      }
+    }
+
+    loadSubjects();
+  }, [initialSubjects]);
+
+  function handleSubjectChange(event: React.ChangeEvent<HTMLSelectElement>) {
+    const value = event.target.value;
+
+    setValue("subjectId", value, {
+      shouldValidate: true,
+      shouldDirty: true,
+    });
+
+    setValue("topicId", "", {
+      shouldValidate: true,
+      shouldDirty: true,
+    });
   }
 
-  function updateOption(id: string, content: JSONContent) {
-    setOptions((current) =>
-      current.map((option) =>
-        option.id === id
-          ? {
-              ...option,
-              content,
-            }
-          : option,
-      ),
-    );
-  }
+  function handleTypeChange(type: QuestionFormValues["type"]) {
+    setValue("type", type, {
+      shouldValidate: true,
+      shouldDirty: true,
+    });
 
-  function toggleCorrect(id: string) {
     if (type === "SINGLE_CHOICE") {
-      setOptions((current) =>
-        current.map((option) => ({
-          ...option,
-          isCorrect: option.id === id,
-        })),
-      );
+      const firstCorrectIndex = options.findIndex((option) => option.isCorrect);
 
-      return;
+      options.forEach((option, index) => {
+        setValue(`options.${index}.isCorrect`, index === firstCorrectIndex, {
+          shouldValidate: true,
+          shouldDirty: true,
+        });
+      });
     }
-
-    setOptions((current) =>
-      current.map((option) =>
-        option.id === id
-          ? {
-              ...option,
-              isCorrect: !option.isCorrect,
-            }
-          : option,
-      ),
-    );
   }
 
-  function addOption() {
-    if (options.length >= 10) {
-      return;
-    }
-
-    setOptions((current) => [
-      ...current,
-      {
-        id: crypto.randomUUID(),
-        content: emptyContent,
-        isCorrect: false,
-      },
-    ]);
-  }
-
-  function removeOption(id: string) {
-    if (options.length <= 2) {
-      return;
-    }
-    setOptions((current) => current.filter((option) => option.id !== id));
-  }
-
-  async function onSubmit(values: FormValues) {
-    setError("");
-    const payload: QuestionInput = {
-      subjectId: values.subjectId,
-      topicId: values.topicId,
-      type: values.type,
-      content: questionContent,
-      options: options.map((option) => ({
+  async function onSubmit(data: QuestionFormValues) {
+    const payload = structuredClone({
+      subjectId: data.subjectId,
+      topicId: data.topicId,
+      type: data.type,
+      content: data.content,
+      options: data.options.map((option) => ({
         content: option.content,
         isCorrect: option.isCorrect,
       })),
-    };
+    });
 
-    const result = isEdit
+    const result = isEditMode
       ? await updateQuestion(initialData!.id, payload)
       : await createQuestion(payload);
 
     if (!result.success) {
-      setError(result.error ?? "Something went wrong");
+      console.error("Create question failed:", result.error);
+
       return;
     }
 
+    reset();
+
     router.push("/questions");
-    router.refresh();
+  }
+
+  if (loadingSubjects) {
+    return <div className="p-6">Loading...</div>;
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-      {/* Basic Details */}
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+      {/* Question Details */}
 
       <section className="rounded-xl border bg-white p-6">
-        <h2 className="mb-5 text-lg font-semibold">Question Details</h2>
+        <h2 className="mb-4 text-lg font-semibold">Question Details</h2>
 
-        <div className="grid gap-5 md:grid-cols-3">
+        <div className="grid gap-5 md:grid-cols-2">
+          {/* Subject */}
+
           <div>
             <label className="mb-2 block text-sm font-medium">Subject</label>
 
             <select
               {...register("subjectId")}
-              onChange={(event) => {
-                setValue("subjectId", event.target.value);
-
-                setValue("topicId", "");
-              }}
+              onChange={handleSubjectChange}
               className="w-full rounded-lg border px-3 py-2"
             >
-              <option value="">Select Subject</option>
+              <option value="">Select subject</option>
 
               {subjects.map((subject) => (
                 <option key={subject.id} value={subject.id}>
@@ -224,7 +219,15 @@ export default function QuestionForm({ subjects, initialData }: Props) {
                 </option>
               ))}
             </select>
+
+            {errors.subjectId && (
+              <p className="mt-1 text-sm text-red-500">
+                {errors.subjectId.message}
+              </p>
+            )}
           </div>
+
+          {/* Topic */}
 
           <div>
             <label className="mb-2 block text-sm font-medium">Topic</label>
@@ -234,34 +237,20 @@ export default function QuestionForm({ subjects, initialData }: Props) {
               disabled={!subjectId}
               className="w-full rounded-lg border px-3 py-2 disabled:bg-gray-100"
             >
-              <option value="">Select Topic</option>
+              <option value="">Select topic</option>
 
-              {selectedSubject?.topics.map((topic) => (
+              {topics.map((topic) => (
                 <option key={topic.id} value={topic.id}>
                   {topic.name}
                 </option>
               ))}
             </select>
-          </div>
 
-          <div>
-            <label className="mb-2 block text-sm font-medium">
-              Question Type
-            </label>
-
-            <select
-              value={type}
-              onChange={(event) =>
-                handleTypeChange(
-                  event.target.value as "SINGLE_CHOICE" | "MULTIPLE_CHOICE",
-                )
-              }
-              className="w-full rounded-lg border px-3 py-2"
-            >
-              <option value="SINGLE_CHOICE">Single Choice</option>
-
-              <option value="MULTIPLE_CHOICE">Multiple Choice</option>
-            </select>
+            {errors.topicId && (
+              <p className="mt-1 text-sm text-red-500">
+                {errors.topicId.message}
+              </p>
+            )}
           </div>
         </div>
       </section>
@@ -269,9 +258,51 @@ export default function QuestionForm({ subjects, initialData }: Props) {
       {/* Question */}
 
       <section className="rounded-xl border bg-white p-6">
-        <h2 className="mb-4 text-lg font-semibold">Question Content</h2>
+        <h2 className="mb-4 text-lg font-semibold">Question</h2>
 
-        <QuestionEditor value={questionContent} onChange={setQuestionContent} />
+        <Controller
+          name="content"
+          control={control}
+          render={({ field }) => (
+            <QuestionEditor
+              value={field.value}
+              onChange={field.onChange}
+              minHeight="220px"
+            />
+          )}
+        />
+
+        {errors.content && (
+          <p className="mt-2 text-sm text-red-500">{errors.content.message}</p>
+        )}
+      </section>
+
+      {/* Question Type */}
+
+      <section className="rounded-xl border bg-white p-6">
+        <h2 className="mb-4 text-lg font-semibold">Question Type</h2>
+
+        <div className="flex gap-6">
+          <label className="flex items-center gap-2">
+            <input
+              type="radio"
+              value="SINGLE_CHOICE"
+              checked={questionType === "SINGLE_CHOICE"}
+              onChange={() => handleTypeChange("SINGLE_CHOICE")}
+            />
+            Single Choice
+          </label>
+
+          <label className="flex items-center gap-2">
+            <input
+              type="radio"
+              value="MULTIPLE_CHOICE"
+              checked={questionType === "MULTIPLE_CHOICE"}
+              onChange={() => handleTypeChange("MULTIPLE_CHOICE")}
+            />
+            Multiple Choice
+          </label>
+        </div>
       </section>
 
       {/* Options */}
@@ -279,52 +310,108 @@ export default function QuestionForm({ subjects, initialData }: Props) {
       <section className="rounded-xl border bg-white p-6">
         <div className="mb-5 flex items-center justify-between">
           <div>
-            <h2 className="text-lg font-semibold">Answer Options</h2>
+            <h2 className="text-lg font-semibold">Options</h2>
 
-            <p className="text-sm text-gray-500">
-              {type === "SINGLE_CHOICE"
-                ? "Select exactly one correct answer."
-                : "Select one or more correct answers."}
-            </p>
+            <p className="text-sm text-gray-500">Select the correct answer</p>
           </div>
 
           <button
             type="button"
-            disabled={options.length >= 10}
-            onClick={addOption}
-            className="rounded-lg border px-4 py-2 text-sm disabled:opacity-50"
+            onClick={() => append(createOption())}
+            className="rounded-lg border px-4 py-2 text-sm"
           >
             + Add Option
           </button>
         </div>
 
         <div className="space-y-5">
-          {options.map((option, index) => (
-            <OptionEditor
-              key={option.id}
-              index={index}
-              content={option.content}
-              isCorrect={option.isCorrect}
-              type={type}
-              onContentChange={(content) => updateOption(option.id, content)}
-              onCorrectChange={() => toggleCorrect(option.id)}
-              onRemove={() => removeOption(option.id)}
-              canRemove={options.length > 2}
-            />
-          ))}
+          {optionFields.map((field, index) => {
+            const isCorrect = options?.[index]?.isCorrect ?? false;
+
+            return (
+              <div key={field.id} className="rounded-lg border p-4">
+                <div className="mb-3 flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <span className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-100 text-sm font-semibold">
+                      {String.fromCharCode(65 + index)}
+                    </span>
+
+                    <label className="flex items-center gap-2 text-sm">
+                      <input
+                        type={
+                          questionType === "SINGLE_CHOICE"
+                            ? "radio"
+                            : "checkbox"
+                        }
+                        checked={isCorrect}
+                        onChange={() => {
+                          if (questionType === "SINGLE_CHOICE") {
+                            options?.forEach((_, optionIndex) => {
+                              setValue(
+                                `options.${optionIndex}.isCorrect`,
+                                optionIndex === index,
+                                {
+                                  shouldValidate: true,
+                                  shouldDirty: true,
+                                },
+                              );
+                            });
+                          } else {
+                            setValue(`options.${index}.isCorrect`, !isCorrect, {
+                              shouldValidate: true,
+                              shouldDirty: true,
+                            });
+                          }
+                        }}
+                      />
+                      Correct Answer
+                    </label>
+                  </div>
+
+                  {optionFields.length > 2 && (
+                    <button
+                      type="button"
+                      onClick={() => remove(index)}
+                      className="text-sm text-red-500"
+                    >
+                      Remove
+                    </button>
+                  )}
+                </div>
+
+                <Controller
+                  name={`options.${index}.content`}
+                  control={control}
+                  render={({ field }) => (
+                    <QuestionEditor
+                      value={field.value}
+                      onChange={field.onChange}
+                      minHeight="100px"
+                    />
+                  )}
+                />
+
+                {errors.options?.[index]?.content && (
+                  <p className="mt-1 text-sm text-red-500">
+                    {errors.options[index]?.content?.message}
+                  </p>
+                )}
+              </div>
+            );
+          })}
         </div>
+
+        {errors.options?.message && (
+          <p className="mt-3 text-sm text-red-500">{errors.options.message}</p>
+        )}
       </section>
 
-      {error && (
-        <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-600">
-          {error}
-        </div>
-      )}
+      {/* Submit */}
 
       <div className="flex justify-end gap-3">
         <button
           type="button"
-          onClick={() => router.push("/questions")}
+          onClick={() => (window.location.href = "/questions")}
           className="rounded-lg border px-5 py-2"
         >
           Cancel
@@ -333,11 +420,13 @@ export default function QuestionForm({ subjects, initialData }: Props) {
         <button
           type="submit"
           disabled={isSubmitting}
-          className="rounded-lg bg-black px-6 py-2 text-white disabled:opacity-50"
+          className="rounded-lg bg-black px-5 py-2 text-white disabled:opacity-50"
         >
           {isSubmitting
-            ? "Saving..."
-            : isEdit
+            ? isEditMode
+              ? "Updating..."
+              : "Creating..."
+            : isEditMode
               ? "Update Question"
               : "Create Question"}
         </button>
