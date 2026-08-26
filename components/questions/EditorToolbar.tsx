@@ -2,37 +2,22 @@
 
 import type { Editor } from "@tiptap/react";
 import { useRef, useState } from "react";
-
 import { uploadQuestionImage } from "@/actions/upload.actions";
 
 type Props = {
   editor: Editor;
 };
 
-export default function EditorToolbar({
-  editor,
-}: Props) {
-  const fileRef =
-    useRef<HTMLInputElement>(null);
-
-  const [uploading, setUploading] =
-    useState(false);
+export default function EditorToolbar({ editor }: Props) {
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [uploading, setUploading] = useState(false);
 
   async function uploadImage(file: File) {
     try {
       setUploading(true);
-
       const formData = new FormData();
-
       formData.append("file", file);
-
-      const result =
-        await uploadQuestionImage(formData);
-
-      console.log(
-        "uploadQuestionImage result:",
-        result,
-      );
+      const result = await uploadQuestionImage(formData);
 
       if (!result.success) {
         alert(result.error);
@@ -47,10 +32,7 @@ export default function EditorToolbar({
         kind: "image" as const,
       };
 
-      console.log(
-        "Image attrs:",
-        imageAttrs,
-      );
+      console.log("Image attrs:", imageAttrs);
 
       editor
         .chain()
@@ -60,23 +42,8 @@ export default function EditorToolbar({
           attrs: imageAttrs,
         })
         .run();
-
-      // IMPORTANT:
-      // Check what Tiptap actually stored.
-      console.log(
-        "Editor JSON after image:",
-        JSON.stringify(
-          editor.getJSON(),
-          null,
-          2,
-        ),
-      );
     } catch (error) {
-      console.error(
-        "Image upload error:",
-        error,
-      );
-
+      console.error("Image upload error:", error);
       alert("Failed to upload image");
     } finally {
       setUploading(false);
@@ -89,13 +56,9 @@ export default function EditorToolbar({
         type="button"
         disabled={uploading}
         className="toolbar-btn"
-        onClick={() =>
-          fileRef.current?.click()
-        }
+        onClick={() => fileRef.current?.click()}
       >
-        {uploading
-          ? "Uploading..."
-          : "Image"}
+        {uploading ? "Uploading..." : "Image"}
       </button>
 
       <input
@@ -104,15 +67,11 @@ export default function EditorToolbar({
         hidden
         accept="image/png,image/jpeg,image/webp,image/gif"
         onChange={async (event) => {
-          const file =
-            event.target.files?.[0];
-
+          const file = event.target.files?.[0];
           if (!file) {
             return;
           }
-
           await uploadImage(file);
-
           event.target.value = "";
         }}
       />

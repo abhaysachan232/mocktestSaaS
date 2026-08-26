@@ -10,10 +10,12 @@ import { useTestResult } from "./useTestResult";
 import { useTestSubmit } from "./useTestSubmit";
 
 export function useTestSession(
-  test: any, // TestEngineData,
+  test: TestEngineData,
   onTimeExpired?: () => void,
 ) {
-  const questions = test.testQuestions;
+  
+  const questions = test.testQuestions.map(testQuestion => testQuestion.question);
+  console.log('questions', questions)
   const questionIds = questions.map((question) => question.id);
 
   const {
@@ -102,6 +104,7 @@ export function useTestSession(
     resetTimer();
     goToQuestion(0);
   }, [resetAnswers, resetPalette, resetTimer, goToQuestion]);
+
   return {
     questions,
     currentIndex,

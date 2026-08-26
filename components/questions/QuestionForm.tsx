@@ -69,6 +69,7 @@ export default function QuestionForm({
       topicId: "",
       type: "SINGLE_CHOICE",
       content: structuredClone(emptyContent),
+      solution: structuredClone(emptyContent),
       options: [createOption(), createOption()],
     },
   });
@@ -168,6 +169,7 @@ export default function QuestionForm({
       topicId: data.topicId,
       type: data.type,
       content: data.content,
+      solution: data.solution,
       options: data.options.map((option) => ({
         content: option.content,
         isCorrect: option.isCorrect,
@@ -180,12 +182,10 @@ export default function QuestionForm({
 
     if (!result.success) {
       console.error("Create question failed:", result.error);
-
       return;
     }
 
     reset();
-
     router.push("/questions");
   }
 
@@ -262,6 +262,25 @@ export default function QuestionForm({
 
         <Controller
           name="content"
+          control={control}
+          render={({ field }) => (
+            <QuestionEditor
+              value={field.value}
+              onChange={field.onChange}
+              minHeight="220px"
+            />
+          )}
+        />
+
+        {errors.content && (
+          <p className="mt-2 text-sm text-red-500">{errors.content.message}</p>
+        )}
+      </section>
+      <section className="rounded-xl border bg-white p-6">
+        <h2 className="mb-4 text-lg font-semibold">Solution</h2>
+
+        <Controller
+          name="solution"
           control={control}
           render={({ field }) => (
             <QuestionEditor

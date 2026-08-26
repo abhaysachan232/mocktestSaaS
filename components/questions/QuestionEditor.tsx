@@ -2,7 +2,6 @@
 
 import { useEffect } from "react";
 import { EditorContent, useEditor } from "@tiptap/react";
-
 import StarterKit from "@tiptap/starter-kit";
 import { Link } from "@tiptap/extension-link";
 import { Table } from "@tiptap/extension-table";
@@ -11,9 +10,7 @@ import { TableCell } from "@tiptap/extension-table-cell";
 import { TableHeader } from "@tiptap/extension-table-header";
 import { Subscript } from "@tiptap/extension-subscript";
 import { Superscript } from "@tiptap/extension-superscript";
-
 import type { JSONContent } from "@tiptap/react";
-
 import EditorToolbar from "./EditorToolbar";
 import { ImageResizeNode } from "./ImageResizeNode";
 
@@ -30,10 +27,7 @@ export default function QuestionEditor({
 }: Props) {
   const editor = useEditor({
     immediatelyRender: false,
-
     extensions: [
-      // Link is disabled inside StarterKit
-      // because we configure it separately below.
       StarterKit.configure({
         link: false,
       }),
@@ -52,33 +46,21 @@ export default function QuestionEditor({
 
       Subscript,
       Superscript,
-
       ImageResizeNode,
     ],
-
     content: value,
-
     onUpdate({ editor }) {
       const json = editor.getJSON();
-
-      console.log("QuestionEditor onUpdate:", json);
-
       onChange(json);
     },
   });
 
-  /**
-   * Sync external value -> Tiptap
-   *
-   * Important for React Hook Form / edit forms.
-   */
   useEffect(() => {
     if (!editor) {
       return;
     }
 
     const currentContent = editor.getJSON();
-
     const currentString = JSON.stringify(currentContent);
     const valueString = JSON.stringify(value);
 

@@ -9,14 +9,6 @@ export default function DeleteQuestionButton({ id }: { id: string }) {
   const [pending, startTransition] = useTransition();
 
   function handleDelete() {
-    const confirmed = window.confirm(
-      "Are you sure you want to delete this question?",
-    );
-
-    if (!confirmed) {
-      return;
-    }
-
     startTransition(async () => {
       const result = await deleteQuestion(id);
 

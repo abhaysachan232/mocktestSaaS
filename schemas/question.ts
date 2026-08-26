@@ -12,6 +12,7 @@ export const questionSchema = z
     topicId: z.string().min(1, "Topic is required"),
     type: z.enum(["SINGLE_CHOICE", "MULTIPLE_CHOICE"]),
     content: jsonContentSchema,
+    solution: jsonContentSchema.optional(),
     options: z
       .array(
         z.object({
@@ -68,6 +69,7 @@ export const questionFormSchema = z
     type: z.enum(["SINGLE_CHOICE", "MULTIPLE_CHOICE"]),
 
     content: jsonContentSchema,
+    solution: jsonContentSchema.optional(),
 
     options: z
       .array(questionOptionSchema)

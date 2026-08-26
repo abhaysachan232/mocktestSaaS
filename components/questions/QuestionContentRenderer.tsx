@@ -3,11 +3,10 @@
 import type { JSONContent } from "@tiptap/react";
 
 type Props = {
-  content: JSONContent;
+  content: JSONContent | null | undefined;
 };
 
 function renderNode(node: JSONContent, key: string) {
-    // console.log('node.type', node.type)
   switch (node.type) {
     case "doc":
       return (
@@ -153,7 +152,7 @@ function renderNode(node: JSONContent, key: string) {
       );
 
     case "resizableImage": {
-        console.log("IMAGE NODE:", node);
+      console.log("IMAGE NODE:", node);
       const src = node.attrs?.src;
 
       if (!src) {
@@ -164,22 +163,24 @@ function renderNode(node: JSONContent, key: string) {
         typeof node.attrs?.width === "number" ? node.attrs.width : 500;
 
       return (
-        <div key={key} className="my-3">
+        <div
+          key={key}
+          className="my-4 overflow-hidden rounded-xl border border-slate-200 bg-slate-50"
+        >
+          <div className="relative min-h-40 w-full">
           <img
             src={src}
             alt={node.attrs?.alt ?? ""}
             width={width}
-            className="h-auto max-w-full rounded border"
+            className="object-contain"
             onLoad={() => {
-          console.log("IMAGE LOADED:", src);
-        }}
-        onError={() => {
-          console.error(
-            "IMAGE LOAD FAILED:",
-            src,
-          );
-        }}
+              console.log("IMAGE LOADED:", src);
+            }}
+            onError={() => {
+              console.error("IMAGE LOAD FAILED:", src);
+            }}
           />
+          </div>
         </div>
       );
     }
@@ -196,5 +197,8 @@ function renderNode(node: JSONContent, key: string) {
 }
 
 export default function QuestionContentRenderer({ content }: Props) {
+  if (!content) {
+    return <span className="text-sm text-gray-400">No solution available</span>;
+  }
   return <div className="text-sm leading-6">{renderNode(content, "root")}</div>;
 }

@@ -51,6 +51,7 @@ export type QuestionCountAggregateOutputType = {
   topicId: number
   type: number
   content: number
+  solution: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -84,6 +85,7 @@ export type QuestionCountAggregateInputType = {
   topicId?: true
   type?: true
   content?: true
+  solution?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -168,6 +170,7 @@ export type QuestionGroupByOutputType = {
   topicId: string
   type: $Enums.QuestionType
   content: runtime.JsonValue
+  solution: runtime.JsonValue | null
   createdAt: Date
   updatedAt: Date
   _count: QuestionCountAggregateOutputType | null
@@ -200,6 +203,7 @@ export type QuestionWhereInput = {
   topicId?: Prisma.StringFilter<"Question"> | string
   type?: Prisma.EnumQuestionTypeFilter<"Question"> | $Enums.QuestionType
   content?: Prisma.JsonFilter<"Question">
+  solution?: Prisma.JsonNullableFilter<"Question">
   createdAt?: Prisma.DateTimeFilter<"Question"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Question"> | Date | string
   user?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
@@ -216,6 +220,7 @@ export type QuestionOrderByWithRelationInput = {
   topicId?: Prisma.SortOrder
   type?: Prisma.SortOrder
   content?: Prisma.SortOrder
+  solution?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   user?: Prisma.UserOrderByWithRelationInput
@@ -235,6 +240,7 @@ export type QuestionWhereUniqueInput = Prisma.AtLeast<{
   topicId?: Prisma.StringFilter<"Question"> | string
   type?: Prisma.EnumQuestionTypeFilter<"Question"> | $Enums.QuestionType
   content?: Prisma.JsonFilter<"Question">
+  solution?: Prisma.JsonNullableFilter<"Question">
   createdAt?: Prisma.DateTimeFilter<"Question"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Question"> | Date | string
   user?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
@@ -251,6 +257,7 @@ export type QuestionOrderByWithAggregationInput = {
   topicId?: Prisma.SortOrder
   type?: Prisma.SortOrder
   content?: Prisma.SortOrder
+  solution?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.QuestionCountOrderByAggregateInput
@@ -268,6 +275,7 @@ export type QuestionScalarWhereWithAggregatesInput = {
   topicId?: Prisma.StringWithAggregatesFilter<"Question"> | string
   type?: Prisma.EnumQuestionTypeWithAggregatesFilter<"Question"> | $Enums.QuestionType
   content?: Prisma.JsonWithAggregatesFilter<"Question">
+  solution?: Prisma.JsonNullableWithAggregatesFilter<"Question">
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Question"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Question"> | Date | string
 }
@@ -276,6 +284,7 @@ export type QuestionCreateInput = {
   id?: string
   type?: $Enums.QuestionType
   content: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  solution?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
   user?: Prisma.UserCreateNestedOneWithoutQuestionsInput
@@ -292,6 +301,7 @@ export type QuestionUncheckedCreateInput = {
   topicId: string
   type?: $Enums.QuestionType
   content: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  solution?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
   options?: Prisma.QuestionOptionUncheckedCreateNestedManyWithoutQuestionInput
@@ -302,6 +312,7 @@ export type QuestionUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumQuestionTypeFieldUpdateOperationsInput | $Enums.QuestionType
   content?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  solution?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneWithoutQuestionsNestedInput
@@ -318,6 +329,7 @@ export type QuestionUncheckedUpdateInput = {
   topicId?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumQuestionTypeFieldUpdateOperationsInput | $Enums.QuestionType
   content?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  solution?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   options?: Prisma.QuestionOptionUncheckedUpdateManyWithoutQuestionNestedInput
@@ -331,6 +343,7 @@ export type QuestionCreateManyInput = {
   topicId: string
   type?: $Enums.QuestionType
   content: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  solution?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -339,6 +352,7 @@ export type QuestionUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumQuestionTypeFieldUpdateOperationsInput | $Enums.QuestionType
   content?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  solution?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -350,6 +364,7 @@ export type QuestionUncheckedUpdateManyInput = {
   topicId?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumQuestionTypeFieldUpdateOperationsInput | $Enums.QuestionType
   content?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  solution?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -371,6 +386,7 @@ export type QuestionCountOrderByAggregateInput = {
   topicId?: Prisma.SortOrder
   type?: Prisma.SortOrder
   content?: Prisma.SortOrder
+  solution?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -562,6 +578,7 @@ export type QuestionCreateWithoutUserInput = {
   id?: string
   type?: $Enums.QuestionType
   content: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  solution?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
   subject: Prisma.SubjectCreateNestedOneWithoutQuestionsInput
@@ -576,6 +593,7 @@ export type QuestionUncheckedCreateWithoutUserInput = {
   topicId: string
   type?: $Enums.QuestionType
   content: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  solution?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
   options?: Prisma.QuestionOptionUncheckedCreateNestedManyWithoutQuestionInput
@@ -618,6 +636,7 @@ export type QuestionScalarWhereInput = {
   topicId?: Prisma.StringFilter<"Question"> | string
   type?: Prisma.EnumQuestionTypeFilter<"Question"> | $Enums.QuestionType
   content?: Prisma.JsonFilter<"Question">
+  solution?: Prisma.JsonNullableFilter<"Question">
   createdAt?: Prisma.DateTimeFilter<"Question"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Question"> | Date | string
 }
@@ -626,6 +645,7 @@ export type QuestionCreateWithoutSubjectInput = {
   id?: string
   type?: $Enums.QuestionType
   content: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  solution?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
   user?: Prisma.UserCreateNestedOneWithoutQuestionsInput
@@ -640,6 +660,7 @@ export type QuestionUncheckedCreateWithoutSubjectInput = {
   topicId: string
   type?: $Enums.QuestionType
   content: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  solution?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
   options?: Prisma.QuestionOptionUncheckedCreateNestedManyWithoutQuestionInput
@@ -676,6 +697,7 @@ export type QuestionCreateWithoutTopicInput = {
   id?: string
   type?: $Enums.QuestionType
   content: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  solution?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
   user?: Prisma.UserCreateNestedOneWithoutQuestionsInput
@@ -690,6 +712,7 @@ export type QuestionUncheckedCreateWithoutTopicInput = {
   subjectId: string
   type?: $Enums.QuestionType
   content: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  solution?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
   options?: Prisma.QuestionOptionUncheckedCreateNestedManyWithoutQuestionInput
@@ -726,6 +749,7 @@ export type QuestionCreateWithoutOptionsInput = {
   id?: string
   type?: $Enums.QuestionType
   content: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  solution?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
   user?: Prisma.UserCreateNestedOneWithoutQuestionsInput
@@ -741,6 +765,7 @@ export type QuestionUncheckedCreateWithoutOptionsInput = {
   topicId: string
   type?: $Enums.QuestionType
   content: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  solution?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
   testQuestions?: Prisma.TestQuestionUncheckedCreateNestedManyWithoutQuestionInput
@@ -766,6 +791,7 @@ export type QuestionUpdateWithoutOptionsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumQuestionTypeFieldUpdateOperationsInput | $Enums.QuestionType
   content?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  solution?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneWithoutQuestionsNestedInput
@@ -781,6 +807,7 @@ export type QuestionUncheckedUpdateWithoutOptionsInput = {
   topicId?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumQuestionTypeFieldUpdateOperationsInput | $Enums.QuestionType
   content?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  solution?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   testQuestions?: Prisma.TestQuestionUncheckedUpdateManyWithoutQuestionNestedInput
@@ -790,6 +817,7 @@ export type QuestionCreateWithoutTestQuestionsInput = {
   id?: string
   type?: $Enums.QuestionType
   content: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  solution?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
   user?: Prisma.UserCreateNestedOneWithoutQuestionsInput
@@ -805,6 +833,7 @@ export type QuestionUncheckedCreateWithoutTestQuestionsInput = {
   topicId: string
   type?: $Enums.QuestionType
   content: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  solution?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
   options?: Prisma.QuestionOptionUncheckedCreateNestedManyWithoutQuestionInput
@@ -830,6 +859,7 @@ export type QuestionUpdateWithoutTestQuestionsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumQuestionTypeFieldUpdateOperationsInput | $Enums.QuestionType
   content?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  solution?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneWithoutQuestionsNestedInput
@@ -845,6 +875,7 @@ export type QuestionUncheckedUpdateWithoutTestQuestionsInput = {
   topicId?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumQuestionTypeFieldUpdateOperationsInput | $Enums.QuestionType
   content?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  solution?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   options?: Prisma.QuestionOptionUncheckedUpdateManyWithoutQuestionNestedInput
@@ -856,6 +887,7 @@ export type QuestionCreateManyUserInput = {
   topicId: string
   type?: $Enums.QuestionType
   content: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  solution?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -864,6 +896,7 @@ export type QuestionUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumQuestionTypeFieldUpdateOperationsInput | $Enums.QuestionType
   content?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  solution?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   subject?: Prisma.SubjectUpdateOneRequiredWithoutQuestionsNestedInput
@@ -878,6 +911,7 @@ export type QuestionUncheckedUpdateWithoutUserInput = {
   topicId?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumQuestionTypeFieldUpdateOperationsInput | $Enums.QuestionType
   content?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  solution?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   options?: Prisma.QuestionOptionUncheckedUpdateManyWithoutQuestionNestedInput
@@ -890,6 +924,7 @@ export type QuestionUncheckedUpdateManyWithoutUserInput = {
   topicId?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumQuestionTypeFieldUpdateOperationsInput | $Enums.QuestionType
   content?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  solution?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -900,6 +935,7 @@ export type QuestionCreateManySubjectInput = {
   topicId: string
   type?: $Enums.QuestionType
   content: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  solution?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -908,6 +944,7 @@ export type QuestionUpdateWithoutSubjectInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumQuestionTypeFieldUpdateOperationsInput | $Enums.QuestionType
   content?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  solution?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneWithoutQuestionsNestedInput
@@ -922,6 +959,7 @@ export type QuestionUncheckedUpdateWithoutSubjectInput = {
   topicId?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumQuestionTypeFieldUpdateOperationsInput | $Enums.QuestionType
   content?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  solution?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   options?: Prisma.QuestionOptionUncheckedUpdateManyWithoutQuestionNestedInput
@@ -934,6 +972,7 @@ export type QuestionUncheckedUpdateManyWithoutSubjectInput = {
   topicId?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumQuestionTypeFieldUpdateOperationsInput | $Enums.QuestionType
   content?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  solution?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -944,6 +983,7 @@ export type QuestionCreateManyTopicInput = {
   subjectId: string
   type?: $Enums.QuestionType
   content: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  solution?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -952,6 +992,7 @@ export type QuestionUpdateWithoutTopicInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumQuestionTypeFieldUpdateOperationsInput | $Enums.QuestionType
   content?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  solution?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneWithoutQuestionsNestedInput
@@ -966,6 +1007,7 @@ export type QuestionUncheckedUpdateWithoutTopicInput = {
   subjectId?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumQuestionTypeFieldUpdateOperationsInput | $Enums.QuestionType
   content?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  solution?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   options?: Prisma.QuestionOptionUncheckedUpdateManyWithoutQuestionNestedInput
@@ -978,6 +1020,7 @@ export type QuestionUncheckedUpdateManyWithoutTopicInput = {
   subjectId?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumQuestionTypeFieldUpdateOperationsInput | $Enums.QuestionType
   content?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  solution?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -1029,6 +1072,7 @@ export type QuestionSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   topicId?: boolean
   type?: boolean
   content?: boolean
+  solution?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.Question$userArgs<ExtArgs>
@@ -1046,6 +1090,7 @@ export type QuestionSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exte
   topicId?: boolean
   type?: boolean
   content?: boolean
+  solution?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.Question$userArgs<ExtArgs>
@@ -1060,6 +1105,7 @@ export type QuestionSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exte
   topicId?: boolean
   type?: boolean
   content?: boolean
+  solution?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.Question$userArgs<ExtArgs>
@@ -1074,11 +1120,12 @@ export type QuestionSelectScalar = {
   topicId?: boolean
   type?: boolean
   content?: boolean
+  solution?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type QuestionOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "subjectId" | "topicId" | "type" | "content" | "createdAt" | "updatedAt", ExtArgs["result"]["question"]>
+export type QuestionOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "subjectId" | "topicId" | "type" | "content" | "solution" | "createdAt" | "updatedAt", ExtArgs["result"]["question"]>
 export type QuestionInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.Question$userArgs<ExtArgs>
   subject?: boolean | Prisma.SubjectDefaultArgs<ExtArgs>
@@ -1114,6 +1161,7 @@ export type $QuestionPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     topicId: string
     type: $Enums.QuestionType
     content: runtime.JsonValue
+    solution: runtime.JsonValue | null
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["question"]>
@@ -1550,6 +1598,7 @@ export interface QuestionFieldRefs {
   readonly topicId: Prisma.FieldRef<"Question", 'String'>
   readonly type: Prisma.FieldRef<"Question", 'QuestionType'>
   readonly content: Prisma.FieldRef<"Question", 'Json'>
+  readonly solution: Prisma.FieldRef<"Question", 'Json'>
   readonly createdAt: Prisma.FieldRef<"Question", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Question", 'DateTime'>
 }

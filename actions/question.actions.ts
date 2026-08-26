@@ -49,17 +49,7 @@ export async function getQuestionSubjects() {
   };
 }
 
-
-
 export async function createQuestion(payload: QuestionFormValues) {
-  console.log(
-    "========== CREATE QUESTION ACTION ==========",
-  );
-
-  console.log(
-    "createQuestion received:",
-    JSON.stringify(payload, null, 2),
-  );
   try {
     const userId = await getUserId();
 
@@ -80,11 +70,7 @@ export async function createQuestion(payload: QuestionFormValues) {
       };
     }
 
-    const data = payload;
-
-    const { subjectId, topicId, type, content, options } = data;
-    console.log("Parsed question:", subjectId, topicId, type, content, options);
-
+    const { subjectId, topicId, type, content, solution, options } = payload;
     const topic = await prisma.topic.findFirst({
       where: {
         id: topicId,
@@ -99,25 +85,19 @@ export async function createQuestion(payload: QuestionFormValues) {
       };
     }
 
-    // Convert Tiptap JSON into plain JSON
-    const plainContent = JSON.parse(JSON.stringify(content));
-
-    console.log("plainContent", plainContent);
-
-    const plainOptions = options.map((option) => ({
-      content: JSON.parse(JSON.stringify(option.content)),
-      isCorrect: option.isCorrect,
-    }));
-
     const question = await prisma.question.create({
       data: {
         userId,
         subjectId,
         topicId,
         type,
-        content: plainContent,
+        content,
+        solution,
         options: {
-          create: plainOptions,
+          create: options.map((option) => ({
+            content: option.content,
+            isCorrect: option.isCorrect,
+          })),
         },
       },
     });
@@ -214,7 +194,7 @@ export async function getQuestionById(id: string) {
   };
 }
 
-export async function updateQuestion(id: string, input: QuestionInput) {
+export async function updateQuestion(id: string, input: QuestionFormValues) {
   try {
     const userId = await getUserId();
 
@@ -248,7 +228,7 @@ export async function updateQuestion(id: string, input: QuestionInput) {
       };
     }
 
-    const { subjectId, topicId, type, content, options } = parsed.data;
+    const { subjectId, topicId, type, content, solution, options } = parsed.data;
 
     const topic = await prisma.topic.findFirst({
       where: {
@@ -281,10 +261,10 @@ export async function updateQuestion(id: string, input: QuestionInput) {
           topicId,
           type,
           content,
+          solution,
           options: {
             create: options.map((option) => ({
               content: option.content,
-
               isCorrect: option.isCorrect,
             })),
           },

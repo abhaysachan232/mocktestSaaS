@@ -95,13 +95,9 @@ function ImageComponent({ node, updateAttributes }: ReactNodeViewProps) {
 
 export const ImageResizeNode = Node.create({
   name: "resizableImage",
-
   group: "block",
-
   atom: true,
-
   selectable: true,
-
   draggable: true,
 
   addAttributes() {

@@ -1,6 +1,6 @@
 interface TestTitleProps {
   title: string;
-  subtitle?: string;
+  subtitle?: string | null;
 }
 
 export default function TestTitle({

@@ -8,7 +8,6 @@ import QuestionContentRenderer from "@/components/questions/QuestionContentRende
 
 export default async function QuestionsPage() {
   const result = await getQuestions();
-  console.log("result", result);
 
   if (!result.success) {
     return <div className="p-6 text-red-500">{result.error}</div>;
@@ -16,15 +15,11 @@ export default async function QuestionsPage() {
 
   return (
     <div className="space-y-6 p-6">
-      {/* Header */}
-
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold">Questions</h1>
-
           <p className="text-sm text-gray-500">Manage your question bank</p>
         </div>
-
         <Link
           href="/questions/new"
           className="rounded-lg bg-black px-5 py-2 text-sm text-white"
@@ -32,27 +27,19 @@ export default async function QuestionsPage() {
           + Create Question
         </Link>
       </div>
-
-      {/* Question List */}
-
       <div className="overflow-hidden rounded-xl border bg-white">
         <table className="w-full">
           <thead className="border-b bg-gray-50">
             <tr>
               <th className="px-4 py-3 text-left">Question</th>
-
+              <th className="px-4 py-3 text-left">Solution</th>
               <th className="px-4 py-3 text-left">Subject</th>
-
               <th className="px-4 py-3 text-left">Topic</th>
-
               <th className="px-4 py-3 text-left">Type</th>
-
               <th className="px-4 py-3 text-left">Options</th>
-
               <th className="px-4 py-3 text-right">Action</th>
             </tr>
           </thead>
-
           <tbody>
             {result.data.map((question) => (
               <tr key={question.id} className="border-b align-top">
@@ -61,22 +48,16 @@ export default async function QuestionsPage() {
                     content={question.content as JSONContent}
                   />
                 </td>
-                {/* Subject */}
-
+                <td className="px-4 py-4">
+                  <QuestionContentRenderer
+                    content={question.solution as JSONContent}
+                  />
+                </td>
                 <td className="px-4 py-4">{question.subject.name}</td>
-
-                {/* Topic */}
-
                 <td className="px-4 py-4">{question.topic.name}</td>
-
-                {/* Type */}
-
                 <td className="px-4 py-4">
                   {question.type === "SINGLE_CHOICE" ? "Single" : "Multiple"}
                 </td>
-
-                {/* Options */}
-
                 <td className="px-4 py-4">
                   <div className="space-y-2">
                     {question.options.map((option, index) => (
@@ -100,9 +81,6 @@ export default async function QuestionsPage() {
                     ))}
                   </div>
                 </td>
-
-                {/* Actions */}
-
                 <td className="px-4 py-4 text-right">
                   <div className="flex justify-end gap-2">
                     <Link

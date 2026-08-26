@@ -7,20 +7,17 @@ import Timer from "./Timer";
 
 interface TestHeaderProps {
   title: string;
-  subtitle?: string;
-
+  description: string | null;
   currentQuestion: number;
   totalQuestions: number;
-
   timeRemaining: number;
-
   onMenuClick?: () => void;
   onSubmit?: () => void;
 }
 
 export default function TestHeader({
   title,
-  subtitle,
+  description,
   currentQuestion,
   totalQuestions,
   timeRemaining,
@@ -35,7 +32,7 @@ export default function TestHeader({
         <div className="hidden items-center gap-5 md:flex">
           <TestTitle
             title={title}
-            subtitle={subtitle}
+            subtitle={description}
           />
 
           <TestProgress
@@ -75,7 +72,7 @@ export default function TestHeader({
             <div className="min-w-0 flex-1">
               <TestTitle
                 title={title}
-                subtitle={subtitle}
+                subtitle={description}
               />
             </div>
 

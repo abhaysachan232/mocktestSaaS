@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import type { JSONContent } from "@tiptap/react";
 import TestHeader from "./header/TestHeader";
-import QuestionSection from "./question/QuestionSection";
+import QuestionSection from "./QuestionSection";
 import QuestionPalette from "./palette/QuestionPalette";
 import NavigationButtons from "./navigation/NavigationButtons";
 import MarkForReviewButton from "./navigation/MarkForReviewButton";
@@ -15,39 +16,53 @@ import Calculator from "./tools/Calculator";
 import { useTestSession } from "@/hooks/useTestSession";
 export interface TestEngineOption {
   id: string;
-  text: string;
+  content: JSONContent;
+  isCorrect: boolean;
 }
 
 export interface TestEngineQuestion {
   id: string;
-  question: string;
+  type: "SINGLE_CHOICE" | "MULTIPLE_CHOICE";
+  content: JSONContent;
   options: TestEngineOption[];
-  image?: string;
-  imageAlt?: string;
-  correctAnswer?: string;
-  marks?: number;
-  negativeMarks?: number;
+  subject: {
+    id: string;
+    name: string;
+  };
+  topic: {
+    id: string;
+    name: string;
+  };
+}
+
+export interface testQuestions {
+  order: number;
+  question: TestEngineQuestion;
 }
 
 export interface TestEngineData {
   id: string;
-  title: string;
-  subtitle?: string;
+  name: string;
+  description: string | null;
   duration: number;
-  testQuestions: TestEngineQuestion[];
+  totalMarks: number;
+  totalQuestions: number;
+  negativeMarking: boolean;
+  negativeMarks: number | null;
+  testQuestions: testQuestions[];
 }
 
 interface TestEngineProps {
   test: TestEngineData;
 }
 
-export default function TestEngine({ test }: any) {
+export default function TestEngine({ test }: TestEngineProps) {
   const [testStarted, setTestStarted] = useState(false);
   const [submitModalOpen, setSubmitModalOpen] = useState(false);
   const [mobilePaletteOpen, setMobilePaletteOpen] = useState(false);
   const [calculatorOpen, setCalculatorOpen] = useState(false);
 
-  console.log('test', test)
+  console.log("test", test);
   const handleTimeExpired = () => {
     handleSubmit();
   };
@@ -152,12 +167,12 @@ export default function TestEngine({ test }: any) {
           {/* Title */}
           <div className="mt-5 text-center">
             <h1 className="text-xl font-bold text-slate-900 sm:text-2xl">
-              {test.title}
+              {test.name}
             </h1>
 
-            {test.subtitle && (
+            {test.description && (
               <p className="mt-2 text-sm leading-6 text-slate-500">
-                {test.subtitle}
+                {test.description}
               </p>
             )}
           </div>
@@ -235,8 +250,8 @@ export default function TestEngine({ test }: any) {
   return (
     <div className="min-h-screen bg-slate-50">
       <TestHeader
-        title={test.title}
-        subtitle={test.subtitle}
+        title={test.name}
+        description={test.description}
         currentQuestion={currentIndex + 1}
         totalQuestions={totalQuestions}
         timeRemaining={remainingSeconds}
@@ -248,11 +263,11 @@ export default function TestEngine({ test }: any) {
           <div className="min-w-0">
             <QuestionSection
               questionNumber={currentIndex + 1}
-              questionText={currentQuestion.question}
+              questionContent={currentQuestion.content}
               options={currentQuestion.options}
               selectedOption={answers[currentQuestion.id] ?? null}
-              image={currentQuestion.image}
-              imageAlt={currentQuestion.imageAlt}
+              // image={currentQuestion.image}
+              // imageAlt={currentQuestion.imageAlt}
               onSelectOption={selectCurrentAnswer}
             />
             <div className="mt-4 hidden items-center justify-between gap-3 md:flex">
