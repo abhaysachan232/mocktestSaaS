@@ -4,15 +4,10 @@ import type { JSONContent } from "@tiptap/react";
 import { TestEngineOption } from "./TestEngine";
 import QuestionContentRenderer from "@/components/questions/QuestionContentRenderer";
 
-interface OptionsListProps extends TestEngineOption {
-  selectedOption?: string | null;
-  onSelect: (optionId: string) => void;
-  disabled?: boolean;
-}
 interface QuestionSectionProps {
   questionNumber: number;
   questionContent: JSONContent;
-  options: OptionsListProps[];
+  options: TestEngineOption[];
   selectedOption?: string | null;
   onSelectOption: (optionId: string) => void;
   disabled?: boolean;

@@ -18,6 +18,7 @@ export interface TestEngineOption {
   id: string;
   content: JSONContent;
   isCorrect: boolean;
+  questionId: string;
 }
 
 export interface TestEngineQuestion {
@@ -93,6 +94,7 @@ export default function TestEngine({ test }: TestEngineProps) {
     isSubmitting,
   } = session;
   const totalQuestions = questions.length;
+  console.log('currentQuestion.options', currentQuestion.options)
 
   const handleSubmit = async () => {
     pauseTimer();
@@ -266,8 +268,6 @@ export default function TestEngine({ test }: TestEngineProps) {
               questionContent={currentQuestion.content}
               options={currentQuestion.options}
               selectedOption={answers[currentQuestion.id] ?? null}
-              // image={currentQuestion.image}
-              // imageAlt={currentQuestion.imageAlt}
               onSelectOption={selectCurrentAnswer}
             />
             <div className="mt-4 hidden items-center justify-between gap-3 md:flex">
