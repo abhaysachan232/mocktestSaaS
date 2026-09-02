@@ -63,7 +63,10 @@ export const ModelName = {
   Question: 'Question',
   QuestionOption: 'QuestionOption',
   Test: 'Test',
-  TestQuestion: 'TestQuestion'
+  TestQuestion: 'TestQuestion',
+  TestAttempt: 'TestAttempt',
+  AttemptAnswer: 'AttemptAnswer',
+  Result: 'Result'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -113,10 +116,17 @@ export const CoachingScalarFieldEnum = {
   coachingName: 'coachingName',
   mobile: 'mobile',
   logo: 'logo',
+  logoPublicId: 'logoPublicId',
+  logoResourceType: 'logoResourceType',
   address: 'address',
   ownerName: 'ownerName',
   idProof: 'idProof',
-  idNumber: 'idNumber'
+  idProofPublicId: 'idProofPublicId',
+  idProofResourceType: 'idProofResourceType',
+  idNumber: 'idNumber',
+  isActive: 'isActive',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 } as const
 
 export type CoachingScalarFieldEnum = (typeof CoachingScalarFieldEnum)[keyof typeof CoachingScalarFieldEnum]
@@ -232,6 +242,58 @@ export const TestQuestionScalarFieldEnum = {
 } as const
 
 export type TestQuestionScalarFieldEnum = (typeof TestQuestionScalarFieldEnum)[keyof typeof TestQuestionScalarFieldEnum]
+
+
+export const TestAttemptScalarFieldEnum = {
+  id: 'id',
+  testId: 'testId',
+  userId: 'userId',
+  status: 'status',
+  startedAt: 'startedAt',
+  submittedAt: 'submittedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type TestAttemptScalarFieldEnum = (typeof TestAttemptScalarFieldEnum)[keyof typeof TestAttemptScalarFieldEnum]
+
+
+export const AttemptAnswerScalarFieldEnum = {
+  id: 'id',
+  attemptId: 'attemptId',
+  questionId: 'questionId',
+  selectedOptionIds: 'selectedOptionIds',
+  isAttempted: 'isAttempted',
+  isCorrect: 'isCorrect',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type AttemptAnswerScalarFieldEnum = (typeof AttemptAnswerScalarFieldEnum)[keyof typeof AttemptAnswerScalarFieldEnum]
+
+
+export const ResultScalarFieldEnum = {
+  id: 'id',
+  attemptId: 'attemptId',
+  totalQuestions: 'totalQuestions',
+  attempted: 'attempted',
+  correct: 'correct',
+  incorrect: 'incorrect',
+  skipped: 'skipped',
+  totalMarks: 'totalMarks',
+  marksObtained: 'marksObtained',
+  positiveMarks: 'positiveMarks',
+  negativeMarks: 'negativeMarks',
+  percentage: 'percentage',
+  accuracy: 'accuracy',
+  timeTaken: 'timeTaken',
+  rank: 'rank',
+  percentile: 'percentile',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ResultScalarFieldEnum = (typeof ResultScalarFieldEnum)[keyof typeof ResultScalarFieldEnum]
 
 
 export const SortOrder = {

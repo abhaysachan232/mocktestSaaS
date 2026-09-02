@@ -8,7 +8,6 @@ import { testSchema, type TestFormValues } from "@/schemas/test";
 import { createTest, updateTest } from "@/actions/test.actions";
 import TestBasicDetails from "./TestBasicDetails";
 import TestExamSelector from "./TestExamSelector";
-import TestSettings from "./TestSettings";
 import TestQuestionSelector from "./TestQuestionSelector";
 
 type Exam = {
@@ -102,7 +101,6 @@ export default function TestForm({ exams, initialData }: Props) {
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
       <TestBasicDetails register={register} errors={errors} />
       <TestExamSelector control={control} errors={errors} exams={exams} />
-      <TestSettings control={control} register={register} errors={errors} />
       <TestQuestionSelector control={control} errors={errors} examId={examId} />
 
       {serverError && (

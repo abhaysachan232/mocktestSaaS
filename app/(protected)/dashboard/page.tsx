@@ -30,13 +30,13 @@ export default async function DashboardPage() {
   // ADMIN
   // -------------------------
   if (role === ROLES.ADMIN) {
-    const data = await getAdminDashboard();
-    if (!data) {
-      notFound();
-    }
+    const result = await getAdminDashboard();
+    if (!result.success || !result.data) {
+    notFound();
+  }
     return (
       <main className="min-h-screen bg-slate-50">
-        <AdminDashboard userId={userId} data={data} />
+        <AdminDashboard data={result.data} />
       </main>
     );
   }
@@ -45,13 +45,14 @@ export default async function DashboardPage() {
   // COACHING
   // -------------------------
   if (role === ROLES.COACHING) {
-    const data = await getCoachingDashboard(userId);
-    if (!data) {
-      notFound();
-    }
+    const result = await getCoachingDashboard(userId);
+    if (!result.success || !result.data) {
+    notFound();
+  }
+    
     return (
       <main className="min-h-screen bg-slate-50">
-        <CoachingDashboard userId={userId} data={data} />
+        <CoachingDashboard data={result.data} />
       </main>
     );
   }

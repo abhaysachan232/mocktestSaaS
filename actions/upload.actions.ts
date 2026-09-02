@@ -3,13 +3,22 @@
 import { auth } from "@/lib/auth";
 import cloudinary from "@/lib/cloudinary";
 
-type UploadQuestionImageResult =
+export type UploadFileOptions = {
+  folder?: string;
+  maxSizeMB?: number;
+  allowedTypes?: string[];
+  resourceType?: "image" | "raw" | "auto";
+};
+
+export type UploadFileResult =
   | {
       success: true;
       data: {
         secure_url: string;
-        width?: number;
         public_id: string;
+        resource_type: string;
+        width?: number;
+        height?: number;
       };
     }
   | {
@@ -17,10 +26,10 @@ type UploadQuestionImageResult =
       error: string;
     };
 
-export async function uploadQuestionImage(
+export async function uploadFile(
   formData: FormData,
-): Promise<UploadQuestionImageResult> {
-  console.log("formData", formData);
+  options: UploadFileOptions = {},
+): Promise<UploadFileResult> {
   try {
     const session = await auth();
 
@@ -33,26 +42,39 @@ export async function uploadQuestionImage(
 
     const file = formData.get("file");
 
-    if (!(file instanceof File)) {
+    if (!(file instanceof File) || file.size === 0) {
       return {
         success: false,
         error: "File is required",
       };
     }
 
-    if (!file.type.startsWith("image/")) {
+    const {
+      folder = "uploads",
+      maxSizeMB = 5,
+      allowedTypes,
+      resourceType = "auto",
+    } = options;
+
+    /*
+     * File type validation
+     */
+    if (allowedTypes && !allowedTypes.includes(file.type)) {
       return {
         success: false,
-        error: "Only image files are allowed",
+        error: `Invalid file type. Allowed: ${allowedTypes.join(", ")}`,
       };
     }
 
-    const maxSize = 5 * 1024 * 1024;
+    /*
+     * Size validation
+     */
+    const maxSize = maxSizeMB * 1024 * 1024;
 
     if (file.size > maxSize) {
       return {
         success: false,
-        error: "Image must be smaller than 5MB",
+        error: `File must be smaller than ${maxSizeMB}MB`,
       };
     }
 
@@ -61,13 +83,14 @@ export async function uploadQuestionImage(
     const result = await new Promise<{
       secure_url: string;
       public_id: string;
-      width: number;
-      height: number;
+      resource_type: string;
+      width?: number;
+      height?: number;
     }>((resolve, reject) => {
       const stream = cloudinary.uploader.upload_stream(
         {
-          folder: `${session?.user?.id}/questions`,
-          resource_type: "image",
+          folder,
+          resource_type: resourceType,
         },
         (error, result) => {
           if (error || !result) {
@@ -79,6 +102,7 @@ export async function uploadQuestionImage(
           resolve({
             secure_url: result.secure_url,
             public_id: result.public_id,
+            resource_type: result.resource_type,
             width: result.width,
             height: result.height,
           });
@@ -93,11 +117,24 @@ export async function uploadQuestionImage(
       data: result,
     };
   } catch (error) {
-    console.error("uploadQuestionImage:", error);
+    console.error("uploadFile:", error);
 
     return {
       success: false,
-      error: "Image upload failed",
+      error: "File upload failed",
     };
+  }
+}
+
+export async function deleteCloudinaryFile(
+  publicId: string,
+  resourceType: string | undefined,
+) {
+  try {
+    await cloudinary.uploader.destroy(publicId, {
+      resource_type: resourceType === "raw" ? "raw" : "image",
+    });
+  } catch (error) {
+    console.error("deleteCloudinaryFile:", error);
   }
 }

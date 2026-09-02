@@ -82,3 +82,18 @@ export type Test = Prisma.TestModel
  * 
  */
 export type TestQuestion = Prisma.TestQuestionModel
+/**
+ * Model TestAttempt
+ * 
+ */
+export type TestAttempt = Prisma.TestAttemptModel
+/**
+ * Model AttemptAnswer
+ * 
+ */
+export type AttemptAnswer = Prisma.AttemptAnswerModel
+/**
+ * Model Result
+ * 
+ */
+export type Result = Prisma.ResultModel

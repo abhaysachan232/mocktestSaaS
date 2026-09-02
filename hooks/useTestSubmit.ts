@@ -2,93 +2,71 @@
 
 import { useCallback, useState } from "react";
 
-interface SubmitTestPayload {
+import { submitTestAttempt } from "@/actions/test-attempt.actions";
+
+interface SubmitInput {
   testId: string;
-  answers: Record<string, string>;
-  markedQuestions: string[];
+  attemptId: string;
+  answers: Record<string, string[]>;
   timeRemaining: number;
 }
 
 export function useTestSubmit() {
-  const [isSubmitting, setIsSubmitting] =
-    useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const [isSubmitted, setIsSubmitted] =
-    useState(false);
+  const [isSubmitted, setIsSubmitted] = useState(false);
 
-  const [error, setError] =
-    useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   const submit = useCallback(
-    async (
-      payload: SubmitTestPayload
-    ) => {
+    async ({testId, attemptId, answers, timeRemaining }: SubmitInput) => {
+      if (isSubmitting) {
+        return {
+          success: false,
+          error: "Submission already in progress.",
+        };
+      }
+
+      setIsSubmitting(true);
+      setError(null);
       try {
-        setIsSubmitting(true);
-        setError(null);
+        
+        const response = await submitTestAttempt({
+          testId,
+          attemptId,
+          answers,
+          timeRemaining,
+        });
 
-        /*
-         * Static version:
-         * API call later.
-         *
-         * Example:
-         *
-         * const response = await fetch(
-         *   "/api/test/submit",
-         *   {
-         *     method: "POST",
-         *     headers: {
-         *       "Content-Type":
-         *         "application/json",
-         *     },
-         *     body: JSON.stringify(payload),
-         *   }
-         * );
-         */
+        if (!response.success) {
+          setError(response.error);
 
-        console.log(
-          "Static test submission:",
-          payload
-        );
-
-        await new Promise((resolve) =>
-          setTimeout(resolve, 300)
-        );
+          return response;
+        }
 
         setIsSubmitted(true);
 
-        return {
-          success: true,
-          data: payload,
-        };
-      } catch (err) {
-        console.error(err);
+        return response;
+      } catch (error) {
+        console.error("TEST_SUBMIT_ERROR:", error);
 
-        setError(
-          "Unable to submit test."
-        );
+        const message = "Unable to submit test.";
+
+        setError(message);
 
         return {
           success: false,
-          data: null,
+          error: message,
         };
       } finally {
         setIsSubmitting(false);
       }
     },
-    []
+    [isSubmitting],
   );
-
-  const reset = useCallback(() => {
-    setIsSubmitting(false);
-    setIsSubmitted(false);
-    setError(null);
-  }, []);
 
   return {
     submit,
-    reset,
-
     isSubmitting,
     isSubmitted,
     error,

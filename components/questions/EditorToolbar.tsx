@@ -2,7 +2,7 @@
 
 import type { Editor } from "@tiptap/react";
 import { useRef, useState } from "react";
-import { uploadQuestionImage } from "@/actions/upload.actions";
+import { uploadFile } from "@/actions/upload.actions";
 
 type Props = {
   editor: Editor;
@@ -17,7 +17,12 @@ export default function EditorToolbar({ editor }: Props) {
       setUploading(true);
       const formData = new FormData();
       formData.append("file", file);
-      const result = await uploadQuestionImage(formData);
+      const result = await uploadFile(formData, {
+        folder: "questions",
+        maxSizeMB: 5,
+        resourceType: "image",
+        allowedTypes: ["image/jpeg", "image/png", "image/webp"],
+      });
 
       if (!result.success) {
         alert(result.error);

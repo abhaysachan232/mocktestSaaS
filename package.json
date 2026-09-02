@@ -12,7 +12,7 @@
     "security": "npm run lint && npm run typecheck && npm run audit",
     "postinstall": "npm run prisma:generate",
     "prisma:generate": "node --env-file=.env ./node_modules/prisma/build/index.js generate",
-    "prisma:migrate": "node --env-file=.env ./node_modules/prisma/build/index.js migrate dev",
+    "prisma:migrate": "node --env-file=.env ./node_modules/prisma/build/index.js migrate dev && npm run prisma:generate",
     "prisma:deploy": "node --env-file=.env ./node_modules/prisma/build/index.js migrate deploy",
     "prisma:status": "node --env-file=.env ./node_modules/prisma/build/index.js migrate status",
     "prisma:reset": "node --env-file=.env ./node_modules/prisma/build/index.js migrate reset",

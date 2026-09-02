@@ -13,7 +13,7 @@ export const Role = {
   STUDENT: 'STUDENT',
   COACHING: 'COACHING',
   SALES: 'SALES',
-  MAINTINACE: 'MAINTINACE',
+  MAINTENANCE: 'MAINTENANCE',
   ADMIN: 'ADMIN'
 } as const
 
@@ -69,3 +69,13 @@ export const TestStatus = {
 } as const
 
 export type TestStatus = (typeof TestStatus)[keyof typeof TestStatus]
+
+
+export const AttemptStatus = {
+  IN_PROGRESS: 'IN_PROGRESS',
+  SUBMITTED: 'SUBMITTED',
+  EXPIRED: 'EXPIRED',
+  ABANDONED: 'ABANDONED'
+} as const
+
+export type AttemptStatus = (typeof AttemptStatus)[keyof typeof AttemptStatus]

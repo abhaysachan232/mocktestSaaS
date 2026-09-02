@@ -211,6 +211,7 @@ export type QuestionWhereInput = {
   topic?: Prisma.XOR<Prisma.TopicScalarRelationFilter, Prisma.TopicWhereInput>
   options?: Prisma.QuestionOptionListRelationFilter
   testQuestions?: Prisma.TestQuestionListRelationFilter
+  attemptAnswers?: Prisma.AttemptAnswerListRelationFilter
 }
 
 export type QuestionOrderByWithRelationInput = {
@@ -228,6 +229,7 @@ export type QuestionOrderByWithRelationInput = {
   topic?: Prisma.TopicOrderByWithRelationInput
   options?: Prisma.QuestionOptionOrderByRelationAggregateInput
   testQuestions?: Prisma.TestQuestionOrderByRelationAggregateInput
+  attemptAnswers?: Prisma.AttemptAnswerOrderByRelationAggregateInput
 }
 
 export type QuestionWhereUniqueInput = Prisma.AtLeast<{
@@ -248,6 +250,7 @@ export type QuestionWhereUniqueInput = Prisma.AtLeast<{
   topic?: Prisma.XOR<Prisma.TopicScalarRelationFilter, Prisma.TopicWhereInput>
   options?: Prisma.QuestionOptionListRelationFilter
   testQuestions?: Prisma.TestQuestionListRelationFilter
+  attemptAnswers?: Prisma.AttemptAnswerListRelationFilter
 }, "id">
 
 export type QuestionOrderByWithAggregationInput = {
@@ -292,6 +295,7 @@ export type QuestionCreateInput = {
   topic: Prisma.TopicCreateNestedOneWithoutQuestionsInput
   options?: Prisma.QuestionOptionCreateNestedManyWithoutQuestionInput
   testQuestions?: Prisma.TestQuestionCreateNestedManyWithoutQuestionInput
+  attemptAnswers?: Prisma.AttemptAnswerCreateNestedManyWithoutQuestionInput
 }
 
 export type QuestionUncheckedCreateInput = {
@@ -306,6 +310,7 @@ export type QuestionUncheckedCreateInput = {
   updatedAt?: Date | string
   options?: Prisma.QuestionOptionUncheckedCreateNestedManyWithoutQuestionInput
   testQuestions?: Prisma.TestQuestionUncheckedCreateNestedManyWithoutQuestionInput
+  attemptAnswers?: Prisma.AttemptAnswerUncheckedCreateNestedManyWithoutQuestionInput
 }
 
 export type QuestionUpdateInput = {
@@ -320,6 +325,7 @@ export type QuestionUpdateInput = {
   topic?: Prisma.TopicUpdateOneRequiredWithoutQuestionsNestedInput
   options?: Prisma.QuestionOptionUpdateManyWithoutQuestionNestedInput
   testQuestions?: Prisma.TestQuestionUpdateManyWithoutQuestionNestedInput
+  attemptAnswers?: Prisma.AttemptAnswerUpdateManyWithoutQuestionNestedInput
 }
 
 export type QuestionUncheckedUpdateInput = {
@@ -334,6 +340,7 @@ export type QuestionUncheckedUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   options?: Prisma.QuestionOptionUncheckedUpdateManyWithoutQuestionNestedInput
   testQuestions?: Prisma.TestQuestionUncheckedUpdateManyWithoutQuestionNestedInput
+  attemptAnswers?: Prisma.AttemptAnswerUncheckedUpdateManyWithoutQuestionNestedInput
 }
 
 export type QuestionCreateManyInput = {
@@ -574,6 +581,20 @@ export type QuestionUpdateOneRequiredWithoutTestQuestionsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.QuestionUpdateToOneWithWhereWithoutTestQuestionsInput, Prisma.QuestionUpdateWithoutTestQuestionsInput>, Prisma.QuestionUncheckedUpdateWithoutTestQuestionsInput>
 }
 
+export type QuestionCreateNestedOneWithoutAttemptAnswersInput = {
+  create?: Prisma.XOR<Prisma.QuestionCreateWithoutAttemptAnswersInput, Prisma.QuestionUncheckedCreateWithoutAttemptAnswersInput>
+  connectOrCreate?: Prisma.QuestionCreateOrConnectWithoutAttemptAnswersInput
+  connect?: Prisma.QuestionWhereUniqueInput
+}
+
+export type QuestionUpdateOneRequiredWithoutAttemptAnswersNestedInput = {
+  create?: Prisma.XOR<Prisma.QuestionCreateWithoutAttemptAnswersInput, Prisma.QuestionUncheckedCreateWithoutAttemptAnswersInput>
+  connectOrCreate?: Prisma.QuestionCreateOrConnectWithoutAttemptAnswersInput
+  upsert?: Prisma.QuestionUpsertWithoutAttemptAnswersInput
+  connect?: Prisma.QuestionWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.QuestionUpdateToOneWithWhereWithoutAttemptAnswersInput, Prisma.QuestionUpdateWithoutAttemptAnswersInput>, Prisma.QuestionUncheckedUpdateWithoutAttemptAnswersInput>
+}
+
 export type QuestionCreateWithoutUserInput = {
   id?: string
   type?: $Enums.QuestionType
@@ -585,6 +606,7 @@ export type QuestionCreateWithoutUserInput = {
   topic: Prisma.TopicCreateNestedOneWithoutQuestionsInput
   options?: Prisma.QuestionOptionCreateNestedManyWithoutQuestionInput
   testQuestions?: Prisma.TestQuestionCreateNestedManyWithoutQuestionInput
+  attemptAnswers?: Prisma.AttemptAnswerCreateNestedManyWithoutQuestionInput
 }
 
 export type QuestionUncheckedCreateWithoutUserInput = {
@@ -598,6 +620,7 @@ export type QuestionUncheckedCreateWithoutUserInput = {
   updatedAt?: Date | string
   options?: Prisma.QuestionOptionUncheckedCreateNestedManyWithoutQuestionInput
   testQuestions?: Prisma.TestQuestionUncheckedCreateNestedManyWithoutQuestionInput
+  attemptAnswers?: Prisma.AttemptAnswerUncheckedCreateNestedManyWithoutQuestionInput
 }
 
 export type QuestionCreateOrConnectWithoutUserInput = {
@@ -652,6 +675,7 @@ export type QuestionCreateWithoutSubjectInput = {
   topic: Prisma.TopicCreateNestedOneWithoutQuestionsInput
   options?: Prisma.QuestionOptionCreateNestedManyWithoutQuestionInput
   testQuestions?: Prisma.TestQuestionCreateNestedManyWithoutQuestionInput
+  attemptAnswers?: Prisma.AttemptAnswerCreateNestedManyWithoutQuestionInput
 }
 
 export type QuestionUncheckedCreateWithoutSubjectInput = {
@@ -665,6 +689,7 @@ export type QuestionUncheckedCreateWithoutSubjectInput = {
   updatedAt?: Date | string
   options?: Prisma.QuestionOptionUncheckedCreateNestedManyWithoutQuestionInput
   testQuestions?: Prisma.TestQuestionUncheckedCreateNestedManyWithoutQuestionInput
+  attemptAnswers?: Prisma.AttemptAnswerUncheckedCreateNestedManyWithoutQuestionInput
 }
 
 export type QuestionCreateOrConnectWithoutSubjectInput = {
@@ -704,6 +729,7 @@ export type QuestionCreateWithoutTopicInput = {
   subject: Prisma.SubjectCreateNestedOneWithoutQuestionsInput
   options?: Prisma.QuestionOptionCreateNestedManyWithoutQuestionInput
   testQuestions?: Prisma.TestQuestionCreateNestedManyWithoutQuestionInput
+  attemptAnswers?: Prisma.AttemptAnswerCreateNestedManyWithoutQuestionInput
 }
 
 export type QuestionUncheckedCreateWithoutTopicInput = {
@@ -717,6 +743,7 @@ export type QuestionUncheckedCreateWithoutTopicInput = {
   updatedAt?: Date | string
   options?: Prisma.QuestionOptionUncheckedCreateNestedManyWithoutQuestionInput
   testQuestions?: Prisma.TestQuestionUncheckedCreateNestedManyWithoutQuestionInput
+  attemptAnswers?: Prisma.AttemptAnswerUncheckedCreateNestedManyWithoutQuestionInput
 }
 
 export type QuestionCreateOrConnectWithoutTopicInput = {
@@ -756,6 +783,7 @@ export type QuestionCreateWithoutOptionsInput = {
   subject: Prisma.SubjectCreateNestedOneWithoutQuestionsInput
   topic: Prisma.TopicCreateNestedOneWithoutQuestionsInput
   testQuestions?: Prisma.TestQuestionCreateNestedManyWithoutQuestionInput
+  attemptAnswers?: Prisma.AttemptAnswerCreateNestedManyWithoutQuestionInput
 }
 
 export type QuestionUncheckedCreateWithoutOptionsInput = {
@@ -769,6 +797,7 @@ export type QuestionUncheckedCreateWithoutOptionsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   testQuestions?: Prisma.TestQuestionUncheckedCreateNestedManyWithoutQuestionInput
+  attemptAnswers?: Prisma.AttemptAnswerUncheckedCreateNestedManyWithoutQuestionInput
 }
 
 export type QuestionCreateOrConnectWithoutOptionsInput = {
@@ -798,6 +827,7 @@ export type QuestionUpdateWithoutOptionsInput = {
   subject?: Prisma.SubjectUpdateOneRequiredWithoutQuestionsNestedInput
   topic?: Prisma.TopicUpdateOneRequiredWithoutQuestionsNestedInput
   testQuestions?: Prisma.TestQuestionUpdateManyWithoutQuestionNestedInput
+  attemptAnswers?: Prisma.AttemptAnswerUpdateManyWithoutQuestionNestedInput
 }
 
 export type QuestionUncheckedUpdateWithoutOptionsInput = {
@@ -811,6 +841,7 @@ export type QuestionUncheckedUpdateWithoutOptionsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   testQuestions?: Prisma.TestQuestionUncheckedUpdateManyWithoutQuestionNestedInput
+  attemptAnswers?: Prisma.AttemptAnswerUncheckedUpdateManyWithoutQuestionNestedInput
 }
 
 export type QuestionCreateWithoutTestQuestionsInput = {
@@ -824,6 +855,7 @@ export type QuestionCreateWithoutTestQuestionsInput = {
   subject: Prisma.SubjectCreateNestedOneWithoutQuestionsInput
   topic: Prisma.TopicCreateNestedOneWithoutQuestionsInput
   options?: Prisma.QuestionOptionCreateNestedManyWithoutQuestionInput
+  attemptAnswers?: Prisma.AttemptAnswerCreateNestedManyWithoutQuestionInput
 }
 
 export type QuestionUncheckedCreateWithoutTestQuestionsInput = {
@@ -837,6 +869,7 @@ export type QuestionUncheckedCreateWithoutTestQuestionsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   options?: Prisma.QuestionOptionUncheckedCreateNestedManyWithoutQuestionInput
+  attemptAnswers?: Prisma.AttemptAnswerUncheckedCreateNestedManyWithoutQuestionInput
 }
 
 export type QuestionCreateOrConnectWithoutTestQuestionsInput = {
@@ -866,6 +899,7 @@ export type QuestionUpdateWithoutTestQuestionsInput = {
   subject?: Prisma.SubjectUpdateOneRequiredWithoutQuestionsNestedInput
   topic?: Prisma.TopicUpdateOneRequiredWithoutQuestionsNestedInput
   options?: Prisma.QuestionOptionUpdateManyWithoutQuestionNestedInput
+  attemptAnswers?: Prisma.AttemptAnswerUpdateManyWithoutQuestionNestedInput
 }
 
 export type QuestionUncheckedUpdateWithoutTestQuestionsInput = {
@@ -879,6 +913,79 @@ export type QuestionUncheckedUpdateWithoutTestQuestionsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   options?: Prisma.QuestionOptionUncheckedUpdateManyWithoutQuestionNestedInput
+  attemptAnswers?: Prisma.AttemptAnswerUncheckedUpdateManyWithoutQuestionNestedInput
+}
+
+export type QuestionCreateWithoutAttemptAnswersInput = {
+  id?: string
+  type?: $Enums.QuestionType
+  content: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  solution?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  user?: Prisma.UserCreateNestedOneWithoutQuestionsInput
+  subject: Prisma.SubjectCreateNestedOneWithoutQuestionsInput
+  topic: Prisma.TopicCreateNestedOneWithoutQuestionsInput
+  options?: Prisma.QuestionOptionCreateNestedManyWithoutQuestionInput
+  testQuestions?: Prisma.TestQuestionCreateNestedManyWithoutQuestionInput
+}
+
+export type QuestionUncheckedCreateWithoutAttemptAnswersInput = {
+  id?: string
+  userId?: string | null
+  subjectId: string
+  topicId: string
+  type?: $Enums.QuestionType
+  content: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  solution?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  options?: Prisma.QuestionOptionUncheckedCreateNestedManyWithoutQuestionInput
+  testQuestions?: Prisma.TestQuestionUncheckedCreateNestedManyWithoutQuestionInput
+}
+
+export type QuestionCreateOrConnectWithoutAttemptAnswersInput = {
+  where: Prisma.QuestionWhereUniqueInput
+  create: Prisma.XOR<Prisma.QuestionCreateWithoutAttemptAnswersInput, Prisma.QuestionUncheckedCreateWithoutAttemptAnswersInput>
+}
+
+export type QuestionUpsertWithoutAttemptAnswersInput = {
+  update: Prisma.XOR<Prisma.QuestionUpdateWithoutAttemptAnswersInput, Prisma.QuestionUncheckedUpdateWithoutAttemptAnswersInput>
+  create: Prisma.XOR<Prisma.QuestionCreateWithoutAttemptAnswersInput, Prisma.QuestionUncheckedCreateWithoutAttemptAnswersInput>
+  where?: Prisma.QuestionWhereInput
+}
+
+export type QuestionUpdateToOneWithWhereWithoutAttemptAnswersInput = {
+  where?: Prisma.QuestionWhereInput
+  data: Prisma.XOR<Prisma.QuestionUpdateWithoutAttemptAnswersInput, Prisma.QuestionUncheckedUpdateWithoutAttemptAnswersInput>
+}
+
+export type QuestionUpdateWithoutAttemptAnswersInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.EnumQuestionTypeFieldUpdateOperationsInput | $Enums.QuestionType
+  content?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  solution?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  user?: Prisma.UserUpdateOneWithoutQuestionsNestedInput
+  subject?: Prisma.SubjectUpdateOneRequiredWithoutQuestionsNestedInput
+  topic?: Prisma.TopicUpdateOneRequiredWithoutQuestionsNestedInput
+  options?: Prisma.QuestionOptionUpdateManyWithoutQuestionNestedInput
+  testQuestions?: Prisma.TestQuestionUpdateManyWithoutQuestionNestedInput
+}
+
+export type QuestionUncheckedUpdateWithoutAttemptAnswersInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subjectId?: Prisma.StringFieldUpdateOperationsInput | string
+  topicId?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.EnumQuestionTypeFieldUpdateOperationsInput | $Enums.QuestionType
+  content?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  solution?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  options?: Prisma.QuestionOptionUncheckedUpdateManyWithoutQuestionNestedInput
+  testQuestions?: Prisma.TestQuestionUncheckedUpdateManyWithoutQuestionNestedInput
 }
 
 export type QuestionCreateManyUserInput = {
@@ -903,6 +1010,7 @@ export type QuestionUpdateWithoutUserInput = {
   topic?: Prisma.TopicUpdateOneRequiredWithoutQuestionsNestedInput
   options?: Prisma.QuestionOptionUpdateManyWithoutQuestionNestedInput
   testQuestions?: Prisma.TestQuestionUpdateManyWithoutQuestionNestedInput
+  attemptAnswers?: Prisma.AttemptAnswerUpdateManyWithoutQuestionNestedInput
 }
 
 export type QuestionUncheckedUpdateWithoutUserInput = {
@@ -916,6 +1024,7 @@ export type QuestionUncheckedUpdateWithoutUserInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   options?: Prisma.QuestionOptionUncheckedUpdateManyWithoutQuestionNestedInput
   testQuestions?: Prisma.TestQuestionUncheckedUpdateManyWithoutQuestionNestedInput
+  attemptAnswers?: Prisma.AttemptAnswerUncheckedUpdateManyWithoutQuestionNestedInput
 }
 
 export type QuestionUncheckedUpdateManyWithoutUserInput = {
@@ -951,6 +1060,7 @@ export type QuestionUpdateWithoutSubjectInput = {
   topic?: Prisma.TopicUpdateOneRequiredWithoutQuestionsNestedInput
   options?: Prisma.QuestionOptionUpdateManyWithoutQuestionNestedInput
   testQuestions?: Prisma.TestQuestionUpdateManyWithoutQuestionNestedInput
+  attemptAnswers?: Prisma.AttemptAnswerUpdateManyWithoutQuestionNestedInput
 }
 
 export type QuestionUncheckedUpdateWithoutSubjectInput = {
@@ -964,6 +1074,7 @@ export type QuestionUncheckedUpdateWithoutSubjectInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   options?: Prisma.QuestionOptionUncheckedUpdateManyWithoutQuestionNestedInput
   testQuestions?: Prisma.TestQuestionUncheckedUpdateManyWithoutQuestionNestedInput
+  attemptAnswers?: Prisma.AttemptAnswerUncheckedUpdateManyWithoutQuestionNestedInput
 }
 
 export type QuestionUncheckedUpdateManyWithoutSubjectInput = {
@@ -999,6 +1110,7 @@ export type QuestionUpdateWithoutTopicInput = {
   subject?: Prisma.SubjectUpdateOneRequiredWithoutQuestionsNestedInput
   options?: Prisma.QuestionOptionUpdateManyWithoutQuestionNestedInput
   testQuestions?: Prisma.TestQuestionUpdateManyWithoutQuestionNestedInput
+  attemptAnswers?: Prisma.AttemptAnswerUpdateManyWithoutQuestionNestedInput
 }
 
 export type QuestionUncheckedUpdateWithoutTopicInput = {
@@ -1012,6 +1124,7 @@ export type QuestionUncheckedUpdateWithoutTopicInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   options?: Prisma.QuestionOptionUncheckedUpdateManyWithoutQuestionNestedInput
   testQuestions?: Prisma.TestQuestionUncheckedUpdateManyWithoutQuestionNestedInput
+  attemptAnswers?: Prisma.AttemptAnswerUncheckedUpdateManyWithoutQuestionNestedInput
 }
 
 export type QuestionUncheckedUpdateManyWithoutTopicInput = {
@@ -1033,11 +1146,13 @@ export type QuestionUncheckedUpdateManyWithoutTopicInput = {
 export type QuestionCountOutputType = {
   options: number
   testQuestions: number
+  attemptAnswers: number
 }
 
 export type QuestionCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   options?: boolean | QuestionCountOutputTypeCountOptionsArgs
   testQuestions?: boolean | QuestionCountOutputTypeCountTestQuestionsArgs
+  attemptAnswers?: boolean | QuestionCountOutputTypeCountAttemptAnswersArgs
 }
 
 /**
@@ -1064,6 +1179,13 @@ export type QuestionCountOutputTypeCountTestQuestionsArgs<ExtArgs extends runtim
   where?: Prisma.TestQuestionWhereInput
 }
 
+/**
+ * QuestionCountOutputType without action
+ */
+export type QuestionCountOutputTypeCountAttemptAnswersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.AttemptAnswerWhereInput
+}
+
 
 export type QuestionSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1080,6 +1202,7 @@ export type QuestionSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   topic?: boolean | Prisma.TopicDefaultArgs<ExtArgs>
   options?: boolean | Prisma.Question$optionsArgs<ExtArgs>
   testQuestions?: boolean | Prisma.Question$testQuestionsArgs<ExtArgs>
+  attemptAnswers?: boolean | Prisma.Question$attemptAnswersArgs<ExtArgs>
   _count?: boolean | Prisma.QuestionCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["question"]>
 
@@ -1132,6 +1255,7 @@ export type QuestionInclude<ExtArgs extends runtime.Types.Extensions.InternalArg
   topic?: boolean | Prisma.TopicDefaultArgs<ExtArgs>
   options?: boolean | Prisma.Question$optionsArgs<ExtArgs>
   testQuestions?: boolean | Prisma.Question$testQuestionsArgs<ExtArgs>
+  attemptAnswers?: boolean | Prisma.Question$attemptAnswersArgs<ExtArgs>
   _count?: boolean | Prisma.QuestionCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type QuestionIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1153,6 +1277,7 @@ export type $QuestionPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     topic: Prisma.$TopicPayload<ExtArgs>
     options: Prisma.$QuestionOptionPayload<ExtArgs>[]
     testQuestions: Prisma.$TestQuestionPayload<ExtArgs>[]
+    attemptAnswers: Prisma.$AttemptAnswerPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1563,6 +1688,7 @@ export interface Prisma__QuestionClient<T, Null = never, ExtArgs extends runtime
   topic<T extends Prisma.TopicDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.TopicDefaultArgs<ExtArgs>>): Prisma.Prisma__TopicClient<runtime.Types.Result.GetResult<Prisma.$TopicPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   options<T extends Prisma.Question$optionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Question$optionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$QuestionOptionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   testQuestions<T extends Prisma.Question$testQuestionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Question$testQuestionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TestQuestionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  attemptAnswers<T extends Prisma.Question$attemptAnswersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Question$attemptAnswersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AttemptAnswerPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2066,6 +2192,30 @@ export type Question$testQuestionsArgs<ExtArgs extends runtime.Types.Extensions.
   take?: number
   skip?: number
   distinct?: Prisma.TestQuestionScalarFieldEnum | Prisma.TestQuestionScalarFieldEnum[]
+}
+
+/**
+ * Question.attemptAnswers
+ */
+export type Question$attemptAnswersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the AttemptAnswer
+   */
+  select?: Prisma.AttemptAnswerSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the AttemptAnswer
+   */
+  omit?: Prisma.AttemptAnswerOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AttemptAnswerInclude<ExtArgs> | null
+  where?: Prisma.AttemptAnswerWhereInput
+  orderBy?: Prisma.AttemptAnswerOrderByWithRelationInput | Prisma.AttemptAnswerOrderByWithRelationInput[]
+  cursor?: Prisma.AttemptAnswerWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.AttemptAnswerScalarFieldEnum | Prisma.AttemptAnswerScalarFieldEnum[]
 }
 
 /**

@@ -30,10 +30,17 @@ export type CoachingMinAggregateOutputType = {
   coachingName: string | null
   mobile: string | null
   logo: string | null
+  logoPublicId: string | null
+  logoResourceType: string | null
   address: string | null
   ownerName: string | null
   idProof: string | null
+  idProofPublicId: string | null
+  idProofResourceType: string | null
   idNumber: string | null
+  isActive: boolean | null
+  createdAt: Date | null
+  updatedAt: Date | null
 }
 
 export type CoachingMaxAggregateOutputType = {
@@ -42,10 +49,17 @@ export type CoachingMaxAggregateOutputType = {
   coachingName: string | null
   mobile: string | null
   logo: string | null
+  logoPublicId: string | null
+  logoResourceType: string | null
   address: string | null
   ownerName: string | null
   idProof: string | null
+  idProofPublicId: string | null
+  idProofResourceType: string | null
   idNumber: string | null
+  isActive: boolean | null
+  createdAt: Date | null
+  updatedAt: Date | null
 }
 
 export type CoachingCountAggregateOutputType = {
@@ -54,10 +68,17 @@ export type CoachingCountAggregateOutputType = {
   coachingName: number
   mobile: number
   logo: number
+  logoPublicId: number
+  logoResourceType: number
   address: number
   ownerName: number
   idProof: number
+  idProofPublicId: number
+  idProofResourceType: number
   idNumber: number
+  isActive: number
+  createdAt: number
+  updatedAt: number
   _all: number
 }
 
@@ -68,10 +89,17 @@ export type CoachingMinAggregateInputType = {
   coachingName?: true
   mobile?: true
   logo?: true
+  logoPublicId?: true
+  logoResourceType?: true
   address?: true
   ownerName?: true
   idProof?: true
+  idProofPublicId?: true
+  idProofResourceType?: true
   idNumber?: true
+  isActive?: true
+  createdAt?: true
+  updatedAt?: true
 }
 
 export type CoachingMaxAggregateInputType = {
@@ -80,10 +108,17 @@ export type CoachingMaxAggregateInputType = {
   coachingName?: true
   mobile?: true
   logo?: true
+  logoPublicId?: true
+  logoResourceType?: true
   address?: true
   ownerName?: true
   idProof?: true
+  idProofPublicId?: true
+  idProofResourceType?: true
   idNumber?: true
+  isActive?: true
+  createdAt?: true
+  updatedAt?: true
 }
 
 export type CoachingCountAggregateInputType = {
@@ -92,10 +127,17 @@ export type CoachingCountAggregateInputType = {
   coachingName?: true
   mobile?: true
   logo?: true
+  logoPublicId?: true
+  logoResourceType?: true
   address?: true
   ownerName?: true
   idProof?: true
+  idProofPublicId?: true
+  idProofResourceType?: true
   idNumber?: true
+  isActive?: true
+  createdAt?: true
+  updatedAt?: true
   _all?: true
 }
 
@@ -177,10 +219,17 @@ export type CoachingGroupByOutputType = {
   coachingName: string
   mobile: string
   logo: string | null
+  logoPublicId: string | null
+  logoResourceType: string | null
   address: string
   ownerName: string
   idProof: string | null
+  idProofPublicId: string | null
+  idProofResourceType: string | null
   idNumber: string
+  isActive: boolean
+  createdAt: Date
+  updatedAt: Date
   _count: CoachingCountAggregateOutputType | null
   _min: CoachingMinAggregateOutputType | null
   _max: CoachingMaxAggregateOutputType | null
@@ -210,10 +259,17 @@ export type CoachingWhereInput = {
   coachingName?: Prisma.StringFilter<"Coaching"> | string
   mobile?: Prisma.StringFilter<"Coaching"> | string
   logo?: Prisma.StringNullableFilter<"Coaching"> | string | null
+  logoPublicId?: Prisma.StringNullableFilter<"Coaching"> | string | null
+  logoResourceType?: Prisma.StringNullableFilter<"Coaching"> | string | null
   address?: Prisma.StringFilter<"Coaching"> | string
   ownerName?: Prisma.StringFilter<"Coaching"> | string
   idProof?: Prisma.StringNullableFilter<"Coaching"> | string | null
+  idProofPublicId?: Prisma.StringNullableFilter<"Coaching"> | string | null
+  idProofResourceType?: Prisma.StringNullableFilter<"Coaching"> | string | null
   idNumber?: Prisma.StringFilter<"Coaching"> | string
+  isActive?: Prisma.BoolFilter<"Coaching"> | boolean
+  createdAt?: Prisma.DateTimeFilter<"Coaching"> | Date | string
+  updatedAt?: Prisma.DateTimeFilter<"Coaching"> | Date | string
   users?: Prisma.UserListRelationFilter
 }
 
@@ -223,10 +279,17 @@ export type CoachingOrderByWithRelationInput = {
   coachingName?: Prisma.SortOrder
   mobile?: Prisma.SortOrder
   logo?: Prisma.SortOrderInput | Prisma.SortOrder
+  logoPublicId?: Prisma.SortOrderInput | Prisma.SortOrder
+  logoResourceType?: Prisma.SortOrderInput | Prisma.SortOrder
   address?: Prisma.SortOrder
   ownerName?: Prisma.SortOrder
   idProof?: Prisma.SortOrderInput | Prisma.SortOrder
+  idProofPublicId?: Prisma.SortOrderInput | Prisma.SortOrder
+  idProofResourceType?: Prisma.SortOrderInput | Prisma.SortOrder
   idNumber?: Prisma.SortOrder
+  isActive?: Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
   users?: Prisma.UserOrderByRelationAggregateInput
 }
 
@@ -234,17 +297,24 @@ export type CoachingWhereUniqueInput = Prisma.AtLeast<{
   id?: string
   code?: string
   mobile?: string
+  idNumber?: string
   AND?: Prisma.CoachingWhereInput | Prisma.CoachingWhereInput[]
   OR?: Prisma.CoachingWhereInput[]
   NOT?: Prisma.CoachingWhereInput | Prisma.CoachingWhereInput[]
   coachingName?: Prisma.StringFilter<"Coaching"> | string
   logo?: Prisma.StringNullableFilter<"Coaching"> | string | null
+  logoPublicId?: Prisma.StringNullableFilter<"Coaching"> | string | null
+  logoResourceType?: Prisma.StringNullableFilter<"Coaching"> | string | null
   address?: Prisma.StringFilter<"Coaching"> | string
   ownerName?: Prisma.StringFilter<"Coaching"> | string
   idProof?: Prisma.StringNullableFilter<"Coaching"> | string | null
-  idNumber?: Prisma.StringFilter<"Coaching"> | string
+  idProofPublicId?: Prisma.StringNullableFilter<"Coaching"> | string | null
+  idProofResourceType?: Prisma.StringNullableFilter<"Coaching"> | string | null
+  isActive?: Prisma.BoolFilter<"Coaching"> | boolean
+  createdAt?: Prisma.DateTimeFilter<"Coaching"> | Date | string
+  updatedAt?: Prisma.DateTimeFilter<"Coaching"> | Date | string
   users?: Prisma.UserListRelationFilter
-}, "id" | "code" | "mobile">
+}, "id" | "code" | "mobile" | "idNumber">
 
 export type CoachingOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
@@ -252,10 +322,17 @@ export type CoachingOrderByWithAggregationInput = {
   coachingName?: Prisma.SortOrder
   mobile?: Prisma.SortOrder
   logo?: Prisma.SortOrderInput | Prisma.SortOrder
+  logoPublicId?: Prisma.SortOrderInput | Prisma.SortOrder
+  logoResourceType?: Prisma.SortOrderInput | Prisma.SortOrder
   address?: Prisma.SortOrder
   ownerName?: Prisma.SortOrder
   idProof?: Prisma.SortOrderInput | Prisma.SortOrder
+  idProofPublicId?: Prisma.SortOrderInput | Prisma.SortOrder
+  idProofResourceType?: Prisma.SortOrderInput | Prisma.SortOrder
   idNumber?: Prisma.SortOrder
+  isActive?: Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
   _count?: Prisma.CoachingCountOrderByAggregateInput
   _max?: Prisma.CoachingMaxOrderByAggregateInput
   _min?: Prisma.CoachingMinOrderByAggregateInput
@@ -270,10 +347,17 @@ export type CoachingScalarWhereWithAggregatesInput = {
   coachingName?: Prisma.StringWithAggregatesFilter<"Coaching"> | string
   mobile?: Prisma.StringWithAggregatesFilter<"Coaching"> | string
   logo?: Prisma.StringNullableWithAggregatesFilter<"Coaching"> | string | null
+  logoPublicId?: Prisma.StringNullableWithAggregatesFilter<"Coaching"> | string | null
+  logoResourceType?: Prisma.StringNullableWithAggregatesFilter<"Coaching"> | string | null
   address?: Prisma.StringWithAggregatesFilter<"Coaching"> | string
   ownerName?: Prisma.StringWithAggregatesFilter<"Coaching"> | string
   idProof?: Prisma.StringNullableWithAggregatesFilter<"Coaching"> | string | null
+  idProofPublicId?: Prisma.StringNullableWithAggregatesFilter<"Coaching"> | string | null
+  idProofResourceType?: Prisma.StringNullableWithAggregatesFilter<"Coaching"> | string | null
   idNumber?: Prisma.StringWithAggregatesFilter<"Coaching"> | string
+  isActive?: Prisma.BoolWithAggregatesFilter<"Coaching"> | boolean
+  createdAt?: Prisma.DateTimeWithAggregatesFilter<"Coaching"> | Date | string
+  updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Coaching"> | Date | string
 }
 
 export type CoachingCreateInput = {
@@ -282,10 +366,17 @@ export type CoachingCreateInput = {
   coachingName: string
   mobile: string
   logo?: string | null
+  logoPublicId?: string | null
+  logoResourceType?: string | null
   address: string
   ownerName: string
   idProof?: string | null
+  idProofPublicId?: string | null
+  idProofResourceType?: string | null
   idNumber: string
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
   users?: Prisma.UserCreateNestedManyWithoutCoachingInput
 }
 
@@ -295,10 +386,17 @@ export type CoachingUncheckedCreateInput = {
   coachingName: string
   mobile: string
   logo?: string | null
+  logoPublicId?: string | null
+  logoResourceType?: string | null
   address: string
   ownerName: string
   idProof?: string | null
+  idProofPublicId?: string | null
+  idProofResourceType?: string | null
   idNumber: string
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
   users?: Prisma.UserUncheckedCreateNestedManyWithoutCoachingInput
 }
 
@@ -308,10 +406,17 @@ export type CoachingUpdateInput = {
   coachingName?: Prisma.StringFieldUpdateOperationsInput | string
   mobile?: Prisma.StringFieldUpdateOperationsInput | string
   logo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoPublicId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoResourceType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.StringFieldUpdateOperationsInput | string
   ownerName?: Prisma.StringFieldUpdateOperationsInput | string
   idProof?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  idProofPublicId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  idProofResourceType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   idNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   users?: Prisma.UserUpdateManyWithoutCoachingNestedInput
 }
 
@@ -321,10 +426,17 @@ export type CoachingUncheckedUpdateInput = {
   coachingName?: Prisma.StringFieldUpdateOperationsInput | string
   mobile?: Prisma.StringFieldUpdateOperationsInput | string
   logo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoPublicId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoResourceType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.StringFieldUpdateOperationsInput | string
   ownerName?: Prisma.StringFieldUpdateOperationsInput | string
   idProof?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  idProofPublicId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  idProofResourceType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   idNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   users?: Prisma.UserUncheckedUpdateManyWithoutCoachingNestedInput
 }
 
@@ -334,10 +446,17 @@ export type CoachingCreateManyInput = {
   coachingName: string
   mobile: string
   logo?: string | null
+  logoPublicId?: string | null
+  logoResourceType?: string | null
   address: string
   ownerName: string
   idProof?: string | null
+  idProofPublicId?: string | null
+  idProofResourceType?: string | null
   idNumber: string
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
 }
 
 export type CoachingUpdateManyMutationInput = {
@@ -346,10 +465,17 @@ export type CoachingUpdateManyMutationInput = {
   coachingName?: Prisma.StringFieldUpdateOperationsInput | string
   mobile?: Prisma.StringFieldUpdateOperationsInput | string
   logo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoPublicId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoResourceType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.StringFieldUpdateOperationsInput | string
   ownerName?: Prisma.StringFieldUpdateOperationsInput | string
   idProof?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  idProofPublicId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  idProofResourceType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   idNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type CoachingUncheckedUpdateManyInput = {
@@ -358,10 +484,17 @@ export type CoachingUncheckedUpdateManyInput = {
   coachingName?: Prisma.StringFieldUpdateOperationsInput | string
   mobile?: Prisma.StringFieldUpdateOperationsInput | string
   logo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoPublicId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoResourceType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.StringFieldUpdateOperationsInput | string
   ownerName?: Prisma.StringFieldUpdateOperationsInput | string
   idProof?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  idProofPublicId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  idProofResourceType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   idNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type CoachingNullableScalarRelationFilter = {
@@ -375,10 +508,17 @@ export type CoachingCountOrderByAggregateInput = {
   coachingName?: Prisma.SortOrder
   mobile?: Prisma.SortOrder
   logo?: Prisma.SortOrder
+  logoPublicId?: Prisma.SortOrder
+  logoResourceType?: Prisma.SortOrder
   address?: Prisma.SortOrder
   ownerName?: Prisma.SortOrder
   idProof?: Prisma.SortOrder
+  idProofPublicId?: Prisma.SortOrder
+  idProofResourceType?: Prisma.SortOrder
   idNumber?: Prisma.SortOrder
+  isActive?: Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
 }
 
 export type CoachingMaxOrderByAggregateInput = {
@@ -387,10 +527,17 @@ export type CoachingMaxOrderByAggregateInput = {
   coachingName?: Prisma.SortOrder
   mobile?: Prisma.SortOrder
   logo?: Prisma.SortOrder
+  logoPublicId?: Prisma.SortOrder
+  logoResourceType?: Prisma.SortOrder
   address?: Prisma.SortOrder
   ownerName?: Prisma.SortOrder
   idProof?: Prisma.SortOrder
+  idProofPublicId?: Prisma.SortOrder
+  idProofResourceType?: Prisma.SortOrder
   idNumber?: Prisma.SortOrder
+  isActive?: Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
 }
 
 export type CoachingMinOrderByAggregateInput = {
@@ -399,10 +546,17 @@ export type CoachingMinOrderByAggregateInput = {
   coachingName?: Prisma.SortOrder
   mobile?: Prisma.SortOrder
   logo?: Prisma.SortOrder
+  logoPublicId?: Prisma.SortOrder
+  logoResourceType?: Prisma.SortOrder
   address?: Prisma.SortOrder
   ownerName?: Prisma.SortOrder
   idProof?: Prisma.SortOrder
+  idProofPublicId?: Prisma.SortOrder
+  idProofResourceType?: Prisma.SortOrder
   idNumber?: Prisma.SortOrder
+  isActive?: Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
 }
 
 export type CoachingCreateNestedOneWithoutUsersInput = {
@@ -427,10 +581,17 @@ export type CoachingCreateWithoutUsersInput = {
   coachingName: string
   mobile: string
   logo?: string | null
+  logoPublicId?: string | null
+  logoResourceType?: string | null
   address: string
   ownerName: string
   idProof?: string | null
+  idProofPublicId?: string | null
+  idProofResourceType?: string | null
   idNumber: string
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
 }
 
 export type CoachingUncheckedCreateWithoutUsersInput = {
@@ -439,10 +600,17 @@ export type CoachingUncheckedCreateWithoutUsersInput = {
   coachingName: string
   mobile: string
   logo?: string | null
+  logoPublicId?: string | null
+  logoResourceType?: string | null
   address: string
   ownerName: string
   idProof?: string | null
+  idProofPublicId?: string | null
+  idProofResourceType?: string | null
   idNumber: string
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
 }
 
 export type CoachingCreateOrConnectWithoutUsersInput = {
@@ -467,10 +635,17 @@ export type CoachingUpdateWithoutUsersInput = {
   coachingName?: Prisma.StringFieldUpdateOperationsInput | string
   mobile?: Prisma.StringFieldUpdateOperationsInput | string
   logo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoPublicId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoResourceType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.StringFieldUpdateOperationsInput | string
   ownerName?: Prisma.StringFieldUpdateOperationsInput | string
   idProof?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  idProofPublicId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  idProofResourceType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   idNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type CoachingUncheckedUpdateWithoutUsersInput = {
@@ -479,10 +654,17 @@ export type CoachingUncheckedUpdateWithoutUsersInput = {
   coachingName?: Prisma.StringFieldUpdateOperationsInput | string
   mobile?: Prisma.StringFieldUpdateOperationsInput | string
   logo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoPublicId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoResourceType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.StringFieldUpdateOperationsInput | string
   ownerName?: Prisma.StringFieldUpdateOperationsInput | string
   idProof?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  idProofPublicId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  idProofResourceType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   idNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 
@@ -522,10 +704,17 @@ export type CoachingSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   coachingName?: boolean
   mobile?: boolean
   logo?: boolean
+  logoPublicId?: boolean
+  logoResourceType?: boolean
   address?: boolean
   ownerName?: boolean
   idProof?: boolean
+  idProofPublicId?: boolean
+  idProofResourceType?: boolean
   idNumber?: boolean
+  isActive?: boolean
+  createdAt?: boolean
+  updatedAt?: boolean
   users?: boolean | Prisma.Coaching$usersArgs<ExtArgs>
   _count?: boolean | Prisma.CoachingCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["coaching"]>
@@ -536,10 +725,17 @@ export type CoachingSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exte
   coachingName?: boolean
   mobile?: boolean
   logo?: boolean
+  logoPublicId?: boolean
+  logoResourceType?: boolean
   address?: boolean
   ownerName?: boolean
   idProof?: boolean
+  idProofPublicId?: boolean
+  idProofResourceType?: boolean
   idNumber?: boolean
+  isActive?: boolean
+  createdAt?: boolean
+  updatedAt?: boolean
 }, ExtArgs["result"]["coaching"]>
 
 export type CoachingSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -548,10 +744,17 @@ export type CoachingSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exte
   coachingName?: boolean
   mobile?: boolean
   logo?: boolean
+  logoPublicId?: boolean
+  logoResourceType?: boolean
   address?: boolean
   ownerName?: boolean
   idProof?: boolean
+  idProofPublicId?: boolean
+  idProofResourceType?: boolean
   idNumber?: boolean
+  isActive?: boolean
+  createdAt?: boolean
+  updatedAt?: boolean
 }, ExtArgs["result"]["coaching"]>
 
 export type CoachingSelectScalar = {
@@ -560,13 +763,20 @@ export type CoachingSelectScalar = {
   coachingName?: boolean
   mobile?: boolean
   logo?: boolean
+  logoPublicId?: boolean
+  logoResourceType?: boolean
   address?: boolean
   ownerName?: boolean
   idProof?: boolean
+  idProofPublicId?: boolean
+  idProofResourceType?: boolean
   idNumber?: boolean
+  isActive?: boolean
+  createdAt?: boolean
+  updatedAt?: boolean
 }
 
-export type CoachingOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "code" | "coachingName" | "mobile" | "logo" | "address" | "ownerName" | "idProof" | "idNumber", ExtArgs["result"]["coaching"]>
+export type CoachingOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "code" | "coachingName" | "mobile" | "logo" | "logoPublicId" | "logoResourceType" | "address" | "ownerName" | "idProof" | "idProofPublicId" | "idProofResourceType" | "idNumber" | "isActive" | "createdAt" | "updatedAt", ExtArgs["result"]["coaching"]>
 export type CoachingInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   users?: boolean | Prisma.Coaching$usersArgs<ExtArgs>
   _count?: boolean | Prisma.CoachingCountOutputTypeDefaultArgs<ExtArgs>
@@ -585,10 +795,17 @@ export type $CoachingPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     coachingName: string
     mobile: string
     logo: string | null
+    logoPublicId: string | null
+    logoResourceType: string | null
     address: string
     ownerName: string
     idProof: string | null
+    idProofPublicId: string | null
+    idProofResourceType: string | null
     idNumber: string
+    isActive: boolean
+    createdAt: Date
+    updatedAt: Date
   }, ExtArgs["result"]["coaching"]>
   composites: {}
 }
@@ -1018,10 +1235,17 @@ export interface CoachingFieldRefs {
   readonly coachingName: Prisma.FieldRef<"Coaching", 'String'>
   readonly mobile: Prisma.FieldRef<"Coaching", 'String'>
   readonly logo: Prisma.FieldRef<"Coaching", 'String'>
+  readonly logoPublicId: Prisma.FieldRef<"Coaching", 'String'>
+  readonly logoResourceType: Prisma.FieldRef<"Coaching", 'String'>
   readonly address: Prisma.FieldRef<"Coaching", 'String'>
   readonly ownerName: Prisma.FieldRef<"Coaching", 'String'>
   readonly idProof: Prisma.FieldRef<"Coaching", 'String'>
+  readonly idProofPublicId: Prisma.FieldRef<"Coaching", 'String'>
+  readonly idProofResourceType: Prisma.FieldRef<"Coaching", 'String'>
   readonly idNumber: Prisma.FieldRef<"Coaching", 'String'>
+  readonly isActive: Prisma.FieldRef<"Coaching", 'Boolean'>
+  readonly createdAt: Prisma.FieldRef<"Coaching", 'DateTime'>
+  readonly updatedAt: Prisma.FieldRef<"Coaching", 'DateTime'>
 }
     
 

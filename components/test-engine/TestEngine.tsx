@@ -1,7 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import type { JSONContent } from "@tiptap/react";
+
 import TestHeader from "./header/TestHeader";
 import QuestionSection from "./QuestionSection";
 import QuestionPalette from "./palette/QuestionPalette";
@@ -13,7 +15,14 @@ import MobileQuestionPalette from "./mobile/MobileQuestionPalette";
 import SubmitButton from "./submit/SubmitButton";
 import SubmitModal from "./submit/SubmitModal";
 import Calculator from "./tools/Calculator";
+
 import { useTestSession } from "@/hooks/useTestSession";
+import { startTestAttempt } from "@/actions/test-attempt.actions";
+
+/* =========================================================
+   TYPES
+========================================================= */
+
 export interface TestEngineOption {
   id: string;
   content: JSONContent;
@@ -23,20 +32,25 @@ export interface TestEngineOption {
 
 export interface TestEngineQuestion {
   id: string;
+
   type: "SINGLE_CHOICE" | "MULTIPLE_CHOICE";
+
   content: JSONContent;
+
   options: TestEngineOption[];
+
   subject: {
     id: string;
     name: string;
   };
+
   topic: {
     id: string;
     name: string;
   };
 }
 
-export interface testQuestions {
+export interface TestQuestion {
   order: number;
   question: TestEngineQuestion;
 }
@@ -45,93 +59,223 @@ export interface TestEngineData {
   id: string;
   name: string;
   description: string | null;
+
   duration: number;
+
   totalMarks: number;
+
   totalQuestions: number;
+
   negativeMarking: boolean;
+
   negativeMarks: number | null;
-  testQuestions: testQuestions[];
+
+  testQuestions: TestQuestion[];
 }
 
 interface TestEngineProps {
   test: TestEngineData;
+
+  /**
+   * Existing TestAttempt ID.
+   *
+   * undefined:
+   *     Start screen
+   *
+   * defined:
+   *     Attempt page
+   */
+  attemptId?: string;
+
+  /**
+   * Logged-in student's User ID.
+   */
+  userId: string;
 }
 
-export default function TestEngine({ test }: TestEngineProps) {
-  const [testStarted, setTestStarted] = useState(false);
+/* =========================================================
+   COMPONENT
+========================================================= */
+
+export default function TestEngine({
+  test,
+  attemptId,
+  userId,
+}: TestEngineProps) {
+  const router = useRouter();
+
+  /* =======================================================
+     UI STATE
+  ======================================================= */
+
+  const [testStarted, setTestStarted] = useState(Boolean(attemptId));
+
   const [submitModalOpen, setSubmitModalOpen] = useState(false);
+
   const [mobilePaletteOpen, setMobilePaletteOpen] = useState(false);
+
   const [calculatorOpen, setCalculatorOpen] = useState(false);
 
-  console.log("test", test);
-  const handleTimeExpired = () => {
-    handleSubmit();
-  };
-  const session = useTestSession(test, handleTimeExpired);
+  /* =======================================================
+     TIME EXPIRED
+  ======================================================= */
+
+  async function handleTimeExpired() {
+    await handleSubmit();
+  }
+
+  /* =======================================================
+     TEST SESSION
+  ======================================================= */
+
+  const session = useTestSession(test, attemptId ?? "", handleTimeExpired);
+
   const {
     questions,
     currentIndex,
     currentQuestion,
+
     goTo,
     nextQuestion,
     previousQuestion,
+
     isFirstQuestion,
     isLastQuestion,
+
     answers,
     attempted,
+
     selectCurrentAnswer,
     clearCurrentAnswer,
+
     markedQuestions,
     markedCount,
+
     toggleCurrentMark,
     isMarked,
     getStatus,
+
     remainingSeconds,
     startTimer,
     pauseTimer,
+
     result,
+
     submit,
     isSubmitting,
-  } = session;
-  const totalQuestions = questions.length;
-  console.log('currentQuestion.options', currentQuestion.options)
 
-  const handleSubmit = async () => {
+    saveStatus,
+    saveError,
+  } = session;
+
+  const totalQuestions = questions.length;
+
+  /* =======================================================
+     START TIMER
+  ======================================================= */
+
+  useEffect(() => {
+    if (!attemptId) {
+      return;
+    }
+
+    setTestStarted(true);
+
+    startTimer();
+  }, [attemptId, startTimer]);
+
+  /* =======================================================
+     SUBMIT TEST
+  ======================================================= */
+
+  async function handleSubmit() {
+    /*
+     * Stop timer immediately.
+     */
     pauseTimer();
+
     const response = await submit({
       testId: test.id,
+      attemptId,
       answers,
+
       markedQuestions: Array.from(markedQuestions),
+
       timeRemaining: remainingSeconds,
     });
 
-    if (response.success) {
-      setSubmitModalOpen(false);
+    console.log("response", response);
 
-      /*
-       * Static version:
-       * Result available in `result`.
-       *
-       * Later:
-       *
-       * router.push(
-       *   `/mock-test-result/${test.id}`
-       * );
-       */
+    if (!response.success) {
+      console.error("TEST_SUBMIT_ERROR:", response.error);
 
-      console.log("Test submitted successfully");
-      console.log("Result:", result);
+      return;
     }
-  };
+
+    /*
+     * Close modal.
+     */
+    setSubmitModalOpen(false);
+
+    console.log("Test submitted successfully");
+
+    console.log("Result:", result);
+
+    /*
+     * After PHASE 8.4/8.5:
+     *
+     * router.replace(
+     *   `/student/tests/${test.id}/result/${attemptId}`
+     * );
+     */
+
+    if (attemptId) {
+      router.push(`/student/tests/${test.id}/result/${attemptId}`);
+    }
+  }
 
   /* =======================================================
      START TEST
   ======================================================= */
 
-  const handleStartTest = () => {
-    setTestStarted(true);
-    startTimer();
-  };
+  async function handleStartTest() {
+    if (!userId) {
+      alert("User not found.");
+
+      return;
+    }
+
+    try {
+      /*
+       * Create TestAttempt.
+       */
+      const response = await startTestAttempt(userId, test.id);
+
+      if (!response.success) {
+        alert(response.error);
+
+        return;
+      }
+
+      /*
+       * IMPORTANT:
+       *
+       * Timer is NOT started here.
+       *
+       * We navigate to the attempt page.
+       *
+       * Attempt page receives attemptId.
+       *
+       * useEffect above starts timer.
+       */
+
+      router.push(`/student/tests/${test.id}/attempt/${response.attemptId}`);
+    } catch (error) {
+      console.error("START_TEST_ERROR:", error);
+
+      alert("Unable to start test. Please try again.");
+    }
+  }
 
   /* =======================================================
      EMPTY TEST
@@ -157,16 +301,18 @@ export default function TestEngine({ test }: TestEngineProps) {
      START SCREEN
   ======================================================= */
 
-  if (!testStarted) {
+  if (!testStarted || !attemptId) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-blue-50 via-white to-indigo-100 p-4">
         <div className="w-full max-w-md rounded-3xl border border-white bg-white p-6 shadow-xl sm:p-8">
           {/* Logo */}
+
           <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-600 text-2xl font-bold text-white shadow-lg">
             T
           </div>
 
           {/* Title */}
+
           <div className="mt-5 text-center">
             <h1 className="text-xl font-bold text-slate-900 sm:text-2xl">
               {test.name}
@@ -180,6 +326,7 @@ export default function TestEngine({ test }: TestEngineProps) {
           </div>
 
           {/* Test Information */}
+
           <div className="mt-6 grid grid-cols-2 gap-3">
             <div className="rounded-2xl bg-slate-50 p-4 text-center">
               <p className="text-2xl font-bold text-indigo-600">
@@ -201,6 +348,7 @@ export default function TestEngine({ test }: TestEngineProps) {
           </div>
 
           {/* Instructions */}
+
           <div className="mt-5 rounded-2xl border border-amber-200 bg-amber-50 p-4">
             <h2 className="text-sm font-bold text-amber-800">
               Test Instructions
@@ -208,14 +356,21 @@ export default function TestEngine({ test }: TestEngineProps) {
 
             <ul className="mt-2 space-y-1.5 text-xs leading-5 text-amber-700">
               <li>• Timer starts after clicking Start Test.</li>
+
               <li>• You can navigate between questions.</li>
+
               <li>• You can mark questions for review.</li>
-              <li>• You can clear your selected answer.</li>
+
+              <li>• You can select or clear answers.</li>
+
+              <li>• Multiple-choice questions may have multiple answers.</li>
+
               <li>• Test automatically submits when time ends.</li>
             </ul>
           </div>
 
           {/* Start Button */}
+
           <button
             type="button"
             onClick={handleStartTest}
@@ -229,7 +384,7 @@ export default function TestEngine({ test }: TestEngineProps) {
   }
 
   /* =======================================================
-     CURRENT QUESTION SAFETY CHECK
+     CURRENT QUESTION SAFETY
   ======================================================= */
 
   if (!currentQuestion) {
@@ -237,6 +392,7 @@ export default function TestEngine({ test }: TestEngineProps) {
       <div className="flex min-h-screen items-center justify-center bg-slate-50 p-6">
         <div className="rounded-2xl border border-red-200 bg-red-50 p-6 text-center">
           <h2 className="font-bold text-red-700">Question Not Found</h2>
+
           <p className="mt-1 text-sm text-red-600">
             Unable to load the current question.
           </p>
@@ -246,11 +402,23 @@ export default function TestEngine({ test }: TestEngineProps) {
   }
 
   /* =======================================================
+     CURRENT ANSWER
+  ======================================================= */
+
+  const currentSelectedOptions = answers[currentQuestion.id] ?? [];
+
+  const hasCurrentAnswer = currentSelectedOptions.length > 0;
+
+  /* =======================================================
      MAIN TEST UI
   ======================================================= */
 
   return (
     <div className="min-h-screen bg-slate-50">
+      {/* ===================================================
+          HEADER
+      =================================================== */}
+
       <TestHeader
         title={test.name}
         description={test.description}
@@ -260,30 +428,44 @@ export default function TestEngine({ test }: TestEngineProps) {
         onMenuClick={() => setMobilePaletteOpen(true)}
         onSubmit={() => setSubmitModalOpen(true)}
       />
+
       <div className="mx-auto max-w-7xl px-3 py-4 pb-24 sm:px-5 sm:py-6 md:pb-8 lg:px-6">
         <div className="grid grid-cols-1 gap-5 lg:grid-cols-[minmax(0,1fr)_300px]">
+          {/* =================================================
+              QUESTION SECTION
+          ================================================= */}
+
           <div className="min-w-0">
             <QuestionSection
               questionNumber={currentIndex + 1}
               questionContent={currentQuestion.content}
               options={currentQuestion.options}
-              selectedOption={answers[currentQuestion.id] ?? null}
+              questionType={currentQuestion.type}
+              selectedOptions={currentSelectedOptions}
               onSelectOption={selectCurrentAnswer}
             />
+
+            {/* =============================================
+                DESKTOP ACTIONS
+            ============================================= */}
+
             <div className="mt-4 hidden items-center justify-between gap-3 md:flex">
               {/* Left Actions */}
+
               <div className="flex items-center gap-2">
                 <MarkForReviewButton
                   isMarked={isMarked(currentQuestion.id)}
                   onClick={toggleCurrentMark}
                 />
+
                 <ClearResponseButton
-                  disabled={!answers[currentQuestion.id]}
+                  disabled={!hasCurrentAnswer}
                   onClick={clearCurrentAnswer}
                 />
               </div>
 
               {/* Navigation */}
+
               <NavigationButtons
                 isFirstQuestion={isFirstQuestion}
                 isLastQuestion={isLastQuestion}
@@ -291,14 +473,35 @@ export default function TestEngine({ test }: TestEngineProps) {
                 onNext={nextQuestion}
               />
             </div>
+
+            {/* =============================================
+                SAVE STATUS
+            ============================================= */}
+
+            {saveStatus === "saving" && (
+              <p className="mt-2 text-right text-xs text-slate-400">
+                Saving...
+              </p>
+            )}
+
+            {saveStatus === "saved" && (
+              <p className="mt-2 text-right text-xs text-green-600">Saved</p>
+            )}
+
+            {saveStatus === "error" && (
+              <p className="mt-2 text-right text-xs text-red-600">
+                {saveError ?? "Unable to save answer"}
+              </p>
+            )}
           </div>
 
-          {/* =============================================
+          {/* =================================================
               DESKTOP SIDEBAR
-          ============================================= */}
+          ================================================= */}
 
           <aside className="hidden space-y-4 lg:block">
             {/* Question Palette */}
+
             <QuestionPalette
               totalQuestions={totalQuestions}
               currentQuestion={currentIndex}
@@ -307,12 +510,14 @@ export default function TestEngine({ test }: TestEngineProps) {
             />
 
             {/* Sidebar Actions */}
+
             <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
               <SubmitButton
                 onClick={() => setSubmitModalOpen(true)}
                 disabled={isSubmitting}
                 label={isSubmitting ? "Submitting..." : "Submit Test"}
               />
+
               <button
                 type="button"
                 onClick={() => setCalculatorOpen(true)}
@@ -324,16 +529,26 @@ export default function TestEngine({ test }: TestEngineProps) {
           </aside>
         </div>
       </div>
+
+      {/* =====================================================
+          MOBILE FOOTER
+      ===================================================== */}
+
       <TestFooter
         isFirstQuestion={isFirstQuestion}
         isLastQuestion={isLastQuestion}
         isMarked={isMarked(currentQuestion.id)}
-        hasAnswer={Boolean(answers[currentQuestion.id])}
+        hasAnswer={hasCurrentAnswer}
         onPrevious={previousQuestion}
         onNext={nextQuestion}
         onMark={toggleCurrentMark}
         onClear={clearCurrentAnswer}
       />
+
+      {/* =====================================================
+          MOBILE QUESTION PALETTE
+      ===================================================== */}
+
       <MobileQuestionPalette
         isOpen={mobilePaletteOpen}
         onClose={() => setMobilePaletteOpen(false)}
@@ -342,6 +557,11 @@ export default function TestEngine({ test }: TestEngineProps) {
         getQuestionStatus={(index) => getStatus(index, currentIndex)}
         onQuestionClick={goTo}
       />
+
+      {/* =====================================================
+          SUBMIT MODAL
+      ===================================================== */}
+
       <SubmitModal
         isOpen={submitModalOpen}
         onClose={() => setSubmitModalOpen(false)}
@@ -351,6 +571,11 @@ export default function TestEngine({ test }: TestEngineProps) {
         unanswered={result.unanswered}
         marked={markedCount}
       />
+
+      {/* =====================================================
+          CALCULATOR
+      ===================================================== */}
+
       <Calculator
         isOpen={calculatorOpen}
         onClose={() => setCalculatorOpen(false)}

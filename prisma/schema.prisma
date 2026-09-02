@@ -16,23 +16,27 @@ enum Role {
   STUDENT
   COACHING
   SALES
-  MAINTINACE
+  MAINTENANCE
   ADMIN
 }
 
 model User {
-  id         String     @id @default(cuid()) // Primary Key
-  email      String     @unique
-  password   String
-  role       Role       @default(STUDENT)
-  isActive   Boolean    @default(true)
-  createdAt  DateTime   @default(now())
-  updatedAt  DateTime   @updatedAt
-  student    Student?
-  coachingId String?
-  coaching   Coaching?  @relation(fields: [coachingId], references: [id])
-  exams      Exam[]
-  questions  Question[]
+  id           String        @id @default(cuid()) // Primary Key
+  email        String        @unique
+  password     String
+  role         Role          @default(STUDENT)
+  isActive     Boolean       @default(true)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  student      Student?
+  coachingId   String?
+  coaching     Coaching?     @relation(fields: [coachingId], references: [id])
+  exams        Exam[]
+  questions    Question[]
+  testAttempts TestAttempt[]
+
+  @@index([coachingId])
+  @@index([role])
 }
 
 model Student {
@@ -45,16 +49,27 @@ model Student {
 }
 
 model Coaching {
-  id           String  @id @default(cuid()) // Primary Key
-  code         String  @unique
-  coachingName String
-  mobile       String  @unique
-  logo         String?
-  address      String
-  ownerName    String
-  idProof      String? //upload id proof doc
-  idNumber     String // input id number adhar/pancard
-  users        User[]
+  id                  String   @id @default(cuid()) // Primary Key
+  code                String   @unique
+  coachingName        String
+  mobile              String   @unique
+  logo                String?
+  logoPublicId        String?
+  logoResourceType    String?
+  address             String
+  ownerName           String
+  idProof             String? //upload id proof doc
+  idProofPublicId     String?
+  idProofResourceType String?
+  idNumber            String   @unique
+  isActive            Boolean  @default(true)
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+  users               User[]
+
+  @@index([coachingName])
+  @@index([mobile])
+  @@index([isActive])
 }
 
 enum CourseName {
@@ -149,20 +164,21 @@ enum QuestionType {
 }
 
 model Question {
-  id            String           @id @default(cuid())
-  userId        String?
-  user          User?            @relation(fields: [userId], references: [id])
-  subjectId     String
-  subject       Subject          @relation(fields: [subjectId], references: [id])
-  topicId       String
-  topic         Topic            @relation(fields: [topicId], references: [id])
-  type          QuestionType     @default(SINGLE_CHOICE)
-  content       Json
-  solution      Json?
-  options       QuestionOption[]
-  createdAt     DateTime         @default(now())
-  updatedAt     DateTime         @updatedAt
-  testQuestions TestQuestion[]
+  id             String           @id @default(cuid())
+  userId         String?
+  user           User?            @relation(fields: [userId], references: [id])
+  subjectId      String
+  subject        Subject          @relation(fields: [subjectId], references: [id])
+  topicId        String
+  topic          Topic            @relation(fields: [topicId], references: [id])
+  type           QuestionType     @default(SINGLE_CHOICE)
+  content        Json
+  solution       Json?
+  options        QuestionOption[]
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  testQuestions  TestQuestion[]
+  attemptAnswers AttemptAnswer[]
 
   @@index([userId])
   @@index([subjectId])
@@ -211,6 +227,7 @@ model Test {
   testQuestions   TestQuestion[]
   createdAt       DateTime       @default(now())
   updatedAt       DateTime       @updatedAt
+  attempts        TestAttempt[]
 
   @@index([examId])
 }
@@ -225,4 +242,73 @@ model TestQuestion {
   @@id([testId, questionId])
   @@index([testId, order])
   @@index([questionId])
+}
+
+enum AttemptStatus {
+  IN_PROGRESS
+  SUBMITTED
+  EXPIRED
+  ABANDONED
+}
+
+model TestAttempt {
+  id          String          @id @default(cuid())
+  testId      String
+  userId      String
+  status      AttemptStatus   @default(IN_PROGRESS)
+  startedAt   DateTime        @default(now())
+  submittedAt DateTime?
+  test        Test            @relation(fields: [testId], references: [id], onDelete: Cascade)
+  user        User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  answers     AttemptAnswer[]
+  result      Result?
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  @@index([testId])
+  @@index([userId])
+  @@index([userId, testId])
+  @@index([status])
+}
+
+model AttemptAnswer {
+  id                String      @id @default(cuid())
+  attemptId         String
+  questionId        String
+  selectedOptionIds String[]    @default([])
+  isAttempted       Boolean     @default(false)
+  isCorrect         Boolean     @default(false)
+  attempt           TestAttempt @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+  question          Question    @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+
+  @@unique([attemptId, questionId])
+  @@index([attemptId])
+  @@index([questionId])
+}
+
+model Result {
+  id             String      @id @default(cuid())
+  attemptId      String      @unique
+  totalQuestions Int
+  attempted      Int
+  correct        Int
+  incorrect      Int
+  skipped        Int
+  totalMarks     Float
+  marksObtained  Float
+  positiveMarks  Float
+  negativeMarks  Float
+  percentage     Float
+  accuracy       Float
+  timeTaken      Int
+  rank           Int?
+  percentile     Float?
+  attempt        TestAttempt @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+
+  @@index([marksObtained])
+  @@index([percentage])
 }

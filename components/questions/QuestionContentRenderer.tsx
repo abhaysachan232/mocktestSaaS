@@ -152,7 +152,7 @@ function renderNode(node: JSONContent, key: string) {
       );
 
     case "resizableImage": {
-      console.log("IMAGE NODE:", node);
+      // console.log("IMAGE NODE:", node);
       const src = node.attrs?.src;
 
       if (!src) {
@@ -174,10 +174,10 @@ function renderNode(node: JSONContent, key: string) {
             width={width}
             className="object-contain"
             onLoad={() => {
-              console.log("IMAGE LOADED:", src);
+              // console.log("IMAGE LOADED:", src);
             }}
             onError={() => {
-              console.error("IMAGE LOAD FAILED:", src);
+              // console.error("IMAGE LOAD FAILED:", src);
             }}
           />
           </div>
