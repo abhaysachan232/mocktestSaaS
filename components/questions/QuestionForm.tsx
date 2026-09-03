@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import type { JSONContent } from "@tiptap/react";
 import { Controller, useFieldArray, useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import QuestionEditor from "./QuestionEditor";
+import RichContentEditor from "../editor/RichContentEditor";
 import {
   createQuestion,
   updateQuestion,
@@ -264,7 +264,7 @@ export default function QuestionForm({
           name="content"
           control={control}
           render={({ field }) => (
-            <QuestionEditor
+            <RichContentEditor
               value={field.value}
               onChange={field.onChange}
               minHeight="220px"
@@ -283,7 +283,7 @@ export default function QuestionForm({
           name="solution"
           control={control}
           render={({ field }) => (
-            <QuestionEditor
+            <RichContentEditor
               value={field.value}
               onChange={field.onChange}
               minHeight="220px"
@@ -402,7 +402,7 @@ export default function QuestionForm({
                   name={`options.${index}.content`}
                   control={control}
                   render={({ field }) => (
-                    <QuestionEditor
+                    <RichContentEditor
                       value={field.value}
                       onChange={field.onChange}
                       minHeight="100px"

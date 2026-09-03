@@ -1,24 +1,16 @@
 "use client";
 
 import type { JSONContent } from "@tiptap/react";
-
 import { TestEngineOption } from "./TestEngine";
-
-import QuestionContentRenderer from "@/components/questions/QuestionContentRenderer";
+import RichContentRenderer from "../editor/RichContentRenderer";
 
 interface QuestionSectionProps {
   questionNumber: number;
-
   questionContent: JSONContent;
-
   options: TestEngineOption[];
-
   questionType: "SINGLE_CHOICE" | "MULTIPLE_CHOICE";
-
   selectedOptions?: string[];
-
   onSelectOption: (optionId: string) => void;
-
   disabled?: boolean;
 }
 
@@ -49,7 +41,7 @@ export default function QuestionSection({
 
           <div className="min-w-0 flex-1">
             <div className="text-[15px] font-medium leading-7 text-slate-800 sm:text-base sm:leading-7">
-              <QuestionContentRenderer content={questionContent} />
+              <RichContentRenderer content={questionContent} />
             </div>
           </div>
         </div>
@@ -126,7 +118,7 @@ export default function QuestionSection({
                       : "text-slate-700"
                   }`}
                 >
-                  <QuestionContentRenderer content={option.content} />
+                  <RichContentRenderer content={option.content} />
                 </span>
               </button>
             );

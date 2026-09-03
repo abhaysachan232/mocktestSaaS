@@ -1,6 +1,6 @@
 "use client";
 
-import { Control, FieldErrors, UseFormRegister } from "react-hook-form";
+import { FieldErrors, UseFormRegister } from "react-hook-form";
 import { ExamFormValues } from "@/schemas/exam";
 
 type Props = {

@@ -1,8 +1,7 @@
 "use client";
 
 import type { JSONContent } from "@tiptap/react";
-
-import QuestionContentRenderer from "@/components/questions/QuestionContentRenderer";
+import RichContentRenderer from "../editor/RichContentRenderer";
 
 interface Option {
   id: string;
@@ -13,29 +12,14 @@ interface Option {
 interface QuestionAnalysisCardProps {
   questionNumber: number;
   content: JSONContent;
-  type:
-    | "SINGLE_CHOICE"
-    | "MULTIPLE_CHOICE";
-
+  type: "SINGLE_CHOICE" | "MULTIPLE_CHOICE";
   options: Option[];
-
   selectedOptionIds: string[];
-
   isAttempted: boolean;
-
   isCorrect: boolean;
 }
 
-const optionLabels = [
-  "A",
-  "B",
-  "C",
-  "D",
-  "E",
-  "F",
-  "G",
-  "H",
-];
+const optionLabels = ["A", "B", "C", "D", "E", "F", "G", "H"];
 
 export default function QuestionAnalysisCard({
   questionNumber,
@@ -82,79 +66,48 @@ export default function QuestionAnalysisCard({
       {/* Question */}
 
       <div className="mt-5 text-sm leading-7 text-slate-800 sm:text-base">
-        <QuestionContentRenderer
-          content={content}
-        />
+        <RichContentRenderer content={content} />
       </div>
 
       {/* Options */}
 
       <div className="mt-5 space-y-3">
-        {options.map(
-          (option, index) => {
-            const isSelected =
-              selectedOptionIds.includes(
-                option.id
-              );
+        {options.map((option, index) => {
+          const isSelected = selectedOptionIds.includes(option.id);
+          const isCorrectOption = option.isCorrect;
+          let optionClass = "border-slate-200 bg-white";
 
-            const isCorrectOption =
-              option.isCorrect;
+          if (isCorrectOption) {
+            optionClass = "border-green-300 bg-green-50";
+          } else if (isSelected && !isCorrectOption) {
+            optionClass = "border-red-300 bg-red-50";
+          }
 
-            let optionClass =
-              "border-slate-200 bg-white";
+          return (
+            <div
+              key={option.id}
+              className={`flex items-start gap-3 rounded-xl border p-3 ${optionClass}`}
+            >
+              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-slate-300 text-xs font-bold text-slate-700">
+                {optionLabels[index] ?? String(index + 1)}
+              </span>
 
-            if (
-              isCorrectOption
-            ) {
-              optionClass =
-                "border-green-300 bg-green-50";
-            } else if (
-              isSelected &&
-              !isCorrectOption
-            ) {
-              optionClass =
-                "border-red-300 bg-red-50";
-            }
+              <div className="min-w-0 flex-1 text-sm leading-6 text-slate-700">
+                <RichContentRenderer content={option.content} />
 
-            return (
-              <div
-                key={option.id}
-                className={`flex items-start gap-3 rounded-xl border p-3 ${optionClass}`}
-              >
-                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-slate-300 text-xs font-bold text-slate-700">
-                  {optionLabels[
-                    index
-                  ] ??
-                    String(
-                      index + 1
-                    )}
-                </span>
+                <div className="mt-1 flex flex-wrap gap-2 text-xs font-semibold">
+                  {isSelected && (
+                    <span className="text-indigo-600">Your Answer</span>
+                  )}
 
-                <div className="min-w-0 flex-1 text-sm leading-6 text-slate-700">
-                  <QuestionContentRenderer
-                    content={
-                      option.content
-                    }
-                  />
-
-                  <div className="mt-1 flex flex-wrap gap-2 text-xs font-semibold">
-                    {isSelected && (
-                      <span className="text-indigo-600">
-                        Your Answer
-                      </span>
-                    )}
-
-                    {isCorrectOption && (
-                      <span className="text-green-600">
-                        Correct Answer
-                      </span>
-                    )}
-                  </div>
+                  {isCorrectOption && (
+                    <span className="text-green-600">Correct Answer</span>
+                  )}
                 </div>
               </div>
-            );
-          }
-        )}
+            </div>
+          );
+        })}
       </div>
     </article>
   );
