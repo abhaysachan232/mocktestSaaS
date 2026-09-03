@@ -7,8 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { ExamFormValues, examSchema } from "@/schemas/exam";
 import { createExam, updateExam } from "@/actions/exam.actions";
 import BasicDetails from "./BasicDetails";
-import SubjectSelector from "./SubjectSelector";
-import TopicSelector from "./TopicSelector";
+import SubjectTopicSelector from "./SubjectTopicSelector";
 
 type Subject = {
   id: string;
@@ -37,15 +36,20 @@ type Props = {
 
 export default function ExamForm({ subjects, exam }: Props) {
   const router = useRouter();
+
   const [serverError, setServerError] = useState("");
   const [loading, setLoading] = useState(false);
+
   const methods = useForm<ExamFormValues>({
     resolver: zodResolver(examSchema),
+
     defaultValues: {
       name: exam?.name ?? "",
       slug: exam?.slug ?? "",
       description: exam?.description ?? "",
+
       subjectIds: exam?.examSubjects.map((item) => item.subjectId) ?? [],
+
       topicIds: exam?.examTopics.map((item) => item.topicId) ?? [],
     },
   });
@@ -81,13 +85,11 @@ export default function ExamForm({ subjects, exam }: Props) {
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         <BasicDetails register={register} errors={errors} />
 
-        <SubjectSelector
+        <SubjectTopicSelector
           control={control}
           subjects={subjects}
           errors={errors}
         />
-
-        <TopicSelector control={control} subjects={subjects} errors={errors} />
 
         {serverError && (
           <div className="rounded-md bg-red-50 p-3 text-sm text-red-600">

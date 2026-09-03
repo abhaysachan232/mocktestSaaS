@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import { createCoaching, updateCoaching } from "@/actions/coaching.actions";
+import Image from "next/image";
 
 type CoachingFormData = {
   id?: string;
@@ -280,10 +281,12 @@ export default function CoachingForm({ mode, initialData }: Props) {
 
           {logoPreview && (
             <div className="mt-3">
-              <img
+              <Image
                 src={logoPreview}
                 alt="Coaching logo"
-                className="h-24 w-24 rounded-md border object-cover"
+                width={120}
+                height={120}
+                className="h-24 w-24 rounded-lg object-cover"
               />
             </div>
           )}
