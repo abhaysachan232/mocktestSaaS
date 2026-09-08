@@ -1820,6 +1820,7 @@ export const TestAttemptScalarFieldEnum = {
   userId: 'userId',
   status: 'status',
   startedAt: 'startedAt',
+  expiresAt: 'expiresAt',
   submittedAt: 'submittedAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
@@ -1835,6 +1836,7 @@ export const AttemptAnswerScalarFieldEnum = {
   selectedOptionIds: 'selectedOptionIds',
   isAttempted: 'isAttempted',
   isCorrect: 'isCorrect',
+  markedForReview: 'markedForReview',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const

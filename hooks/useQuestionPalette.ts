@@ -1,55 +1,53 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 
-import type { PaletteStatus } from "@/components/test-engine/palette/PaletteItem";
+type AnswerMap = Record<string, string[]>;
 
-interface UseQuestionPaletteProps {
+export type QuestionStatus =
+  | "current"
+  | "answered"
+  | "marked"
+  | "answered-marked"
+  | "visited"
+  | "not-visited";
+
+interface UseQuestionPaletteOptions {
   questionIds: string[];
-  answers: Record<string, string[]>;
+  answers: AnswerMap;
+  initialMarkedQuestions?: string[];
 }
 
 export function useQuestionPalette({
   questionIds,
   answers,
-}: UseQuestionPaletteProps) {
-  // ----------------------------------------
-  // Marked Questions
-  // ----------------------------------------
+  initialMarkedQuestions = [],
+}: UseQuestionPaletteOptions) {
+  /*
+   * ----------------------------------------
+   * Marked Questions
+   * ----------------------------------------
+   */
 
   const [markedQuestions, setMarkedQuestions] = useState<Set<string>>(
-    new Set(),
+    () => new Set(initialMarkedQuestions),
   );
 
-  // ----------------------------------------
-  // Visited Questions
-  // ----------------------------------------
+  /*
+   * ----------------------------------------
+   * Visited Questions
+   * ----------------------------------------
+   */
 
   const [visitedQuestions, setVisitedQuestions] = useState<Set<string>>(
-    new Set(questionIds.length > 0 ? [questionIds[0]] : []),
+    () => new Set(),
   );
 
-  // ----------------------------------------
-  // Mark Question As Visited
-  // ----------------------------------------
-
-  const markVisited = useCallback((questionId: string) => {
-    setVisitedQuestions((previous) => {
-      if (previous.has(questionId)) {
-        return previous;
-      }
-
-      const next = new Set(previous);
-
-      next.add(questionId);
-
-      return next;
-    });
-  }, []);
-
-  // ----------------------------------------
-  // Toggle Mark For Review
-  // ----------------------------------------
+  /*
+   * ----------------------------------------
+   * Mark / Unmark
+   * ----------------------------------------
+   */
 
   const toggleMark = useCallback((questionId: string) => {
     setMarkedQuestions((previous) => {
@@ -65,9 +63,49 @@ export function useQuestionPalette({
     });
   }, []);
 
-  // ----------------------------------------
-  // Check Marked
-  // ----------------------------------------
+  /*
+   * ----------------------------------------
+   * Explicit Mark
+   * ----------------------------------------
+   */
+
+  const markQuestion = useCallback((questionId: string) => {
+    setMarkedQuestions((previous) => {
+      if (previous.has(questionId)) {
+        return previous;
+      }
+
+      const next = new Set(previous);
+      next.add(questionId);
+
+      return next;
+    });
+  }, []);
+
+  /*
+   * ----------------------------------------
+   * Explicit Unmark
+   * ----------------------------------------
+   */
+
+  const unmarkQuestion = useCallback((questionId: string) => {
+    setMarkedQuestions((previous) => {
+      if (!previous.has(questionId)) {
+        return previous;
+      }
+
+      const next = new Set(previous);
+      next.delete(questionId);
+
+      return next;
+    });
+  }, []);
+
+  /*
+   * ----------------------------------------
+   * Check Mark
+   * ----------------------------------------
+   */
 
   const isMarked = useCallback(
     (questionId: string) => {
@@ -76,103 +114,173 @@ export function useQuestionPalette({
     [markedQuestions],
   );
 
-  // ----------------------------------------
-  // Get Question Status
-  // ----------------------------------------
+  /*
+   * ----------------------------------------
+   * Mark Visited
+   * ----------------------------------------
+   */
 
-  const getStatus = useCallback(
-    (index: number, currentIndex: number): PaletteStatus => {
-      const questionId = questionIds[index];
+  const markVisited = useCallback((questionId: string) => {
+    setVisitedQuestions((previous) => {
+      if (previous.has(questionId)) {
+        return previous;
+      }
+
+      const next = new Set(previous);
+      next.add(questionId);
+
+      return next;
+    });
+  }, []);
+
+  /*
+   * ----------------------------------------
+   * Check Visited
+   * ----------------------------------------
+   */
+
+  const isVisited = useCallback(
+    (questionId: string) => {
+      return visitedQuestions.has(questionId);
+    },
+    [visitedQuestions],
+  );
+
+  /*
+   * ----------------------------------------
+   * Get Answered State
+   * ----------------------------------------
+   */
+
+  const isAnswered = useCallback(
+    (questionId: string) => {
+      const selectedOptions = answers[questionId];
+
+      return Array.isArray(selectedOptions) && selectedOptions.length > 0;
+    },
+    [answers],
+  );
+
+  /*
+   * ----------------------------------------
+   * Question Status
+   *
+   * Priority:
+   *
+   * current
+   * ↓
+   * answered + marked
+   * ↓
+   * marked
+   * ↓
+   * answered
+   * ↓
+   * visited
+   * ↓
+   * not visited
+   * ----------------------------------------
+   */
+
+  const getQuestionStatus = useCallback(
+    (questionIndex: number, currentQuestionIndex: number): QuestionStatus => {
+      const questionId = questionIds[questionIndex];
 
       if (!questionId) {
         return "not-visited";
       }
 
-      const isCurrent = index === currentIndex;
-
-      const selectedOptions = answers[questionId] ?? [];
-
-      const isAnswered = selectedOptions.length > 0;
-
-      const isMarked = markedQuestions.has(questionId);
-
-      const isVisited = visitedQuestions.has(questionId);
-
-      /*
-       * Current question gets highest priority.
-       */
-
-      if (isCurrent) {
+      if (questionIndex === currentQuestionIndex) {
         return "current";
       }
 
-      /*
-       * Answered + Marked
-       */
+      const answered = isAnswered(questionId);
+      const marked = isMarked(questionId);
+      const visited = isVisited(questionId);
 
-      if (isAnswered && isMarked) {
+      if (answered && marked) {
         return "answered-marked";
       }
 
-      /*
-       * Marked but not answered
-       */
-
-      if (isMarked) {
+      if (marked) {
         return "marked";
       }
 
-      /*
-       * Answered
-       */
-
-      if (isAnswered) {
+      if (answered) {
         return "answered";
       }
 
-      /*
-       * Visited but unanswered
-       */
-
-      if (isVisited) {
+      if (visited) {
         return "visited";
       }
 
-      /*
-       * Never visited
-       */
-
       return "not-visited";
     },
-    [questionIds, answers, markedQuestions, visitedQuestions],
+    [questionIds, isAnswered, isMarked, isVisited],
   );
 
-  // ----------------------------------------
-  // Reset Palette
-  // ----------------------------------------
+  /*
+   * ----------------------------------------
+   * Alias
+   *
+   * Existing TestEngine code may be using
+   * getStatus(...)
+   * ----------------------------------------
+   */
+
+  const getStatus = getQuestionStatus;
+
+  /*
+   * ----------------------------------------
+   * Counts
+   * ----------------------------------------
+   */
+
+  const markedCount = useMemo(() => markedQuestions.size, [markedQuestions]);
+
+  const visitedCount = useMemo(() => visitedQuestions.size, [visitedQuestions]);
+
+  const answeredCount = useMemo(
+    () => questionIds.filter((questionId) => isAnswered(questionId)).length,
+    [questionIds, isAnswered],
+  );
+
+  /*
+   * ----------------------------------------
+   * Reset
+   * ----------------------------------------
+   */
 
   const resetPalette = useCallback(() => {
     setMarkedQuestions(new Set());
+    setVisitedQuestions(new Set());
+  }, []);
 
-    setVisitedQuestions(
-      new Set(questionIds.length > 0 ? [questionIds[0]] : []),
-    );
-  }, [questionIds]);
-
-  // ----------------------------------------
-  // Return
-  // ----------------------------------------
+  /*
+   * ----------------------------------------
+   * Return
+   * ----------------------------------------
+   */
 
   return {
     markedQuestions,
     visitedQuestions,
 
-    markVisited,
-    toggleMark,
-    isMarked,
-    getStatus,
+    markedCount,
+    visitedCount,
+    answeredCount,
 
-    markedCount: markedQuestions.size,
+    markVisited,
+
+    toggleMark,
+    markQuestion,
+    unmarkQuestion,
+
+    isMarked,
+    isVisited,
+    isAnswered,
+
+    getQuestionStatus,
+    getStatus,
 
     resetPalette,
   };

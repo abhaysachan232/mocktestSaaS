@@ -257,6 +257,7 @@ model TestAttempt {
   userId      String
   status      AttemptStatus   @default(IN_PROGRESS)
   startedAt   DateTime        @default(now())
+  expiresAt   DateTime
   submittedAt DateTime?
   test        Test            @relation(fields: [testId], references: [id], onDelete: Cascade)
   user        User            @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -269,6 +270,7 @@ model TestAttempt {
   @@index([userId])
   @@index([userId, testId])
   @@index([status])
+  @@index([expiresAt])
 }
 
 model AttemptAnswer {
@@ -278,6 +280,7 @@ model AttemptAnswer {
   selectedOptionIds String[]    @default([])
   isAttempted       Boolean     @default(false)
   isCorrect         Boolean     @default(false)
+  markedForReview   Boolean     @default(false)
   attempt           TestAttempt @relation(fields: [attemptId], references: [id], onDelete: Cascade)
   question          Question    @relation(fields: [questionId], references: [id], onDelete: Cascade)
   createdAt         DateTime    @default(now())

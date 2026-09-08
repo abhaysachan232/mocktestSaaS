@@ -3,68 +3,169 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
 interface UseTimerOptions {
-  initialSeconds: number;
+  expiresAt: Date | string | number;
   autoStart?: boolean;
   onComplete?: () => void;
 }
 
+interface UseTimerReturn {
+  remainingSeconds: number;
+  isRunning: boolean;
+  start: () => void;
+  pause: () => void;
+  reset: () => void;
+}
+
+function getRemainingSeconds(
+  expiresAt: Date | string | number,
+): number {
+  const expiryTime =
+    expiresAt instanceof Date
+      ? expiresAt.getTime()
+      : typeof expiresAt === "number"
+        ? expiresAt
+        : new Date(expiresAt).getTime();
+
+  if (!Number.isFinite(expiryTime)) {
+    return 0;
+  }
+
+  return Math.max(
+    0,
+    Math.floor(
+      (expiryTime - Date.now()) / 1000,
+    ),
+  );
+}
+
 export function useTimer({
-  initialSeconds,
+  expiresAt,
   autoStart = false,
   onComplete,
-}: UseTimerOptions) {
+}: UseTimerOptions): UseTimerReturn {
   const [remainingSeconds, setRemainingSeconds] =
-    useState(initialSeconds);
+    useState(() =>
+      getRemainingSeconds(expiresAt),
+    );
 
-  const [isRunning, setIsRunning] = useState(autoStart);
+  const [isRunning, setIsRunning] =
+    useState(autoStart);
 
-  const completedRef = useRef(false);
+  const expiresAtRef =
+    useRef(expiresAt);
+
+  const completedRef =
+    useRef(false);
+
+  const onCompleteRef =
+    useRef(onComplete);
+
+  // ==========================================================
+  // KEEP LATEST EXPIRY
+  // ==========================================================
 
   useEffect(() => {
-    if (!isRunning) return;
+    expiresAtRef.current = expiresAt;
+  }, [expiresAt]);
 
-    const interval = window.setInterval(() => {
-      setRemainingSeconds((current) => {
-        if (current <= 1) {
-          window.clearInterval(interval);
+  // ==========================================================
+  // KEEP LATEST CALLBACK
+  // ==========================================================
 
-          if (!completedRef.current) {
-            completedRef.current = true;
-            setIsRunning(false);
-            onComplete?.();
-          }
+  useEffect(() => {
+    onCompleteRef.current = onComplete;
+  }, [onComplete]);
 
-          return 0;
-        }
-
-        return current - 1;
-      });
-    }, 1000);
-
-    return () => {
-      window.clearInterval(interval);
-    };
-  }, [isRunning, onComplete]);
+  // ==========================================================
+  // START
+  // ==========================================================
 
   const start = useCallback(() => {
-    if (remainingSeconds > 0) {
-      completedRef.current = false;
-      setIsRunning(true);
+    const remaining =
+      getRemainingSeconds(
+        expiresAtRef.current,
+      );
+
+    if (remaining <= 0) {
+      if (!completedRef.current) {
+        completedRef.current = true;
+        onCompleteRef.current?.();
+      }
+
+      return;
     }
-  }, [remainingSeconds]);
+
+    completedRef.current = false;
+    setIsRunning(true);
+  }, []);
+
+  // ==========================================================
+  // PAUSE
+  // ==========================================================
 
   const pause = useCallback(() => {
     setIsRunning(false);
   }, []);
 
-  const reset = useCallback(
-    (seconds = initialSeconds) => {
-      completedRef.current = false;
-      setRemainingSeconds(seconds);
-      setIsRunning(false);
-    },
-    [initialSeconds]
-  );
+  // ==========================================================
+  // RESET
+  // ==========================================================
+
+  const reset = useCallback(() => {
+    completedRef.current = false;
+
+    const remaining =
+      getRemainingSeconds(
+        expiresAtRef.current,
+      );
+
+    setRemainingSeconds(remaining);
+
+    setIsRunning(
+      autoStart && remaining > 0,
+    );
+  }, [autoStart]);
+
+  // ==========================================================
+  // TIMER LOOP
+  // ==========================================================
+
+  useEffect(() => {
+    if (!isRunning) {
+      return;
+    }
+
+    const tick = () => {
+      const nextSeconds =
+        getRemainingSeconds(
+          expiresAtRef.current,
+        );
+
+      setRemainingSeconds(nextSeconds);
+
+      if (nextSeconds <= 0) {
+        setIsRunning(false);
+
+        if (!completedRef.current) {
+          completedRef.current = true;
+          onCompleteRef.current?.();
+        }
+      }
+    };
+
+    // Immediate synchronization.
+    tick();
+
+    const intervalId =
+      window.setInterval(
+        tick,
+        1000,
+      );
+
+    return () => {
+      window.clearInterval(intervalId);
+    };
+  }, [isRunning]);
 
   return {
     remainingSeconds,

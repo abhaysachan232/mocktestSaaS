@@ -688,7 +688,14 @@ export async function getTestForEngine(id: string) {
               id: true,
               type: true,
               content: true,
-              options: true, // agar Question model me options field hai
+
+              options: {
+                select: {
+                  id: true,
+                  content: true,
+                  questionId: true,
+                },
+              },
 
               subject: {
                 select: {

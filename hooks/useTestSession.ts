@@ -8,73 +8,83 @@ import { useAnswers } from "./useAnswers";
 import { useCurrentQuestion } from "./useCurrentQuestion";
 import { useQuestionPalette } from "./useQuestionPalette";
 import { useTimer } from "./useTimer";
-import { useTestResult } from "./useTestResult";
 import { useTestSubmit } from "./useTestSubmit";
 
 export function useTestSession(
   test: TestEngineData,
   attemptId: string,
+  expiresAt: Date | string | number,
   onTimeExpired?: () => void,
 ) {
-  // ----------------------------------------
-  // Questions
-  // ----------------------------------------
+  // ==========================================================
+  // QUESTIONS
+  // ==========================================================
 
   const questions = test.testQuestions.map(
     (testQuestion) => testQuestion.question,
   );
 
-  const questionIds = questions.map((question) => question.id);
+  const questionIds = questions.map(
+    (question) => question.id,
+  );
 
-  // ----------------------------------------
-  // Current Question
-  // ----------------------------------------
+  // ==========================================================
+  // CURRENT QUESTION
+  // ==========================================================
 
   const {
     currentIndex,
     currentQuestion,
     goToQuestion,
-    nextQuestion,
-    previousQuestion,
     isFirstQuestion,
     isLastQuestion,
   } = useCurrentQuestion(questions);
 
-  // ----------------------------------------
-  // Answers
-  // ----------------------------------------
+  // ==========================================================
+  // ANSWERS
+  // ==========================================================
 
   const {
     answers,
     selectAnswer,
     clearAnswer,
     getAnswer,
+    hasAnswer,
     attempted,
     resetAnswers,
     saveStatus,
     saveError,
+    isLoading: isAnswersLoading,
   } = useAnswers(attemptId);
 
-  // ----------------------------------------
-  // Question Palette
-  // ----------------------------------------
+  // ==========================================================
+  // QUESTION PALETTE
+  // ==========================================================
 
   const {
     markedQuestions,
+    visitedQuestions,
+    markedCount,
+    visitedCount,
+    answeredCount,
     markVisited,
     toggleMark,
+    markQuestion,
+    unmarkQuestion,
     isMarked,
+    isVisited,
+    isAnswered,
+    getQuestionStatus,
     getStatus,
-    markedCount,
     resetPalette,
   } = useQuestionPalette({
     questionIds,
     answers,
   });
 
-  // ----------------------------------------
-  // Timer
-  // ----------------------------------------
+  // ==========================================================
+  // SERVER AUTHORITATIVE TIMER
+  // ==========================================================
 
   const {
     remainingSeconds,
@@ -83,32 +93,36 @@ export function useTestSession(
     pause,
     reset: resetTimer,
   } = useTimer({
-    initialSeconds: test.duration * 60,
+    expiresAt,
     autoStart: false,
     onComplete: onTimeExpired,
   });
 
-  // ----------------------------------------
-  // Result
-  // ----------------------------------------
+  // ==========================================================
+  // SUBMIT
+  // ==========================================================
 
-  const result = useTestResult({
-    questions,
-    answers,
-  });
+  const {
+    submit,
+    isSubmitting,
+    isSubmitted,
+    error: submitError,
+    resetSubmit,
+  } = useTestSubmit();
 
-  // ----------------------------------------
-  // Submit
-  // ----------------------------------------
-
-  const { submit, isSubmitting, isSubmitted, error } = useTestSubmit();
-
-  // ----------------------------------------
-  // Go To Question
-  // ----------------------------------------
+  // ==========================================================
+  // GO TO QUESTION
+  // ==========================================================
 
   const goTo = useCallback(
     (index: number) => {
+      if (
+        index < 0 ||
+        index >= questions.length
+      ) {
+        return;
+      }
+
       goToQuestion(index);
 
       const question = questions[index];
@@ -117,109 +131,233 @@ export function useTestSession(
         markVisited(question.id);
       }
     },
-    [goToQuestion, questions, markVisited],
+    [
+      questions,
+      goToQuestion,
+      markVisited,
+    ],
   );
 
-  // ----------------------------------------
-  // Select Current Answer
-  // ----------------------------------------
+  // ==========================================================
+  // SELECT CURRENT ANSWER
+  // ==========================================================
 
   const selectCurrentAnswer = useCallback(
     (optionId: string) => {
-      if (!currentQuestion) return;
+      if (!currentQuestion) {
+        return;
+      }
 
-      selectAnswer(currentQuestion.id, optionId, currentQuestion.type);
+      selectAnswer(
+        currentQuestion.id,
+        optionId,
+        currentQuestion.type,
+      );
     },
-    [currentQuestion, selectAnswer],
+    [
+      currentQuestion,
+      selectAnswer,
+    ],
   );
 
-  // ----------------------------------------
-  // Clear Current Answer
-  // ----------------------------------------
+  // ==========================================================
+  // CLEAR CURRENT ANSWER
+  // ==========================================================
 
   const clearCurrentAnswer = useCallback(() => {
-    if (!currentQuestion) return;
+    if (!currentQuestion) {
+      return;
+    }
 
     clearAnswer(currentQuestion.id);
-  }, [currentQuestion, clearAnswer]);
+  }, [
+    currentQuestion,
+    clearAnswer,
+  ]);
 
-  // ----------------------------------------
-  // Toggle Current Question Mark
-  // ----------------------------------------
+  // ==========================================================
+  // TOGGLE CURRENT MARK
+  // ==========================================================
 
   const toggleCurrentMark = useCallback(() => {
-    if (!currentQuestion) return;
+    if (!currentQuestion) {
+      return;
+    }
 
     toggleMark(currentQuestion.id);
-  }, [currentQuestion, toggleMark]);
+  }, [
+    currentQuestion,
+    toggleMark,
+  ]);
 
-  // ----------------------------------------
-  // Reset Session
-  // ----------------------------------------
+  // ==========================================================
+  // NEXT QUESTION
+  // ==========================================================
+
+  const goToNextQuestion = useCallback(() => {
+    if (isLastQuestion) {
+      return;
+    }
+
+    goTo(currentIndex + 1);
+  }, [
+    currentIndex,
+    isLastQuestion,
+    goTo,
+  ]);
+
+  // ==========================================================
+  // PREVIOUS QUESTION
+  // ==========================================================
+
+  const goToPreviousQuestion = useCallback(() => {
+    if (isFirstQuestion) {
+      return;
+    }
+
+    goTo(currentIndex - 1);
+  }, [
+    currentIndex,
+    isFirstQuestion,
+    goTo,
+  ]);
+
+  // ==========================================================
+  // RESET SESSION
+  // ==========================================================
 
   const resetSession = useCallback(() => {
     resetAnswers();
     resetPalette();
     resetTimer();
-    goToQuestion(0);
-  }, [resetAnswers, resetPalette, resetTimer, goToQuestion]);
+    resetSubmit();
 
-  // ----------------------------------------
-  // Return
-  // ----------------------------------------
+    goToQuestion(0);
+
+    const firstQuestion = questions[0];
+
+    if (firstQuestion) {
+      markVisited(firstQuestion.id);
+    }
+  }, [
+    resetAnswers,
+    resetPalette,
+    resetTimer,
+    resetSubmit,
+    goToQuestion,
+    questions,
+    markVisited,
+  ]);
+
+  // ==========================================================
+  // SUMMARY
+  // ==========================================================
+
+  const totalQuestions = questions.length;
+
+  const unanswered = Math.max(
+    0,
+    totalQuestions - attempted,
+  );
+
+  const summary = {
+    totalQuestions,
+    attempted,
+    unanswered,
+    marked: markedCount,
+    visited: visitedCount,
+  };
+
+  // ==========================================================
+  // RETURN
+  // ==========================================================
 
   return {
-    // Questions
     questions,
+    questionIds,
+
     currentIndex,
     currentQuestion,
 
-    // Navigation
     goTo,
-    nextQuestion,
-    previousQuestion,
+    goToQuestion,
+
+    nextQuestion: goToNextQuestion,
+    previousQuestion: goToPreviousQuestion,
+
     isFirstQuestion,
     isLastQuestion,
 
-    // Answers
     answers,
     attempted,
-    selectAnswer,
-    selectCurrentAnswer,
-    clearAnswer,
-    clearCurrentAnswer,
+
+    hasAnswer,
     getAnswer,
 
-    // Answer persistence
+    selectAnswer,
+    selectCurrentAnswer,
+
+    clearAnswer,
+    clearCurrentAnswer,
+
+    resetAnswers,
+
     saveStatus,
     saveError,
+    isAnswersLoading,
 
-    // Question Palette
     markedQuestions,
+    visitedQuestions,
+
     markedCount,
+    visitedCount,
+    answeredCount,
+
     markVisited,
     toggleMark,
     toggleCurrentMark,
+
+    markQuestion,
+    unmarkQuestion,
+
     isMarked,
+    isVisited,
+    isAnswered,
+
+    getQuestionStatus,
     getStatus,
 
-    // Timer
+    resetPalette,
+
+    // ========================================================
+    // TIMER
+    // ========================================================
+
     remainingSeconds,
     isRunning,
+
     startTimer: start,
     pauseTimer: pause,
     resetTimer,
 
-    // Result
-    result,
+    // ========================================================
+    // SUBMIT
+    // ========================================================
 
-    // Submit
     submit,
     isSubmitting,
     isSubmitted,
-    submitError: error,
+    submitError,
 
-    // Session
+    // ========================================================
+    // SUMMARY
+    // ========================================================
+
+    summary,
+
+    totalQuestions,
+    unanswered,
+
     resetSession,
   };
 }

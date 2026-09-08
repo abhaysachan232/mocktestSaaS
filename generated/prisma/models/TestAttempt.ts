@@ -30,6 +30,7 @@ export type TestAttemptMinAggregateOutputType = {
   userId: string | null
   status: $Enums.AttemptStatus | null
   startedAt: Date | null
+  expiresAt: Date | null
   submittedAt: Date | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -41,6 +42,7 @@ export type TestAttemptMaxAggregateOutputType = {
   userId: string | null
   status: $Enums.AttemptStatus | null
   startedAt: Date | null
+  expiresAt: Date | null
   submittedAt: Date | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -52,6 +54,7 @@ export type TestAttemptCountAggregateOutputType = {
   userId: number
   status: number
   startedAt: number
+  expiresAt: number
   submittedAt: number
   createdAt: number
   updatedAt: number
@@ -65,6 +68,7 @@ export type TestAttemptMinAggregateInputType = {
   userId?: true
   status?: true
   startedAt?: true
+  expiresAt?: true
   submittedAt?: true
   createdAt?: true
   updatedAt?: true
@@ -76,6 +80,7 @@ export type TestAttemptMaxAggregateInputType = {
   userId?: true
   status?: true
   startedAt?: true
+  expiresAt?: true
   submittedAt?: true
   createdAt?: true
   updatedAt?: true
@@ -87,6 +92,7 @@ export type TestAttemptCountAggregateInputType = {
   userId?: true
   status?: true
   startedAt?: true
+  expiresAt?: true
   submittedAt?: true
   createdAt?: true
   updatedAt?: true
@@ -171,6 +177,7 @@ export type TestAttemptGroupByOutputType = {
   userId: string
   status: $Enums.AttemptStatus
   startedAt: Date
+  expiresAt: Date
   submittedAt: Date | null
   createdAt: Date
   updatedAt: Date
@@ -203,6 +210,7 @@ export type TestAttemptWhereInput = {
   userId?: Prisma.StringFilter<"TestAttempt"> | string
   status?: Prisma.EnumAttemptStatusFilter<"TestAttempt"> | $Enums.AttemptStatus
   startedAt?: Prisma.DateTimeFilter<"TestAttempt"> | Date | string
+  expiresAt?: Prisma.DateTimeFilter<"TestAttempt"> | Date | string
   submittedAt?: Prisma.DateTimeNullableFilter<"TestAttempt"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"TestAttempt"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"TestAttempt"> | Date | string
@@ -218,6 +226,7 @@ export type TestAttemptOrderByWithRelationInput = {
   userId?: Prisma.SortOrder
   status?: Prisma.SortOrder
   startedAt?: Prisma.SortOrder
+  expiresAt?: Prisma.SortOrder
   submittedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -236,6 +245,7 @@ export type TestAttemptWhereUniqueInput = Prisma.AtLeast<{
   userId?: Prisma.StringFilter<"TestAttempt"> | string
   status?: Prisma.EnumAttemptStatusFilter<"TestAttempt"> | $Enums.AttemptStatus
   startedAt?: Prisma.DateTimeFilter<"TestAttempt"> | Date | string
+  expiresAt?: Prisma.DateTimeFilter<"TestAttempt"> | Date | string
   submittedAt?: Prisma.DateTimeNullableFilter<"TestAttempt"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"TestAttempt"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"TestAttempt"> | Date | string
@@ -251,6 +261,7 @@ export type TestAttemptOrderByWithAggregationInput = {
   userId?: Prisma.SortOrder
   status?: Prisma.SortOrder
   startedAt?: Prisma.SortOrder
+  expiresAt?: Prisma.SortOrder
   submittedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -268,6 +279,7 @@ export type TestAttemptScalarWhereWithAggregatesInput = {
   userId?: Prisma.StringWithAggregatesFilter<"TestAttempt"> | string
   status?: Prisma.EnumAttemptStatusWithAggregatesFilter<"TestAttempt"> | $Enums.AttemptStatus
   startedAt?: Prisma.DateTimeWithAggregatesFilter<"TestAttempt"> | Date | string
+  expiresAt?: Prisma.DateTimeWithAggregatesFilter<"TestAttempt"> | Date | string
   submittedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"TestAttempt"> | Date | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"TestAttempt"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"TestAttempt"> | Date | string
@@ -277,6 +289,7 @@ export type TestAttemptCreateInput = {
   id?: string
   status?: $Enums.AttemptStatus
   startedAt?: Date | string
+  expiresAt: Date | string
   submittedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -292,6 +305,7 @@ export type TestAttemptUncheckedCreateInput = {
   userId: string
   status?: $Enums.AttemptStatus
   startedAt?: Date | string
+  expiresAt: Date | string
   submittedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -303,6 +317,7 @@ export type TestAttemptUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumAttemptStatusFieldUpdateOperationsInput | $Enums.AttemptStatus
   startedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  expiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   submittedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -318,6 +333,7 @@ export type TestAttemptUncheckedUpdateInput = {
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumAttemptStatusFieldUpdateOperationsInput | $Enums.AttemptStatus
   startedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  expiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   submittedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -331,6 +347,7 @@ export type TestAttemptCreateManyInput = {
   userId: string
   status?: $Enums.AttemptStatus
   startedAt?: Date | string
+  expiresAt: Date | string
   submittedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -340,6 +357,7 @@ export type TestAttemptUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumAttemptStatusFieldUpdateOperationsInput | $Enums.AttemptStatus
   startedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  expiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   submittedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -351,6 +369,7 @@ export type TestAttemptUncheckedUpdateManyInput = {
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumAttemptStatusFieldUpdateOperationsInput | $Enums.AttemptStatus
   startedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  expiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   submittedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -372,6 +391,7 @@ export type TestAttemptCountOrderByAggregateInput = {
   userId?: Prisma.SortOrder
   status?: Prisma.SortOrder
   startedAt?: Prisma.SortOrder
+  expiresAt?: Prisma.SortOrder
   submittedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -383,6 +403,7 @@ export type TestAttemptMaxOrderByAggregateInput = {
   userId?: Prisma.SortOrder
   status?: Prisma.SortOrder
   startedAt?: Prisma.SortOrder
+  expiresAt?: Prisma.SortOrder
   submittedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -394,6 +415,7 @@ export type TestAttemptMinOrderByAggregateInput = {
   userId?: Prisma.SortOrder
   status?: Prisma.SortOrder
   startedAt?: Prisma.SortOrder
+  expiresAt?: Prisma.SortOrder
   submittedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -524,6 +546,7 @@ export type TestAttemptCreateWithoutUserInput = {
   id?: string
   status?: $Enums.AttemptStatus
   startedAt?: Date | string
+  expiresAt: Date | string
   submittedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -537,6 +560,7 @@ export type TestAttemptUncheckedCreateWithoutUserInput = {
   testId: string
   status?: $Enums.AttemptStatus
   startedAt?: Date | string
+  expiresAt: Date | string
   submittedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -579,6 +603,7 @@ export type TestAttemptScalarWhereInput = {
   userId?: Prisma.StringFilter<"TestAttempt"> | string
   status?: Prisma.EnumAttemptStatusFilter<"TestAttempt"> | $Enums.AttemptStatus
   startedAt?: Prisma.DateTimeFilter<"TestAttempt"> | Date | string
+  expiresAt?: Prisma.DateTimeFilter<"TestAttempt"> | Date | string
   submittedAt?: Prisma.DateTimeNullableFilter<"TestAttempt"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"TestAttempt"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"TestAttempt"> | Date | string
@@ -588,6 +613,7 @@ export type TestAttemptCreateWithoutTestInput = {
   id?: string
   status?: $Enums.AttemptStatus
   startedAt?: Date | string
+  expiresAt: Date | string
   submittedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -601,6 +627,7 @@ export type TestAttemptUncheckedCreateWithoutTestInput = {
   userId: string
   status?: $Enums.AttemptStatus
   startedAt?: Date | string
+  expiresAt: Date | string
   submittedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -638,6 +665,7 @@ export type TestAttemptCreateWithoutAnswersInput = {
   id?: string
   status?: $Enums.AttemptStatus
   startedAt?: Date | string
+  expiresAt: Date | string
   submittedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -652,6 +680,7 @@ export type TestAttemptUncheckedCreateWithoutAnswersInput = {
   userId: string
   status?: $Enums.AttemptStatus
   startedAt?: Date | string
+  expiresAt: Date | string
   submittedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -678,6 +707,7 @@ export type TestAttemptUpdateWithoutAnswersInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumAttemptStatusFieldUpdateOperationsInput | $Enums.AttemptStatus
   startedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  expiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   submittedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -692,6 +722,7 @@ export type TestAttemptUncheckedUpdateWithoutAnswersInput = {
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumAttemptStatusFieldUpdateOperationsInput | $Enums.AttemptStatus
   startedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  expiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   submittedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -702,6 +733,7 @@ export type TestAttemptCreateWithoutResultInput = {
   id?: string
   status?: $Enums.AttemptStatus
   startedAt?: Date | string
+  expiresAt: Date | string
   submittedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -716,6 +748,7 @@ export type TestAttemptUncheckedCreateWithoutResultInput = {
   userId: string
   status?: $Enums.AttemptStatus
   startedAt?: Date | string
+  expiresAt: Date | string
   submittedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -742,6 +775,7 @@ export type TestAttemptUpdateWithoutResultInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumAttemptStatusFieldUpdateOperationsInput | $Enums.AttemptStatus
   startedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  expiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   submittedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -756,6 +790,7 @@ export type TestAttemptUncheckedUpdateWithoutResultInput = {
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumAttemptStatusFieldUpdateOperationsInput | $Enums.AttemptStatus
   startedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  expiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   submittedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -767,6 +802,7 @@ export type TestAttemptCreateManyUserInput = {
   testId: string
   status?: $Enums.AttemptStatus
   startedAt?: Date | string
+  expiresAt: Date | string
   submittedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -776,6 +812,7 @@ export type TestAttemptUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumAttemptStatusFieldUpdateOperationsInput | $Enums.AttemptStatus
   startedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  expiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   submittedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -789,6 +826,7 @@ export type TestAttemptUncheckedUpdateWithoutUserInput = {
   testId?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumAttemptStatusFieldUpdateOperationsInput | $Enums.AttemptStatus
   startedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  expiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   submittedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -801,6 +839,7 @@ export type TestAttemptUncheckedUpdateManyWithoutUserInput = {
   testId?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumAttemptStatusFieldUpdateOperationsInput | $Enums.AttemptStatus
   startedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  expiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   submittedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -811,6 +850,7 @@ export type TestAttemptCreateManyTestInput = {
   userId: string
   status?: $Enums.AttemptStatus
   startedAt?: Date | string
+  expiresAt: Date | string
   submittedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -820,6 +860,7 @@ export type TestAttemptUpdateWithoutTestInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumAttemptStatusFieldUpdateOperationsInput | $Enums.AttemptStatus
   startedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  expiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   submittedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -833,6 +874,7 @@ export type TestAttemptUncheckedUpdateWithoutTestInput = {
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumAttemptStatusFieldUpdateOperationsInput | $Enums.AttemptStatus
   startedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  expiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   submittedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -845,6 +887,7 @@ export type TestAttemptUncheckedUpdateManyWithoutTestInput = {
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumAttemptStatusFieldUpdateOperationsInput | $Enums.AttemptStatus
   startedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  expiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   submittedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -887,6 +930,7 @@ export type TestAttemptSelect<ExtArgs extends runtime.Types.Extensions.InternalA
   userId?: boolean
   status?: boolean
   startedAt?: boolean
+  expiresAt?: boolean
   submittedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -903,6 +947,7 @@ export type TestAttemptSelectCreateManyAndReturn<ExtArgs extends runtime.Types.E
   userId?: boolean
   status?: boolean
   startedAt?: boolean
+  expiresAt?: boolean
   submittedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -916,6 +961,7 @@ export type TestAttemptSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.E
   userId?: boolean
   status?: boolean
   startedAt?: boolean
+  expiresAt?: boolean
   submittedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -929,12 +975,13 @@ export type TestAttemptSelectScalar = {
   userId?: boolean
   status?: boolean
   startedAt?: boolean
+  expiresAt?: boolean
   submittedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type TestAttemptOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "testId" | "userId" | "status" | "startedAt" | "submittedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["testAttempt"]>
+export type TestAttemptOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "testId" | "userId" | "status" | "startedAt" | "expiresAt" | "submittedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["testAttempt"]>
 export type TestAttemptInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   test?: boolean | Prisma.TestDefaultArgs<ExtArgs>
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -965,6 +1012,7 @@ export type $TestAttemptPayload<ExtArgs extends runtime.Types.Extensions.Interna
     userId: string
     status: $Enums.AttemptStatus
     startedAt: Date
+    expiresAt: Date
     submittedAt: Date | null
     createdAt: Date
     updatedAt: Date
@@ -1400,6 +1448,7 @@ export interface TestAttemptFieldRefs {
   readonly userId: Prisma.FieldRef<"TestAttempt", 'String'>
   readonly status: Prisma.FieldRef<"TestAttempt", 'AttemptStatus'>
   readonly startedAt: Prisma.FieldRef<"TestAttempt", 'DateTime'>
+  readonly expiresAt: Prisma.FieldRef<"TestAttempt", 'DateTime'>
   readonly submittedAt: Prisma.FieldRef<"TestAttempt", 'DateTime'>
   readonly createdAt: Prisma.FieldRef<"TestAttempt", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"TestAttempt", 'DateTime'>
