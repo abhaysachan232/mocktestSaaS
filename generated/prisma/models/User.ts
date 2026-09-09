@@ -32,7 +32,6 @@ export type UserMinAggregateOutputType = {
   isActive: boolean | null
   createdAt: Date | null
   updatedAt: Date | null
-  coachingId: string | null
 }
 
 export type UserMaxAggregateOutputType = {
@@ -43,7 +42,6 @@ export type UserMaxAggregateOutputType = {
   isActive: boolean | null
   createdAt: Date | null
   updatedAt: Date | null
-  coachingId: string | null
 }
 
 export type UserCountAggregateOutputType = {
@@ -54,7 +52,6 @@ export type UserCountAggregateOutputType = {
   isActive: number
   createdAt: number
   updatedAt: number
-  coachingId: number
   _all: number
 }
 
@@ -67,7 +64,6 @@ export type UserMinAggregateInputType = {
   isActive?: true
   createdAt?: true
   updatedAt?: true
-  coachingId?: true
 }
 
 export type UserMaxAggregateInputType = {
@@ -78,7 +74,6 @@ export type UserMaxAggregateInputType = {
   isActive?: true
   createdAt?: true
   updatedAt?: true
-  coachingId?: true
 }
 
 export type UserCountAggregateInputType = {
@@ -89,7 +84,6 @@ export type UserCountAggregateInputType = {
   isActive?: true
   createdAt?: true
   updatedAt?: true
-  coachingId?: true
   _all?: true
 }
 
@@ -173,7 +167,6 @@ export type UserGroupByOutputType = {
   isActive: boolean
   createdAt: Date
   updatedAt: Date
-  coachingId: string | null
   _count: UserCountAggregateOutputType | null
   _min: UserMinAggregateOutputType | null
   _max: UserMaxAggregateOutputType | null
@@ -205,11 +198,11 @@ export type UserWhereInput = {
   isActive?: Prisma.BoolFilter<"User"> | boolean
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
-  coachingId?: Prisma.StringNullableFilter<"User"> | string | null
   student?: Prisma.XOR<Prisma.StudentNullableScalarRelationFilter, Prisma.StudentWhereInput> | null
-  coaching?: Prisma.XOR<Prisma.CoachingNullableScalarRelationFilter, Prisma.CoachingWhereInput> | null
+  coachings?: Prisma.UserCoachingListRelationFilter
   exams?: Prisma.ExamListRelationFilter
   questions?: Prisma.QuestionListRelationFilter
+  tests?: Prisma.TestListRelationFilter
   testAttempts?: Prisma.TestAttemptListRelationFilter
 }
 
@@ -221,11 +214,11 @@ export type UserOrderByWithRelationInput = {
   isActive?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
-  coachingId?: Prisma.SortOrderInput | Prisma.SortOrder
   student?: Prisma.StudentOrderByWithRelationInput
-  coaching?: Prisma.CoachingOrderByWithRelationInput
+  coachings?: Prisma.UserCoachingOrderByRelationAggregateInput
   exams?: Prisma.ExamOrderByRelationAggregateInput
   questions?: Prisma.QuestionOrderByRelationAggregateInput
+  tests?: Prisma.TestOrderByRelationAggregateInput
   testAttempts?: Prisma.TestAttemptOrderByRelationAggregateInput
 }
 
@@ -240,11 +233,11 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   isActive?: Prisma.BoolFilter<"User"> | boolean
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
-  coachingId?: Prisma.StringNullableFilter<"User"> | string | null
   student?: Prisma.XOR<Prisma.StudentNullableScalarRelationFilter, Prisma.StudentWhereInput> | null
-  coaching?: Prisma.XOR<Prisma.CoachingNullableScalarRelationFilter, Prisma.CoachingWhereInput> | null
+  coachings?: Prisma.UserCoachingListRelationFilter
   exams?: Prisma.ExamListRelationFilter
   questions?: Prisma.QuestionListRelationFilter
+  tests?: Prisma.TestListRelationFilter
   testAttempts?: Prisma.TestAttemptListRelationFilter
 }, "id" | "email">
 
@@ -256,7 +249,6 @@ export type UserOrderByWithAggregationInput = {
   isActive?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
-  coachingId?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.UserCountOrderByAggregateInput
   _max?: Prisma.UserMaxOrderByAggregateInput
   _min?: Prisma.UserMinOrderByAggregateInput
@@ -273,7 +265,6 @@ export type UserScalarWhereWithAggregatesInput = {
   isActive?: Prisma.BoolWithAggregatesFilter<"User"> | boolean
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
-  coachingId?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
 }
 
 export type UserCreateInput = {
@@ -285,9 +276,10 @@ export type UserCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   student?: Prisma.StudentCreateNestedOneWithoutUserInput
-  coaching?: Prisma.CoachingCreateNestedOneWithoutUsersInput
+  coachings?: Prisma.UserCoachingCreateNestedManyWithoutUserInput
   exams?: Prisma.ExamCreateNestedManyWithoutUserInput
   questions?: Prisma.QuestionCreateNestedManyWithoutUserInput
+  tests?: Prisma.TestCreateNestedManyWithoutUserInput
   testAttempts?: Prisma.TestAttemptCreateNestedManyWithoutUserInput
 }
 
@@ -299,10 +291,11 @@ export type UserUncheckedCreateInput = {
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
-  coachingId?: string | null
   student?: Prisma.StudentUncheckedCreateNestedOneWithoutUserInput
+  coachings?: Prisma.UserCoachingUncheckedCreateNestedManyWithoutUserInput
   exams?: Prisma.ExamUncheckedCreateNestedManyWithoutUserInput
   questions?: Prisma.QuestionUncheckedCreateNestedManyWithoutUserInput
+  tests?: Prisma.TestUncheckedCreateNestedManyWithoutUserInput
   testAttempts?: Prisma.TestAttemptUncheckedCreateNestedManyWithoutUserInput
 }
 
@@ -315,9 +308,10 @@ export type UserUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   student?: Prisma.StudentUpdateOneWithoutUserNestedInput
-  coaching?: Prisma.CoachingUpdateOneWithoutUsersNestedInput
+  coachings?: Prisma.UserCoachingUpdateManyWithoutUserNestedInput
   exams?: Prisma.ExamUpdateManyWithoutUserNestedInput
   questions?: Prisma.QuestionUpdateManyWithoutUserNestedInput
+  tests?: Prisma.TestUpdateManyWithoutUserNestedInput
   testAttempts?: Prisma.TestAttemptUpdateManyWithoutUserNestedInput
 }
 
@@ -329,10 +323,11 @@ export type UserUncheckedUpdateInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  coachingId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   student?: Prisma.StudentUncheckedUpdateOneWithoutUserNestedInput
+  coachings?: Prisma.UserCoachingUncheckedUpdateManyWithoutUserNestedInput
   exams?: Prisma.ExamUncheckedUpdateManyWithoutUserNestedInput
   questions?: Prisma.QuestionUncheckedUpdateManyWithoutUserNestedInput
+  tests?: Prisma.TestUncheckedUpdateManyWithoutUserNestedInput
   testAttempts?: Prisma.TestAttemptUncheckedUpdateManyWithoutUserNestedInput
 }
 
@@ -344,7 +339,6 @@ export type UserCreateManyInput = {
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
-  coachingId?: string | null
 }
 
 export type UserUpdateManyMutationInput = {
@@ -365,7 +359,6 @@ export type UserUncheckedUpdateManyInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  coachingId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type UserCountOrderByAggregateInput = {
@@ -376,7 +369,6 @@ export type UserCountOrderByAggregateInput = {
   isActive?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
-  coachingId?: Prisma.SortOrder
 }
 
 export type UserMaxOrderByAggregateInput = {
@@ -387,7 +379,6 @@ export type UserMaxOrderByAggregateInput = {
   isActive?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
-  coachingId?: Prisma.SortOrder
 }
 
 export type UserMinOrderByAggregateInput = {
@@ -398,22 +389,11 @@ export type UserMinOrderByAggregateInput = {
   isActive?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
-  coachingId?: Prisma.SortOrder
 }
 
 export type UserScalarRelationFilter = {
   is?: Prisma.UserWhereInput
   isNot?: Prisma.UserWhereInput
-}
-
-export type UserListRelationFilter = {
-  every?: Prisma.UserWhereInput
-  some?: Prisma.UserWhereInput
-  none?: Prisma.UserWhereInput
-}
-
-export type UserOrderByRelationAggregateInput = {
-  _count?: Prisma.SortOrder
 }
 
 export type UserNullableScalarRelationFilter = {
@@ -437,10 +417,6 @@ export type DateTimeFieldUpdateOperationsInput = {
   set?: Date | string
 }
 
-export type NullableStringFieldUpdateOperationsInput = {
-  set?: string | null
-}
-
 export type UserCreateNestedOneWithoutStudentInput = {
   create?: Prisma.XOR<Prisma.UserCreateWithoutStudentInput, Prisma.UserUncheckedCreateWithoutStudentInput>
   connectOrCreate?: Prisma.UserCreateOrConnectWithoutStudentInput
@@ -455,46 +431,18 @@ export type UserUpdateOneRequiredWithoutStudentNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutStudentInput, Prisma.UserUpdateWithoutStudentInput>, Prisma.UserUncheckedUpdateWithoutStudentInput>
 }
 
-export type UserCreateNestedManyWithoutCoachingInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutCoachingInput, Prisma.UserUncheckedCreateWithoutCoachingInput> | Prisma.UserCreateWithoutCoachingInput[] | Prisma.UserUncheckedCreateWithoutCoachingInput[]
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutCoachingInput | Prisma.UserCreateOrConnectWithoutCoachingInput[]
-  createMany?: Prisma.UserCreateManyCoachingInputEnvelope
-  connect?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
+export type UserCreateNestedOneWithoutCoachingsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutCoachingsInput, Prisma.UserUncheckedCreateWithoutCoachingsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutCoachingsInput
+  connect?: Prisma.UserWhereUniqueInput
 }
 
-export type UserUncheckedCreateNestedManyWithoutCoachingInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutCoachingInput, Prisma.UserUncheckedCreateWithoutCoachingInput> | Prisma.UserCreateWithoutCoachingInput[] | Prisma.UserUncheckedCreateWithoutCoachingInput[]
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutCoachingInput | Prisma.UserCreateOrConnectWithoutCoachingInput[]
-  createMany?: Prisma.UserCreateManyCoachingInputEnvelope
-  connect?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
-}
-
-export type UserUpdateManyWithoutCoachingNestedInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutCoachingInput, Prisma.UserUncheckedCreateWithoutCoachingInput> | Prisma.UserCreateWithoutCoachingInput[] | Prisma.UserUncheckedCreateWithoutCoachingInput[]
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutCoachingInput | Prisma.UserCreateOrConnectWithoutCoachingInput[]
-  upsert?: Prisma.UserUpsertWithWhereUniqueWithoutCoachingInput | Prisma.UserUpsertWithWhereUniqueWithoutCoachingInput[]
-  createMany?: Prisma.UserCreateManyCoachingInputEnvelope
-  set?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
-  disconnect?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
-  delete?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
-  connect?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
-  update?: Prisma.UserUpdateWithWhereUniqueWithoutCoachingInput | Prisma.UserUpdateWithWhereUniqueWithoutCoachingInput[]
-  updateMany?: Prisma.UserUpdateManyWithWhereWithoutCoachingInput | Prisma.UserUpdateManyWithWhereWithoutCoachingInput[]
-  deleteMany?: Prisma.UserScalarWhereInput | Prisma.UserScalarWhereInput[]
-}
-
-export type UserUncheckedUpdateManyWithoutCoachingNestedInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutCoachingInput, Prisma.UserUncheckedCreateWithoutCoachingInput> | Prisma.UserCreateWithoutCoachingInput[] | Prisma.UserUncheckedCreateWithoutCoachingInput[]
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutCoachingInput | Prisma.UserCreateOrConnectWithoutCoachingInput[]
-  upsert?: Prisma.UserUpsertWithWhereUniqueWithoutCoachingInput | Prisma.UserUpsertWithWhereUniqueWithoutCoachingInput[]
-  createMany?: Prisma.UserCreateManyCoachingInputEnvelope
-  set?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
-  disconnect?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
-  delete?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
-  connect?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
-  update?: Prisma.UserUpdateWithWhereUniqueWithoutCoachingInput | Prisma.UserUpdateWithWhereUniqueWithoutCoachingInput[]
-  updateMany?: Prisma.UserUpdateManyWithWhereWithoutCoachingInput | Prisma.UserUpdateManyWithWhereWithoutCoachingInput[]
-  deleteMany?: Prisma.UserScalarWhereInput | Prisma.UserScalarWhereInput[]
+export type UserUpdateOneRequiredWithoutCoachingsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutCoachingsInput, Prisma.UserUncheckedCreateWithoutCoachingsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutCoachingsInput
+  upsert?: Prisma.UserUpsertWithoutCoachingsInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutCoachingsInput, Prisma.UserUpdateWithoutCoachingsInput>, Prisma.UserUncheckedUpdateWithoutCoachingsInput>
 }
 
 export type UserCreateNestedOneWithoutExamsInput = {
@@ -529,6 +477,22 @@ export type UserUpdateOneWithoutQuestionsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutQuestionsInput, Prisma.UserUpdateWithoutQuestionsInput>, Prisma.UserUncheckedUpdateWithoutQuestionsInput>
 }
 
+export type UserCreateNestedOneWithoutTestsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutTestsInput, Prisma.UserUncheckedCreateWithoutTestsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutTestsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneWithoutTestsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutTestsInput, Prisma.UserUncheckedCreateWithoutTestsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutTestsInput
+  upsert?: Prisma.UserUpsertWithoutTestsInput
+  disconnect?: Prisma.UserWhereInput | boolean
+  delete?: Prisma.UserWhereInput | boolean
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutTestsInput, Prisma.UserUpdateWithoutTestsInput>, Prisma.UserUncheckedUpdateWithoutTestsInput>
+}
+
 export type UserCreateNestedOneWithoutTestAttemptsInput = {
   create?: Prisma.XOR<Prisma.UserCreateWithoutTestAttemptsInput, Prisma.UserUncheckedCreateWithoutTestAttemptsInput>
   connectOrCreate?: Prisma.UserCreateOrConnectWithoutTestAttemptsInput
@@ -551,9 +515,10 @@ export type UserCreateWithoutStudentInput = {
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
-  coaching?: Prisma.CoachingCreateNestedOneWithoutUsersInput
+  coachings?: Prisma.UserCoachingCreateNestedManyWithoutUserInput
   exams?: Prisma.ExamCreateNestedManyWithoutUserInput
   questions?: Prisma.QuestionCreateNestedManyWithoutUserInput
+  tests?: Prisma.TestCreateNestedManyWithoutUserInput
   testAttempts?: Prisma.TestAttemptCreateNestedManyWithoutUserInput
 }
 
@@ -565,9 +530,10 @@ export type UserUncheckedCreateWithoutStudentInput = {
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
-  coachingId?: string | null
+  coachings?: Prisma.UserCoachingUncheckedCreateNestedManyWithoutUserInput
   exams?: Prisma.ExamUncheckedCreateNestedManyWithoutUserInput
   questions?: Prisma.QuestionUncheckedCreateNestedManyWithoutUserInput
+  tests?: Prisma.TestUncheckedCreateNestedManyWithoutUserInput
   testAttempts?: Prisma.TestAttemptUncheckedCreateNestedManyWithoutUserInput
 }
 
@@ -595,9 +561,10 @@ export type UserUpdateWithoutStudentInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  coaching?: Prisma.CoachingUpdateOneWithoutUsersNestedInput
+  coachings?: Prisma.UserCoachingUpdateManyWithoutUserNestedInput
   exams?: Prisma.ExamUpdateManyWithoutUserNestedInput
   questions?: Prisma.QuestionUpdateManyWithoutUserNestedInput
+  tests?: Prisma.TestUpdateManyWithoutUserNestedInput
   testAttempts?: Prisma.TestAttemptUpdateManyWithoutUserNestedInput
 }
 
@@ -609,13 +576,14 @@ export type UserUncheckedUpdateWithoutStudentInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  coachingId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coachings?: Prisma.UserCoachingUncheckedUpdateManyWithoutUserNestedInput
   exams?: Prisma.ExamUncheckedUpdateManyWithoutUserNestedInput
   questions?: Prisma.QuestionUncheckedUpdateManyWithoutUserNestedInput
+  tests?: Prisma.TestUncheckedUpdateManyWithoutUserNestedInput
   testAttempts?: Prisma.TestAttemptUncheckedUpdateManyWithoutUserNestedInput
 }
 
-export type UserCreateWithoutCoachingInput = {
+export type UserCreateWithoutCoachingsInput = {
   id?: string
   email: string
   password: string
@@ -626,10 +594,11 @@ export type UserCreateWithoutCoachingInput = {
   student?: Prisma.StudentCreateNestedOneWithoutUserInput
   exams?: Prisma.ExamCreateNestedManyWithoutUserInput
   questions?: Prisma.QuestionCreateNestedManyWithoutUserInput
+  tests?: Prisma.TestCreateNestedManyWithoutUserInput
   testAttempts?: Prisma.TestAttemptCreateNestedManyWithoutUserInput
 }
 
-export type UserUncheckedCreateWithoutCoachingInput = {
+export type UserUncheckedCreateWithoutCoachingsInput = {
   id?: string
   email: string
   password: string
@@ -640,47 +609,54 @@ export type UserUncheckedCreateWithoutCoachingInput = {
   student?: Prisma.StudentUncheckedCreateNestedOneWithoutUserInput
   exams?: Prisma.ExamUncheckedCreateNestedManyWithoutUserInput
   questions?: Prisma.QuestionUncheckedCreateNestedManyWithoutUserInput
+  tests?: Prisma.TestUncheckedCreateNestedManyWithoutUserInput
   testAttempts?: Prisma.TestAttemptUncheckedCreateNestedManyWithoutUserInput
 }
 
-export type UserCreateOrConnectWithoutCoachingInput = {
+export type UserCreateOrConnectWithoutCoachingsInput = {
   where: Prisma.UserWhereUniqueInput
-  create: Prisma.XOR<Prisma.UserCreateWithoutCoachingInput, Prisma.UserUncheckedCreateWithoutCoachingInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutCoachingsInput, Prisma.UserUncheckedCreateWithoutCoachingsInput>
 }
 
-export type UserCreateManyCoachingInputEnvelope = {
-  data: Prisma.UserCreateManyCoachingInput | Prisma.UserCreateManyCoachingInput[]
-  skipDuplicates?: boolean
+export type UserUpsertWithoutCoachingsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutCoachingsInput, Prisma.UserUncheckedUpdateWithoutCoachingsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutCoachingsInput, Prisma.UserUncheckedCreateWithoutCoachingsInput>
+  where?: Prisma.UserWhereInput
 }
 
-export type UserUpsertWithWhereUniqueWithoutCoachingInput = {
-  where: Prisma.UserWhereUniqueInput
-  update: Prisma.XOR<Prisma.UserUpdateWithoutCoachingInput, Prisma.UserUncheckedUpdateWithoutCoachingInput>
-  create: Prisma.XOR<Prisma.UserCreateWithoutCoachingInput, Prisma.UserUncheckedCreateWithoutCoachingInput>
+export type UserUpdateToOneWithWhereWithoutCoachingsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutCoachingsInput, Prisma.UserUncheckedUpdateWithoutCoachingsInput>
 }
 
-export type UserUpdateWithWhereUniqueWithoutCoachingInput = {
-  where: Prisma.UserWhereUniqueInput
-  data: Prisma.XOR<Prisma.UserUpdateWithoutCoachingInput, Prisma.UserUncheckedUpdateWithoutCoachingInput>
+export type UserUpdateWithoutCoachingsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  student?: Prisma.StudentUpdateOneWithoutUserNestedInput
+  exams?: Prisma.ExamUpdateManyWithoutUserNestedInput
+  questions?: Prisma.QuestionUpdateManyWithoutUserNestedInput
+  tests?: Prisma.TestUpdateManyWithoutUserNestedInput
+  testAttempts?: Prisma.TestAttemptUpdateManyWithoutUserNestedInput
 }
 
-export type UserUpdateManyWithWhereWithoutCoachingInput = {
-  where: Prisma.UserScalarWhereInput
-  data: Prisma.XOR<Prisma.UserUpdateManyMutationInput, Prisma.UserUncheckedUpdateManyWithoutCoachingInput>
-}
-
-export type UserScalarWhereInput = {
-  AND?: Prisma.UserScalarWhereInput | Prisma.UserScalarWhereInput[]
-  OR?: Prisma.UserScalarWhereInput[]
-  NOT?: Prisma.UserScalarWhereInput | Prisma.UserScalarWhereInput[]
-  id?: Prisma.StringFilter<"User"> | string
-  email?: Prisma.StringFilter<"User"> | string
-  password?: Prisma.StringFilter<"User"> | string
-  role?: Prisma.EnumRoleFilter<"User"> | $Enums.Role
-  isActive?: Prisma.BoolFilter<"User"> | boolean
-  createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
-  updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
-  coachingId?: Prisma.StringNullableFilter<"User"> | string | null
+export type UserUncheckedUpdateWithoutCoachingsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  student?: Prisma.StudentUncheckedUpdateOneWithoutUserNestedInput
+  exams?: Prisma.ExamUncheckedUpdateManyWithoutUserNestedInput
+  questions?: Prisma.QuestionUncheckedUpdateManyWithoutUserNestedInput
+  tests?: Prisma.TestUncheckedUpdateManyWithoutUserNestedInput
+  testAttempts?: Prisma.TestAttemptUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutExamsInput = {
@@ -692,8 +668,9 @@ export type UserCreateWithoutExamsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   student?: Prisma.StudentCreateNestedOneWithoutUserInput
-  coaching?: Prisma.CoachingCreateNestedOneWithoutUsersInput
+  coachings?: Prisma.UserCoachingCreateNestedManyWithoutUserInput
   questions?: Prisma.QuestionCreateNestedManyWithoutUserInput
+  tests?: Prisma.TestCreateNestedManyWithoutUserInput
   testAttempts?: Prisma.TestAttemptCreateNestedManyWithoutUserInput
 }
 
@@ -705,9 +682,10 @@ export type UserUncheckedCreateWithoutExamsInput = {
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
-  coachingId?: string | null
   student?: Prisma.StudentUncheckedCreateNestedOneWithoutUserInput
+  coachings?: Prisma.UserCoachingUncheckedCreateNestedManyWithoutUserInput
   questions?: Prisma.QuestionUncheckedCreateNestedManyWithoutUserInput
+  tests?: Prisma.TestUncheckedCreateNestedManyWithoutUserInput
   testAttempts?: Prisma.TestAttemptUncheckedCreateNestedManyWithoutUserInput
 }
 
@@ -736,8 +714,9 @@ export type UserUpdateWithoutExamsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   student?: Prisma.StudentUpdateOneWithoutUserNestedInput
-  coaching?: Prisma.CoachingUpdateOneWithoutUsersNestedInput
+  coachings?: Prisma.UserCoachingUpdateManyWithoutUserNestedInput
   questions?: Prisma.QuestionUpdateManyWithoutUserNestedInput
+  tests?: Prisma.TestUpdateManyWithoutUserNestedInput
   testAttempts?: Prisma.TestAttemptUpdateManyWithoutUserNestedInput
 }
 
@@ -749,9 +728,10 @@ export type UserUncheckedUpdateWithoutExamsInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  coachingId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   student?: Prisma.StudentUncheckedUpdateOneWithoutUserNestedInput
+  coachings?: Prisma.UserCoachingUncheckedUpdateManyWithoutUserNestedInput
   questions?: Prisma.QuestionUncheckedUpdateManyWithoutUserNestedInput
+  tests?: Prisma.TestUncheckedUpdateManyWithoutUserNestedInput
   testAttempts?: Prisma.TestAttemptUncheckedUpdateManyWithoutUserNestedInput
 }
 
@@ -764,8 +744,9 @@ export type UserCreateWithoutQuestionsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   student?: Prisma.StudentCreateNestedOneWithoutUserInput
-  coaching?: Prisma.CoachingCreateNestedOneWithoutUsersInput
+  coachings?: Prisma.UserCoachingCreateNestedManyWithoutUserInput
   exams?: Prisma.ExamCreateNestedManyWithoutUserInput
+  tests?: Prisma.TestCreateNestedManyWithoutUserInput
   testAttempts?: Prisma.TestAttemptCreateNestedManyWithoutUserInput
 }
 
@@ -777,9 +758,10 @@ export type UserUncheckedCreateWithoutQuestionsInput = {
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
-  coachingId?: string | null
   student?: Prisma.StudentUncheckedCreateNestedOneWithoutUserInput
+  coachings?: Prisma.UserCoachingUncheckedCreateNestedManyWithoutUserInput
   exams?: Prisma.ExamUncheckedCreateNestedManyWithoutUserInput
+  tests?: Prisma.TestUncheckedCreateNestedManyWithoutUserInput
   testAttempts?: Prisma.TestAttemptUncheckedCreateNestedManyWithoutUserInput
 }
 
@@ -808,8 +790,9 @@ export type UserUpdateWithoutQuestionsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   student?: Prisma.StudentUpdateOneWithoutUserNestedInput
-  coaching?: Prisma.CoachingUpdateOneWithoutUsersNestedInput
+  coachings?: Prisma.UserCoachingUpdateManyWithoutUserNestedInput
   exams?: Prisma.ExamUpdateManyWithoutUserNestedInput
+  tests?: Prisma.TestUpdateManyWithoutUserNestedInput
   testAttempts?: Prisma.TestAttemptUpdateManyWithoutUserNestedInput
 }
 
@@ -821,9 +804,86 @@ export type UserUncheckedUpdateWithoutQuestionsInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  coachingId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   student?: Prisma.StudentUncheckedUpdateOneWithoutUserNestedInput
+  coachings?: Prisma.UserCoachingUncheckedUpdateManyWithoutUserNestedInput
   exams?: Prisma.ExamUncheckedUpdateManyWithoutUserNestedInput
+  tests?: Prisma.TestUncheckedUpdateManyWithoutUserNestedInput
+  testAttempts?: Prisma.TestAttemptUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutTestsInput = {
+  id?: string
+  email: string
+  password: string
+  role?: $Enums.Role
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  student?: Prisma.StudentCreateNestedOneWithoutUserInput
+  coachings?: Prisma.UserCoachingCreateNestedManyWithoutUserInput
+  exams?: Prisma.ExamCreateNestedManyWithoutUserInput
+  questions?: Prisma.QuestionCreateNestedManyWithoutUserInput
+  testAttempts?: Prisma.TestAttemptCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutTestsInput = {
+  id?: string
+  email: string
+  password: string
+  role?: $Enums.Role
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  student?: Prisma.StudentUncheckedCreateNestedOneWithoutUserInput
+  coachings?: Prisma.UserCoachingUncheckedCreateNestedManyWithoutUserInput
+  exams?: Prisma.ExamUncheckedCreateNestedManyWithoutUserInput
+  questions?: Prisma.QuestionUncheckedCreateNestedManyWithoutUserInput
+  testAttempts?: Prisma.TestAttemptUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutTestsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutTestsInput, Prisma.UserUncheckedCreateWithoutTestsInput>
+}
+
+export type UserUpsertWithoutTestsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutTestsInput, Prisma.UserUncheckedUpdateWithoutTestsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutTestsInput, Prisma.UserUncheckedCreateWithoutTestsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutTestsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutTestsInput, Prisma.UserUncheckedUpdateWithoutTestsInput>
+}
+
+export type UserUpdateWithoutTestsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  student?: Prisma.StudentUpdateOneWithoutUserNestedInput
+  coachings?: Prisma.UserCoachingUpdateManyWithoutUserNestedInput
+  exams?: Prisma.ExamUpdateManyWithoutUserNestedInput
+  questions?: Prisma.QuestionUpdateManyWithoutUserNestedInput
+  testAttempts?: Prisma.TestAttemptUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutTestsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  student?: Prisma.StudentUncheckedUpdateOneWithoutUserNestedInput
+  coachings?: Prisma.UserCoachingUncheckedUpdateManyWithoutUserNestedInput
+  exams?: Prisma.ExamUncheckedUpdateManyWithoutUserNestedInput
+  questions?: Prisma.QuestionUncheckedUpdateManyWithoutUserNestedInput
   testAttempts?: Prisma.TestAttemptUncheckedUpdateManyWithoutUserNestedInput
 }
 
@@ -836,9 +896,10 @@ export type UserCreateWithoutTestAttemptsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   student?: Prisma.StudentCreateNestedOneWithoutUserInput
-  coaching?: Prisma.CoachingCreateNestedOneWithoutUsersInput
+  coachings?: Prisma.UserCoachingCreateNestedManyWithoutUserInput
   exams?: Prisma.ExamCreateNestedManyWithoutUserInput
   questions?: Prisma.QuestionCreateNestedManyWithoutUserInput
+  tests?: Prisma.TestCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutTestAttemptsInput = {
@@ -849,10 +910,11 @@ export type UserUncheckedCreateWithoutTestAttemptsInput = {
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
-  coachingId?: string | null
   student?: Prisma.StudentUncheckedCreateNestedOneWithoutUserInput
+  coachings?: Prisma.UserCoachingUncheckedCreateNestedManyWithoutUserInput
   exams?: Prisma.ExamUncheckedCreateNestedManyWithoutUserInput
   questions?: Prisma.QuestionUncheckedCreateNestedManyWithoutUserInput
+  tests?: Prisma.TestUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutTestAttemptsInput = {
@@ -880,9 +942,10 @@ export type UserUpdateWithoutTestAttemptsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   student?: Prisma.StudentUpdateOneWithoutUserNestedInput
-  coaching?: Prisma.CoachingUpdateOneWithoutUsersNestedInput
+  coachings?: Prisma.UserCoachingUpdateManyWithoutUserNestedInput
   exams?: Prisma.ExamUpdateManyWithoutUserNestedInput
   questions?: Prisma.QuestionUpdateManyWithoutUserNestedInput
+  tests?: Prisma.TestUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutTestAttemptsInput = {
@@ -893,58 +956,11 @@ export type UserUncheckedUpdateWithoutTestAttemptsInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  coachingId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   student?: Prisma.StudentUncheckedUpdateOneWithoutUserNestedInput
+  coachings?: Prisma.UserCoachingUncheckedUpdateManyWithoutUserNestedInput
   exams?: Prisma.ExamUncheckedUpdateManyWithoutUserNestedInput
   questions?: Prisma.QuestionUncheckedUpdateManyWithoutUserNestedInput
-}
-
-export type UserCreateManyCoachingInput = {
-  id?: string
-  email: string
-  password: string
-  role?: $Enums.Role
-  isActive?: boolean
-  createdAt?: Date | string
-  updatedAt?: Date | string
-}
-
-export type UserUpdateWithoutCoachingInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  email?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.StringFieldUpdateOperationsInput | string
-  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
-  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  student?: Prisma.StudentUpdateOneWithoutUserNestedInput
-  exams?: Prisma.ExamUpdateManyWithoutUserNestedInput
-  questions?: Prisma.QuestionUpdateManyWithoutUserNestedInput
-  testAttempts?: Prisma.TestAttemptUpdateManyWithoutUserNestedInput
-}
-
-export type UserUncheckedUpdateWithoutCoachingInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  email?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.StringFieldUpdateOperationsInput | string
-  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
-  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  student?: Prisma.StudentUncheckedUpdateOneWithoutUserNestedInput
-  exams?: Prisma.ExamUncheckedUpdateManyWithoutUserNestedInput
-  questions?: Prisma.QuestionUncheckedUpdateManyWithoutUserNestedInput
-  testAttempts?: Prisma.TestAttemptUncheckedUpdateManyWithoutUserNestedInput
-}
-
-export type UserUncheckedUpdateManyWithoutCoachingInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  email?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.StringFieldUpdateOperationsInput | string
-  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
-  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  tests?: Prisma.TestUncheckedUpdateManyWithoutUserNestedInput
 }
 
 
@@ -953,14 +969,18 @@ export type UserUncheckedUpdateManyWithoutCoachingInput = {
  */
 
 export type UserCountOutputType = {
+  coachings: number
   exams: number
   questions: number
+  tests: number
   testAttempts: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  coachings?: boolean | UserCountOutputTypeCountCoachingsArgs
   exams?: boolean | UserCountOutputTypeCountExamsArgs
   questions?: boolean | UserCountOutputTypeCountQuestionsArgs
+  tests?: boolean | UserCountOutputTypeCountTestsArgs
   testAttempts?: boolean | UserCountOutputTypeCountTestAttemptsArgs
 }
 
@@ -972,6 +992,13 @@ export type UserCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensi
    * Select specific fields to fetch from the UserCountOutputType
    */
   select?: Prisma.UserCountOutputTypeSelect<ExtArgs> | null
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountCoachingsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.UserCoachingWhereInput
 }
 
 /**
@@ -991,6 +1018,13 @@ export type UserCountOutputTypeCountQuestionsArgs<ExtArgs extends runtime.Types.
 /**
  * UserCountOutputType without action
  */
+export type UserCountOutputTypeCountTestsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.TestWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
 export type UserCountOutputTypeCountTestAttemptsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.TestAttemptWhereInput
 }
@@ -1004,11 +1038,11 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   isActive?: boolean
   createdAt?: boolean
   updatedAt?: boolean
-  coachingId?: boolean
   student?: boolean | Prisma.User$studentArgs<ExtArgs>
-  coaching?: boolean | Prisma.User$coachingArgs<ExtArgs>
+  coachings?: boolean | Prisma.User$coachingsArgs<ExtArgs>
   exams?: boolean | Prisma.User$examsArgs<ExtArgs>
   questions?: boolean | Prisma.User$questionsArgs<ExtArgs>
+  tests?: boolean | Prisma.User$testsArgs<ExtArgs>
   testAttempts?: boolean | Prisma.User$testAttemptsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
@@ -1021,8 +1055,6 @@ export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   isActive?: boolean
   createdAt?: boolean
   updatedAt?: boolean
-  coachingId?: boolean
-  coaching?: boolean | Prisma.User$coachingArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
 export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -1033,8 +1065,6 @@ export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   isActive?: boolean
   createdAt?: boolean
   updatedAt?: boolean
-  coachingId?: boolean
-  coaching?: boolean | Prisma.User$coachingArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
 export type UserSelectScalar = {
@@ -1045,32 +1075,29 @@ export type UserSelectScalar = {
   isActive?: boolean
   createdAt?: boolean
   updatedAt?: boolean
-  coachingId?: boolean
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "email" | "password" | "role" | "isActive" | "createdAt" | "updatedAt" | "coachingId", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "email" | "password" | "role" | "isActive" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   student?: boolean | Prisma.User$studentArgs<ExtArgs>
-  coaching?: boolean | Prisma.User$coachingArgs<ExtArgs>
+  coachings?: boolean | Prisma.User$coachingsArgs<ExtArgs>
   exams?: boolean | Prisma.User$examsArgs<ExtArgs>
   questions?: boolean | Prisma.User$questionsArgs<ExtArgs>
+  tests?: boolean | Prisma.User$testsArgs<ExtArgs>
   testAttempts?: boolean | Prisma.User$testAttemptsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
-export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  coaching?: boolean | Prisma.User$coachingArgs<ExtArgs>
-}
-export type UserIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  coaching?: boolean | Prisma.User$coachingArgs<ExtArgs>
-}
+export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
+export type UserIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
 
 export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "User"
   objects: {
     student: Prisma.$StudentPayload<ExtArgs> | null
-    coaching: Prisma.$CoachingPayload<ExtArgs> | null
+    coachings: Prisma.$UserCoachingPayload<ExtArgs>[]
     exams: Prisma.$ExamPayload<ExtArgs>[]
     questions: Prisma.$QuestionPayload<ExtArgs>[]
+    tests: Prisma.$TestPayload<ExtArgs>[]
     testAttempts: Prisma.$TestAttemptPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
@@ -1081,7 +1108,6 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     isActive: boolean
     createdAt: Date
     updatedAt: Date
-    coachingId: string | null
   }, ExtArgs["result"]["user"]>
   composites: {}
 }
@@ -1477,9 +1503,10 @@ readonly fields: UserFieldRefs;
 export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   student<T extends Prisma.User$studentArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$studentArgs<ExtArgs>>): Prisma.Prisma__StudentClient<runtime.Types.Result.GetResult<Prisma.$StudentPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
-  coaching<T extends Prisma.User$coachingArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$coachingArgs<ExtArgs>>): Prisma.Prisma__CoachingClient<runtime.Types.Result.GetResult<Prisma.$CoachingPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  coachings<T extends Prisma.User$coachingsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$coachingsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UserCoachingPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   exams<T extends Prisma.User$examsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$examsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ExamPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   questions<T extends Prisma.User$questionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$questionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$QuestionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  tests<T extends Prisma.User$testsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$testsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TestPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   testAttempts<T extends Prisma.User$testAttemptsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$testAttemptsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TestAttemptPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -1517,7 +1544,6 @@ export interface UserFieldRefs {
   readonly isActive: Prisma.FieldRef<"User", 'Boolean'>
   readonly createdAt: Prisma.FieldRef<"User", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"User", 'DateTime'>
-  readonly coachingId: Prisma.FieldRef<"User", 'String'>
 }
     
 
@@ -1772,10 +1798,6 @@ export type UserCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensions
    */
   data: Prisma.UserCreateManyInput | Prisma.UserCreateManyInput[]
   skipDuplicates?: boolean
-  /**
-   * Choose, which related nodes to fetch as well
-   */
-  include?: Prisma.UserIncludeCreateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -1846,10 +1868,6 @@ export type UserUpdateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensions
    * Limit how many Users to update.
    */
   limit?: number
-  /**
-   * Choose, which related nodes to fetch as well
-   */
-  include?: Prisma.UserIncludeUpdateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -1938,22 +1956,27 @@ export type User$studentArgs<ExtArgs extends runtime.Types.Extensions.InternalAr
 }
 
 /**
- * User.coaching
+ * User.coachings
  */
-export type User$coachingArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type User$coachingsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
-   * Select specific fields to fetch from the Coaching
+   * Select specific fields to fetch from the UserCoaching
    */
-  select?: Prisma.CoachingSelect<ExtArgs> | null
+  select?: Prisma.UserCoachingSelect<ExtArgs> | null
   /**
-   * Omit specific fields from the Coaching
+   * Omit specific fields from the UserCoaching
    */
-  omit?: Prisma.CoachingOmit<ExtArgs> | null
+  omit?: Prisma.UserCoachingOmit<ExtArgs> | null
   /**
    * Choose, which related nodes to fetch as well
    */
-  include?: Prisma.CoachingInclude<ExtArgs> | null
-  where?: Prisma.CoachingWhereInput
+  include?: Prisma.UserCoachingInclude<ExtArgs> | null
+  where?: Prisma.UserCoachingWhereInput
+  orderBy?: Prisma.UserCoachingOrderByWithRelationInput | Prisma.UserCoachingOrderByWithRelationInput[]
+  cursor?: Prisma.UserCoachingWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.UserCoachingScalarFieldEnum | Prisma.UserCoachingScalarFieldEnum[]
 }
 
 /**
@@ -2002,6 +2025,30 @@ export type User$questionsArgs<ExtArgs extends runtime.Types.Extensions.Internal
   take?: number
   skip?: number
   distinct?: Prisma.QuestionScalarFieldEnum | Prisma.QuestionScalarFieldEnum[]
+}
+
+/**
+ * User.tests
+ */
+export type User$testsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Test
+   */
+  select?: Prisma.TestSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Test
+   */
+  omit?: Prisma.TestOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.TestInclude<ExtArgs> | null
+  where?: Prisma.TestWhereInput
+  orderBy?: Prisma.TestOrderByWithRelationInput | Prisma.TestOrderByWithRelationInput[]
+  cursor?: Prisma.TestWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.TestScalarFieldEnum | Prisma.TestScalarFieldEnum[]
 }
 
 /**

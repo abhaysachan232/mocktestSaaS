@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { getCoachings } from "@/actions/coaching.actions";
-import CoachingTable from "@/components/coaching/CoachingTable";
+import CoachingTable from "@/components/dashboard/coaching/CoachingTable";
 
 export default async function CoachingsPage() {
   const result = await getCoachings();

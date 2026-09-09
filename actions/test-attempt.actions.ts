@@ -50,7 +50,7 @@ type SubmitResult = {
   totalMarks: number;
   positiveMarks: number;
   negativeMarks: number;
-  obtainedMarks: number;
+  marksObtained: number;
 
   percentage: number;
   accuracy: number;
@@ -957,8 +957,8 @@ export async function submitTestAttempt(
             negativeMarks:
               attempt.result.negativeMarks,
 
-            obtainedMarks:
-              attempt.result.obtainedMarks,
+            marksObtained:
+              attempt.result.marksObtained,
 
             percentage:
               attempt.result.percentage,
@@ -1120,7 +1120,7 @@ export async function submitTestAttempt(
         negativeMarks =
           roundNumber(negativeMarks);
 
-        const obtainedMarks =
+        const marksObtained =
           roundNumber(
             positiveMarks -
               negativeMarks,
@@ -1131,7 +1131,7 @@ export async function submitTestAttempt(
             ? Math.max(
                 0,
                 roundNumber(
-                  (obtainedMarks /
+                  (marksObtained /
                     attempt.test.totalMarks) *
                     100,
                 ),
@@ -1203,7 +1203,7 @@ export async function submitTestAttempt(
 
               positiveMarks,
               negativeMarks,
-              obtainedMarks,
+              marksObtained,
 
               percentage,
               accuracy,
@@ -1222,7 +1222,7 @@ export async function submitTestAttempt(
 
               positiveMarks,
               negativeMarks,
-              obtainedMarks,
+              marksObtained,
 
               percentage,
               accuracy,
@@ -1246,7 +1246,7 @@ export async function submitTestAttempt(
 
           positiveMarks,
           negativeMarks,
-          obtainedMarks,
+          marksObtained,
 
           percentage,
           accuracy,

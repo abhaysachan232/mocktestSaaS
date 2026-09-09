@@ -29,11 +29,16 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
               email: true,
               password: true,
               role: true,
-              coachingId: true,
+              isActive: true,
             },
           });
 
-          if (!user) return null;
+          if (!user) 
+            return null;
+          
+          if (!user.isActive) {
+            return null;
+          }
 
           const isValid = await bcrypt.compare(
             credentials.password as string,
@@ -46,7 +51,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             id: user.id,
             email: user.email,
             role: user.role,
-            coachingId: user.coachingId,
           };
         } catch (error) {
           console.error("AUTHORIZE ERROR", error);

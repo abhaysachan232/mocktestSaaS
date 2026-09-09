@@ -270,7 +270,7 @@ export type CoachingWhereInput = {
   isActive?: Prisma.BoolFilter<"Coaching"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Coaching"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Coaching"> | Date | string
-  users?: Prisma.UserListRelationFilter
+  users?: Prisma.UserCoachingListRelationFilter
 }
 
 export type CoachingOrderByWithRelationInput = {
@@ -290,7 +290,7 @@ export type CoachingOrderByWithRelationInput = {
   isActive?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
-  users?: Prisma.UserOrderByRelationAggregateInput
+  users?: Prisma.UserCoachingOrderByRelationAggregateInput
 }
 
 export type CoachingWhereUniqueInput = Prisma.AtLeast<{
@@ -313,7 +313,7 @@ export type CoachingWhereUniqueInput = Prisma.AtLeast<{
   isActive?: Prisma.BoolFilter<"Coaching"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Coaching"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Coaching"> | Date | string
-  users?: Prisma.UserListRelationFilter
+  users?: Prisma.UserCoachingListRelationFilter
 }, "id" | "code" | "mobile" | "idNumber">
 
 export type CoachingOrderByWithAggregationInput = {
@@ -377,7 +377,7 @@ export type CoachingCreateInput = {
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
-  users?: Prisma.UserCreateNestedManyWithoutCoachingInput
+  users?: Prisma.UserCoachingCreateNestedManyWithoutCoachingInput
 }
 
 export type CoachingUncheckedCreateInput = {
@@ -397,7 +397,7 @@ export type CoachingUncheckedCreateInput = {
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
-  users?: Prisma.UserUncheckedCreateNestedManyWithoutCoachingInput
+  users?: Prisma.UserCoachingUncheckedCreateNestedManyWithoutCoachingInput
 }
 
 export type CoachingUpdateInput = {
@@ -417,7 +417,7 @@ export type CoachingUpdateInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  users?: Prisma.UserUpdateManyWithoutCoachingNestedInput
+  users?: Prisma.UserCoachingUpdateManyWithoutCoachingNestedInput
 }
 
 export type CoachingUncheckedUpdateInput = {
@@ -437,7 +437,7 @@ export type CoachingUncheckedUpdateInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  users?: Prisma.UserUncheckedUpdateManyWithoutCoachingNestedInput
+  users?: Prisma.UserCoachingUncheckedUpdateManyWithoutCoachingNestedInput
 }
 
 export type CoachingCreateManyInput = {
@@ -497,11 +497,6 @@ export type CoachingUncheckedUpdateManyInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
-export type CoachingNullableScalarRelationFilter = {
-  is?: Prisma.CoachingWhereInput | null
-  isNot?: Prisma.CoachingWhereInput | null
-}
-
 export type CoachingCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   code?: Prisma.SortOrder
@@ -559,18 +554,25 @@ export type CoachingMinOrderByAggregateInput = {
   updatedAt?: Prisma.SortOrder
 }
 
+export type CoachingScalarRelationFilter = {
+  is?: Prisma.CoachingWhereInput
+  isNot?: Prisma.CoachingWhereInput
+}
+
+export type NullableStringFieldUpdateOperationsInput = {
+  set?: string | null
+}
+
 export type CoachingCreateNestedOneWithoutUsersInput = {
   create?: Prisma.XOR<Prisma.CoachingCreateWithoutUsersInput, Prisma.CoachingUncheckedCreateWithoutUsersInput>
   connectOrCreate?: Prisma.CoachingCreateOrConnectWithoutUsersInput
   connect?: Prisma.CoachingWhereUniqueInput
 }
 
-export type CoachingUpdateOneWithoutUsersNestedInput = {
+export type CoachingUpdateOneRequiredWithoutUsersNestedInput = {
   create?: Prisma.XOR<Prisma.CoachingCreateWithoutUsersInput, Prisma.CoachingUncheckedCreateWithoutUsersInput>
   connectOrCreate?: Prisma.CoachingCreateOrConnectWithoutUsersInput
   upsert?: Prisma.CoachingUpsertWithoutUsersInput
-  disconnect?: Prisma.CoachingWhereInput | boolean
-  delete?: Prisma.CoachingWhereInput | boolean
   connect?: Prisma.CoachingWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.CoachingUpdateToOneWithWhereWithoutUsersInput, Prisma.CoachingUpdateWithoutUsersInput>, Prisma.CoachingUncheckedUpdateWithoutUsersInput>
 }
@@ -694,7 +696,7 @@ export type CoachingCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Ext
  * CoachingCountOutputType without action
  */
 export type CoachingCountOutputTypeCountUsersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.UserWhereInput
+  where?: Prisma.UserCoachingWhereInput
 }
 
 
@@ -787,7 +789,7 @@ export type CoachingIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Ext
 export type $CoachingPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Coaching"
   objects: {
-    users: Prisma.$UserPayload<ExtArgs>[]
+    users: Prisma.$UserCoachingPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1200,7 +1202,7 @@ readonly fields: CoachingFieldRefs;
  */
 export interface Prisma__CoachingClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  users<T extends Prisma.Coaching$usersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Coaching$usersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  users<T extends Prisma.Coaching$usersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Coaching$usersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UserCoachingPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1643,23 +1645,23 @@ export type CoachingDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Inte
  */
 export type Coaching$usersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
-   * Select specific fields to fetch from the User
+   * Select specific fields to fetch from the UserCoaching
    */
-  select?: Prisma.UserSelect<ExtArgs> | null
+  select?: Prisma.UserCoachingSelect<ExtArgs> | null
   /**
-   * Omit specific fields from the User
+   * Omit specific fields from the UserCoaching
    */
-  omit?: Prisma.UserOmit<ExtArgs> | null
+  omit?: Prisma.UserCoachingOmit<ExtArgs> | null
   /**
    * Choose, which related nodes to fetch as well
    */
-  include?: Prisma.UserInclude<ExtArgs> | null
-  where?: Prisma.UserWhereInput
-  orderBy?: Prisma.UserOrderByWithRelationInput | Prisma.UserOrderByWithRelationInput[]
-  cursor?: Prisma.UserWhereUniqueInput
+  include?: Prisma.UserCoachingInclude<ExtArgs> | null
+  where?: Prisma.UserCoachingWhereInput
+  orderBy?: Prisma.UserCoachingOrderByWithRelationInput | Prisma.UserCoachingOrderByWithRelationInput[]
+  cursor?: Prisma.UserCoachingWhereUniqueInput
   take?: number
   skip?: number
-  distinct?: Prisma.UserScalarFieldEnum | Prisma.UserScalarFieldEnum[]
+  distinct?: Prisma.UserCoachingScalarFieldEnum | Prisma.UserCoachingScalarFieldEnum[]
 }
 
 /**

@@ -21,21 +21,20 @@ enum Role {
 }
 
 model User {
-  id           String        @id @default(cuid()) // Primary Key
-  email        String        @unique
+  id           String         @id @default(cuid()) // Primary Key
+  email        String         @unique
   password     String
-  role         Role          @default(STUDENT)
-  isActive     Boolean       @default(true)
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
+  role         Role           @default(STUDENT)
+  isActive     Boolean        @default(true)
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
   student      Student?
-  coachingId   String?
-  coaching     Coaching?     @relation(fields: [coachingId], references: [id])
+  coachings    UserCoaching[]
   exams        Exam[]
   questions    Question[]
+  tests        Test[]
   testAttempts TestAttempt[]
 
-  @@index([coachingId])
   @@index([role])
 }
 
@@ -49,10 +48,10 @@ model Student {
 }
 
 model Coaching {
-  id                  String   @id @default(cuid()) // Primary Key
-  code                String   @unique
+  id                  String         @id @default(cuid()) // Primary Key
+  code                String         @unique
   coachingName        String
-  mobile              String   @unique
+  mobile              String         @unique
   logo                String?
   logoPublicId        String?
   logoResourceType    String?
@@ -61,15 +60,28 @@ model Coaching {
   idProof             String? //upload id proof doc
   idProofPublicId     String?
   idProofResourceType String?
-  idNumber            String   @unique
-  isActive            Boolean  @default(true)
-  createdAt           DateTime @default(now())
-  updatedAt           DateTime @updatedAt
-  users               User[]
+  idNumber            String         @unique
+  isActive            Boolean        @default(true)
+  createdAt           DateTime       @default(now())
+  updatedAt           DateTime       @updatedAt
+  users               UserCoaching[]
 
   @@index([coachingName])
   @@index([mobile])
   @@index([isActive])
+}
+
+model UserCoaching {
+  id         String   @id @default(cuid())
+  userId     String
+  coachingId String
+  createdAt  DateTime @default(now())
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  coaching   Coaching @relation(fields: [coachingId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, coachingId])
+  @@index([userId])
+  @@index([coachingId])
 }
 
 enum CourseName {
@@ -211,6 +223,8 @@ enum TestStatus {
 
 model Test {
   id              String         @id @default(cuid())
+  userId          String?
+  user            User?          @relation(fields: [userId], references: [id], onDelete: SetNull)
   name            String
   slug            String         @unique
   description     String?

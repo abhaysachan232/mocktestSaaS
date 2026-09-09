@@ -54,6 +54,7 @@ export default function TestForm({ exams, initialData }: Props) {
     register,
     control,
     handleSubmit,
+    setValue,
     formState: { errors },
   } = useForm<TestFormValues>({
     resolver: zodResolver(testSchema),
@@ -170,7 +171,12 @@ export default function TestForm({ exams, initialData }: Props) {
       {/* =========================================
           BASIC DETAILS
           ========================================= */}
-      <TestBasicDetails register={register} errors={errors} />
+      <TestBasicDetails
+        register={register}
+        errors={errors}
+        setValue={setValue}
+        control={control}
+      />
 
       {/* =========================================
           EXAM

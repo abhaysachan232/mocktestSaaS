@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getCoachingById } from "@/actions/coaching.actions";
-import CoachingForm from "@/components/coaching/CoachingForm";
+import CoachingForm from "@/components/dashboard/coaching/CoachingForm";
 
 type Props = {
   params: Promise<{

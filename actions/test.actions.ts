@@ -1,6 +1,8 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+
+import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { testSchema, type TestFormValues } from "@/schemas/test";
 
@@ -10,12 +12,56 @@ type ActionResponse<T = unknown> = {
   data?: T;
 };
 
+type UserContext = {
+  id: string;
+  role: "ADMIN" | "COACHING";
+};
+
+async function getUserContext(): Promise<UserContext | null> {
+  const session = await auth();
+
+  const user = session?.user;
+
+  if (!user?.id) {
+    return null;
+  }
+
+  if (user.role !== "ADMIN" && user.role !== "COACHING") {
+    return null;
+  }
+
+  return {
+    id: user.id,
+    role: user.role,
+  };
+}
+
+function isAdmin(user: UserContext) {
+  return user.role === "ADMIN";
+}
+
+function getTestOwnerWhere(user: UserContext) {
+  if (isAdmin(user)) {
+    return {};
+  }
+
+  return {
+    userId: user.id,
+  };
+}
+
 export async function getTests() {
+  const user = await getUserContext();
+
+  if (!user) {
+    return [];
+  }
+
   return prisma.test.findMany({
+    where: getTestOwnerWhere(user),
     orderBy: {
       createdAt: "desc",
     },
-
     include: {
       exam: {
         select: {
@@ -23,7 +69,6 @@ export async function getTests() {
           name: true,
         },
       },
-
       _count: {
         select: {
           testQuestions: true,
@@ -34,11 +79,17 @@ export async function getTests() {
 }
 
 export async function getTestById(id: string) {
-  return prisma.test.findUnique({
+  const user = await getUserContext();
+
+  if (!user) {
+    return null;
+  }
+
+  return prisma.test.findFirst({
     where: {
       id,
+      ...getTestOwnerWhere(user),
     },
-
     include: {
       exam: {
         select: {
@@ -46,12 +97,10 @@ export async function getTestById(id: string) {
           name: true,
         },
       },
-
       testQuestions: {
         orderBy: {
           order: "asc",
         },
-
         select: {
           questionId: true,
           order: true,
@@ -62,11 +111,21 @@ export async function getTestById(id: string) {
 }
 
 export async function getTestExams() {
+  const user = await getUserContext();
+
+  if (!user) {
+    return [];
+  }
+
   return prisma.exam.findMany({
+    where: isAdmin(user)
+      ? {}
+      : {
+          userId: user.id,
+        },
     orderBy: {
       name: "asc",
     },
-
     select: {
       id: true,
       name: true,
@@ -76,14 +135,23 @@ export async function getTestExams() {
 }
 
 export async function getQuestionsForTest(examId: string) {
-  const exam = await prisma.exam.findUnique({
+  const user = await getUserContext();
+
+  if (!user) {
+    return [];
+  }
+
+  const exam = await prisma.exam.findFirst({
     where: {
       id: examId,
+      ...(isAdmin(user)
+        ? {}
+        : {
+            userId: user.id,
+          }),
     },
-
     select: {
       id: true,
-
       examTopics: {
         select: {
           topicId: true,
@@ -97,6 +165,7 @@ export async function getQuestionsForTest(examId: string) {
   }
 
   const topicIds = exam.examTopics.map((item) => item.topicId);
+
   if (topicIds.length === 0) {
     return [];
   }
@@ -106,24 +175,25 @@ export async function getQuestionsForTest(examId: string) {
       topicId: {
         in: topicIds,
       },
+      ...(isAdmin(user)
+        ? {}
+        : {
+            userId: user.id,
+          }),
     },
-
     orderBy: {
       createdAt: "desc",
     },
-
     select: {
       id: true,
       type: true,
       content: true,
-
       subject: {
         select: {
           id: true,
           name: true,
         },
       },
-
       topic: {
         select: {
           id: true,
@@ -134,15 +204,38 @@ export async function getQuestionsForTest(examId: string) {
   });
 }
 
-async function validateTestQuestions(examId: string, questionIds: string[]) {
-  const exam = await prisma.exam.findUnique({
+async function validateTestQuestions(
+  user: UserContext,
+  examId: string,
+  questionIds: string[],
+) {
+  const uniqueQuestionIds = [...new Set(questionIds)];
+
+  if (uniqueQuestionIds.length === 0) {
+    return {
+      valid: false,
+      message: "At least one question is required",
+    };
+  }
+
+  if (uniqueQuestionIds.length !== questionIds.length) {
+    return {
+      valid: false,
+      message: "Duplicate questions are not allowed",
+    };
+  }
+
+  const exam = await prisma.exam.findFirst({
     where: {
       id: examId,
+      ...(isAdmin(user)
+        ? {}
+        : {
+            userId: user.id,
+          }),
     },
-
     select: {
       id: true,
-
       examTopics: {
         select: {
           topicId: true,
@@ -154,28 +247,34 @@ async function validateTestQuestions(examId: string, questionIds: string[]) {
   if (!exam) {
     return {
       valid: false,
-      message: "Selected exam not found",
+      message: "Selected exam not found or you do not have access to it",
     };
   }
 
   const topicIds = new Set(exam.examTopics.map((item) => item.topicId));
+
   const questions = await prisma.question.findMany({
     where: {
       id: {
-        in: questionIds,
+        in: uniqueQuestionIds,
       },
+      ...(isAdmin(user)
+        ? {}
+        : {
+            userId: user.id,
+          }),
     },
-
     select: {
       id: true,
       topicId: true,
     },
   });
 
-  if (questions.length !== questionIds.length) {
+  if (questions.length !== uniqueQuestionIds.length) {
     return {
       valid: false,
-      message: "One or more selected questions are invalid",
+      message:
+        "One or more selected questions are invalid or you do not have access to them",
     };
   }
 
@@ -199,6 +298,15 @@ async function validateTestQuestions(examId: string, questionIds: string[]) {
 export async function createTest(
   values: TestFormValues,
 ): Promise<ActionResponse> {
+  const user = await getUserContext();
+
+  if (!user) {
+    return {
+      success: false,
+      message: "Unauthorized",
+    };
+  }
+
   const parsed = testSchema.safeParse(values);
 
   if (!parsed.success) {
@@ -215,6 +323,9 @@ export async function createTest(
       where: {
         slug: data.slug,
       },
+      select: {
+        id: true,
+      },
     });
 
     if (existing) {
@@ -225,6 +336,7 @@ export async function createTest(
     }
 
     const questionValidation = await validateTestQuestions(
+      user,
       data.examId,
       data.questionIds,
     );
@@ -244,6 +356,7 @@ export async function createTest(
           description: data.description || null,
           testType: data.testType,
           examId: data.examId,
+          userId: user.id,
           duration: data.duration,
           totalMarks: data.totalMarks,
           totalQuestions: data.totalQuestions,
@@ -285,6 +398,15 @@ export async function updateTest(
   id: string,
   values: TestFormValues,
 ): Promise<ActionResponse> {
+  const user = await getUserContext();
+
+  if (!user) {
+    return {
+      success: false,
+      message: "Unauthorized",
+    };
+  }
+
   const parsed = testSchema.safeParse(values);
 
   if (!parsed.success) {
@@ -297,11 +419,11 @@ export async function updateTest(
   const data = parsed.data;
 
   try {
-    const existing = await prisma.test.findUnique({
+    const existing = await prisma.test.findFirst({
       where: {
         id,
+        ...getTestOwnerWhere(user),
       },
-
       select: {
         id: true,
         status: true,
@@ -311,7 +433,7 @@ export async function updateTest(
     if (!existing) {
       return {
         success: false,
-        message: "Test not found",
+        message: "Test not found or you do not have access to it",
       };
     }
 
@@ -322,13 +444,22 @@ export async function updateTest(
       };
     }
 
+    if (existing.status === "ARCHIVED") {
+      return {
+        success: false,
+        message: "Archived test cannot be edited",
+      };
+    }
+
     const duplicate = await prisma.test.findFirst({
       where: {
         slug: data.slug,
-
         NOT: {
           id,
         },
+      },
+      select: {
+        id: true,
       },
     });
 
@@ -340,6 +471,7 @@ export async function updateTest(
     }
 
     const questionValidation = await validateTestQuestions(
+      user,
       data.examId,
       data.questionIds,
     );
@@ -356,7 +488,6 @@ export async function updateTest(
         where: {
           id,
         },
-
         data: {
           name: data.name,
           slug: data.slug,
@@ -404,12 +535,21 @@ export async function updateTest(
 }
 
 export async function deleteTest(id: string): Promise<ActionResponse> {
+  const user = await getUserContext();
+
+  if (!user) {
+    return {
+      success: false,
+      message: "Unauthorized",
+    };
+  }
+
   try {
-    const test = await prisma.test.findUnique({
+    const test = await prisma.test.findFirst({
       where: {
         id,
+        ...getTestOwnerWhere(user),
       },
-
       select: {
         id: true,
         status: true,
@@ -419,7 +559,7 @@ export async function deleteTest(id: string): Promise<ActionResponse> {
     if (!test) {
       return {
         success: false,
-        message: "Test not found",
+        message: "Test not found or you do not have access to it",
       };
     }
 
@@ -432,7 +572,7 @@ export async function deleteTest(id: string): Promise<ActionResponse> {
 
     await prisma.test.delete({
       where: {
-        id,
+        id: test.id,
       },
     });
 
@@ -453,12 +593,21 @@ export async function deleteTest(id: string): Promise<ActionResponse> {
 }
 
 export async function publishTest(id: string): Promise<ActionResponse> {
+  const user = await getUserContext();
+
+  if (!user) {
+    return {
+      success: false,
+      message: "Unauthorized",
+    };
+  }
+
   try {
-    const test = await prisma.test.findUnique({
+    const test = await prisma.test.findFirst({
       where: {
         id,
+        ...getTestOwnerWhere(user),
       },
-
       include: {
         testQuestions: {
           select: {
@@ -471,7 +620,7 @@ export async function publishTest(id: string): Promise<ActionResponse> {
     if (!test) {
       return {
         success: false,
-        message: "Test not found",
+        message: "Test not found or you do not have access to it",
       };
     }
 
@@ -505,9 +654,8 @@ export async function publishTest(id: string): Promise<ActionResponse> {
 
     await prisma.test.update({
       where: {
-        id,
+        id: test.id,
       },
-
       data: {
         status: "PUBLISHED",
         publishedAt: new Date(),
@@ -532,12 +680,21 @@ export async function publishTest(id: string): Promise<ActionResponse> {
 }
 
 export async function unpublishTest(id: string): Promise<ActionResponse> {
+  const user = await getUserContext();
+
+  if (!user) {
+    return {
+      success: false,
+      message: "Unauthorized",
+    };
+  }
+
   try {
-    const test = await prisma.test.findUnique({
+    const test = await prisma.test.findFirst({
       where: {
         id,
+        ...getTestOwnerWhere(user),
       },
-
       select: {
         id: true,
         status: true,
@@ -547,7 +704,7 @@ export async function unpublishTest(id: string): Promise<ActionResponse> {
     if (!test) {
       return {
         success: false,
-        message: "Test not found",
+        message: "Test not found or you do not have access to it",
       };
     }
 
@@ -560,9 +717,8 @@ export async function unpublishTest(id: string): Promise<ActionResponse> {
 
     await prisma.test.update({
       where: {
-        id,
+        id: test.id,
       },
-
       data: {
         status: "DRAFT",
         publishedAt: null,
@@ -587,25 +743,45 @@ export async function unpublishTest(id: string): Promise<ActionResponse> {
 }
 
 export async function archiveTest(id: string): Promise<ActionResponse> {
+  const user = await getUserContext();
+
+  if (!user) {
+    return {
+      success: false,
+      message: "Unauthorized",
+    };
+  }
+
   try {
-    const test = await prisma.test.findUnique({
+    const test = await prisma.test.findFirst({
       where: {
         id,
+        ...getTestOwnerWhere(user),
+      },
+      select: {
+        id: true,
+        status: true,
       },
     });
 
     if (!test) {
       return {
         success: false,
-        message: "Test not found",
+        message: "Test not found or you do not have access to it",
+      };
+    }
+
+    if (test.status === "ARCHIVED") {
+      return {
+        success: false,
+        message: "Test is already archived",
       };
     }
 
     await prisma.test.update({
       where: {
-        id,
+        id: test.id,
       },
-
       data: {
         status: "ARCHIVED",
       },
@@ -664,7 +840,6 @@ export async function getTestForEngine(id: string) {
       id,
       status: "PUBLISHED",
     },
-
     select: {
       id: true,
       name: true,
@@ -674,21 +849,17 @@ export async function getTestForEngine(id: string) {
       totalQuestions: true,
       negativeMarking: true,
       negativeMarks: true,
-
       testQuestions: {
         orderBy: {
           order: "asc",
         },
-
         select: {
           order: true,
-
           question: {
             select: {
               id: true,
               type: true,
               content: true,
-
               options: {
                 select: {
                   id: true,
@@ -696,14 +867,12 @@ export async function getTestForEngine(id: string) {
                   questionId: true,
                 },
               },
-
               subject: {
                 select: {
                   id: true,
                   name: true,
                 },
               },
-
               topic: {
                 select: {
                   id: true,

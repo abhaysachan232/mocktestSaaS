@@ -54,6 +54,7 @@ export const ModelName = {
   User: 'User',
   Student: 'Student',
   Coaching: 'Coaching',
+  UserCoaching: 'UserCoaching',
   Coupon: 'Coupon',
   Subject: 'Subject',
   Topic: 'Topic',
@@ -92,8 +93,7 @@ export const UserScalarFieldEnum = {
   role: 'role',
   isActive: 'isActive',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt',
-  coachingId: 'coachingId'
+  updatedAt: 'updatedAt'
 } as const
 
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
@@ -130,6 +130,16 @@ export const CoachingScalarFieldEnum = {
 } as const
 
 export type CoachingScalarFieldEnum = (typeof CoachingScalarFieldEnum)[keyof typeof CoachingScalarFieldEnum]
+
+
+export const UserCoachingScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  coachingId: 'coachingId',
+  createdAt: 'createdAt'
+} as const
+
+export type UserCoachingScalarFieldEnum = (typeof UserCoachingScalarFieldEnum)[keyof typeof UserCoachingScalarFieldEnum]
 
 
 export const CouponScalarFieldEnum = {
@@ -216,6 +226,7 @@ export type QuestionOptionScalarFieldEnum = (typeof QuestionOptionScalarFieldEnu
 
 export const TestScalarFieldEnum = {
   id: 'id',
+  userId: 'userId',
   name: 'name',
   slug: 'slug',
   description: 'description',

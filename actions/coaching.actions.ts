@@ -10,8 +10,6 @@ import {
 } from "@/schemas/coaching.schema";
 import { deleteCloudinaryFile, uploadFile } from "@/actions/upload.actions";
 
-
-
 function getString(formData: FormData, key: string) {
   const value = formData.get(key);
   return typeof value === "string" ? value.trim() : "";
@@ -19,17 +17,80 @@ function getString(formData: FormData, key: string) {
 
 function getFile(formData: FormData, key: string): File | null {
   const value = formData.get(key);
+
   if (value instanceof File && value.size > 0) {
     return value;
   }
+
   return null;
 }
 
-/* =========================================================
-   CREATE
-========================================================= */
+type UploadData = {
+  secure_url: string;
+  public_id: string;
+  resource_type: string;
+};
+
+async function uploadLogo(
+  file: File,
+): Promise<
+  { success: true; data: UploadData } | { success: false; error: string }
+> {
+  const formData = new FormData();
+  formData.append("file", file);
+
+  const result = await uploadFile(formData, {
+    folder: "coaching/logos",
+    maxSizeMB: 2,
+    resourceType: "image",
+    allowedTypes: ["image/jpeg", "image/png", "image/webp"],
+  });
+
+  if (!result.success) {
+    return {
+      success: false,
+      error: result.error ?? "Failed to upload logo",
+    };
+  }
+
+  return {
+    success: true,
+    data: result.data,
+  };
+}
+
+async function uploadIdProof(
+  file: File,
+): Promise<
+  { success: true; data: UploadData } | { success: false; error: string }
+> {
+  const formData = new FormData();
+  formData.append("file", file);
+
+  const result = await uploadFile(formData, {
+    folder: "coaching/id-proofs",
+    maxSizeMB: 5,
+    resourceType: "auto",
+    allowedTypes: ["application/pdf", "image/jpeg", "image/png", "image/webp"],
+  });
+
+  if (!result.success) {
+    return {
+      success: false,
+      error: result.error ?? "Failed to upload ID proof",
+    };
+  }
+
+  return {
+    success: true,
+    data: result.data,
+  };
+}
 
 export async function createCoaching(formData: FormData) {
+  let logoData: UploadData | null = null;
+  let idProofData: UploadData | null = null;
+
   try {
     const session = await auth();
 
@@ -62,19 +123,44 @@ export async function createCoaching(formData: FormData) {
 
     const data = parsed.data;
 
-    const logoFile = getFile(formData, "logo");
+    const [existingCode, existingMobile, existingIdNumber, existingUser] =
+      await Promise.all([
+        prisma.coaching.findUnique({
+          where: {
+            code: data.code,
+          },
+          select: {
+            id: true,
+          },
+        }),
 
-    const idProofFile = getFile(formData, "idProof");
+        prisma.coaching.findUnique({
+          where: {
+            mobile: data.mobile,
+          },
+          select: {
+            id: true,
+          },
+        }),
 
-    /* -----------------------------------------
-       Duplicate checks
-    ----------------------------------------- */
+        prisma.coaching.findUnique({
+          where: {
+            idNumber: data.idNumber,
+          },
+          select: {
+            id: true,
+          },
+        }),
 
-    const existingCode = await prisma.coaching.findUnique({
-      where: {
-        code: data.code,
-      },
-    });
+        prisma.user.findUnique({
+          where: {
+            email: data.email,
+          },
+          select: {
+            id: true,
+          },
+        }),
+      ]);
 
     if (existingCode) {
       return {
@@ -83,24 +169,12 @@ export async function createCoaching(formData: FormData) {
       };
     }
 
-    const existingMobile = await prisma.coaching.findUnique({
-      where: {
-        mobile: data.mobile,
-      },
-    });
-
     if (existingMobile) {
       return {
         success: false,
         error: "Mobile number already exists",
       };
     }
-
-    const existingIdNumber = await prisma.coaching.findUnique({
-      where: {
-        idNumber: data.idNumber,
-      },
-    });
 
     if (existingIdNumber) {
       return {
@@ -109,12 +183,6 @@ export async function createCoaching(formData: FormData) {
       };
     }
 
-    const existingUser = await prisma.user.findUnique({
-      where: {
-        email: data.email,
-      },
-    });
-
     if (existingUser) {
       return {
         success: false,
@@ -122,85 +190,41 @@ export async function createCoaching(formData: FormData) {
       };
     }
 
-    /* -----------------------------------------
-       Upload files
-    ----------------------------------------- */
+    const logoFile = getFile(formData, "logo");
+    const idProofFile = getFile(formData, "idProof");
 
-    let logoData: {
-      secure_url: string;
-      public_id: string;
-      resource_type: string;
-    } | null = null;
+    if (logoFile) {
+      const result = await uploadLogo(logoFile);
 
-    let idProofData: {
-      secure_url: string;
-      public_id: string;
-      resource_type: string;
-    } | null = null;
+      if (!result.success) {
+        return result;
+      }
+
+      logoData = result.data;
+    }
+
+    if (idProofFile) {
+      const result = await uploadIdProof(idProofFile);
+
+      if (!result.success) {
+        if (logoData) {
+          await deleteCloudinaryFile(
+            logoData.public_id,
+            logoData.resource_type,
+          );
+        }
+
+        return result;
+      }
+
+      idProofData = result.data;
+    }
+
+    const hashedPassword = await bcrypt.hash(data.password, 12);
 
     try {
-      if (logoFile) {
-        const logoForm = new FormData();
-
-        logoForm.append("file", logoFile);
-
-        const result = await uploadFile(logoForm, {
-          folder: "coaching/logos",
-          maxSizeMB: 2,
-          resourceType: "image",
-          allowedTypes: ["image/jpeg", "image/png", "image/webp"],
-        });
-
-        if (!result.success) {
-          return result;
-        }
-
-        logoData = result.data;
-      }
-
-      if (idProofFile) {
-        const proofForm = new FormData();
-
-        proofForm.append("file", idProofFile);
-
-        const result = await uploadFile(proofForm, {
-          folder: "coaching/id-proofs",
-          maxSizeMB: 5,
-          resourceType: "auto",
-          allowedTypes: [
-            "application/pdf",
-            "image/jpeg",
-            "image/png",
-            "image/webp",
-          ],
-        });
-
-        if (!result.success) {
-          if (logoData) {
-            await deleteCloudinaryFile(
-              logoData.public_id,
-              logoData.resource_type,
-            );
-          }
-
-          return result;
-        }
-
-        idProofData = result.data;
-      }
-
-      /* -----------------------------------------
-         Password
-      ----------------------------------------- */
-
-      const hashedPassword = await bcrypt.hash(data.password, 12);
-
-      /* -----------------------------------------
-         Transaction
-      ----------------------------------------- */
-
       const coaching = await prisma.$transaction(async (tx) => {
-        const coaching = await tx.coaching.create({
+        const createdCoaching = await tx.coaching.create({
           data: {
             code: data.code,
             coachingName: data.coachingName,
@@ -208,34 +232,33 @@ export async function createCoaching(formData: FormData) {
             address: data.address,
             ownerName: data.ownerName,
             idNumber: data.idNumber,
-
             logo: logoData?.secure_url ?? null,
-
             logoPublicId: logoData?.public_id ?? null,
-
             logoResourceType: logoData?.resource_type ?? null,
-
             idProof: idProofData?.secure_url ?? null,
-
             idProofPublicId: idProofData?.public_id ?? null,
-
             idProofResourceType: idProofData?.resource_type ?? null,
-
             isActive: true,
           },
         });
 
-        await tx.user.create({
+        const user = await tx.user.create({
           data: {
             email: data.email,
             password: hashedPassword,
             role: Role.COACHING,
             isActive: true,
-            coachingId: coaching.id,
           },
         });
 
-        return coaching;
+        await tx.userCoaching.create({
+          data: {
+            userId: user.id,
+            coachingId: createdCoaching.id,
+          },
+        });
+
+        return createdCoaching;
       });
 
       return {
@@ -266,16 +289,23 @@ export async function createCoaching(formData: FormData) {
   } catch (error) {
     console.error("createCoaching:", error);
 
+    if (logoData) {
+      await deleteCloudinaryFile(logoData.public_id, logoData.resource_type);
+    }
+
+    if (idProofData) {
+      await deleteCloudinaryFile(
+        idProofData.public_id,
+        idProofData.resource_type,
+      );
+    }
+
     return {
       success: false,
       error: "Something went wrong",
     };
   }
 }
-
-/* =========================================================
-   GET ALL
-========================================================= */
 
 export async function getCoachings() {
   try {
@@ -292,54 +322,58 @@ export async function getCoachings() {
       orderBy: {
         createdAt: "desc",
       },
-
       include: {
         _count: {
           select: {
             users: true,
           },
         },
-
         users: {
           where: {
-            role: Role.COACHING,
+            user: {
+              role: Role.COACHING,
+            },
           },
-
           select: {
-            id: true,
-            email: true,
-            isActive: true,
+            user: {
+              select: {
+                id: true,
+                email: true,
+                isActive: true,
+              },
+            },
           },
-
           take: 1,
         },
       },
     });
 
-    const data = coachings.map((coaching) => ({
-      id: coaching.id,
-      code: coaching.code,
-      coachingName: coaching.coachingName,
-      mobile: coaching.mobile,
-      address: coaching.address,
-      ownerName: coaching.ownerName,
+    const data = coachings.map((coaching) => {
+      const coachingUser = coaching.users[0]?.user ?? null;
 
-      logo: coaching.logo,
-
-      idNumber: coaching.idNumber,
-
-      isActive: coaching.isActive,
-
-      createdAt: coaching.createdAt,
-
-      updatedAt: coaching.updatedAt,
-
-      totalUsers: coaching._count.users,
-
-      email: coaching.users[0]?.email ?? null,
-
-      userIsActive: coaching.users[0]?.isActive ?? false,
-    }));
+      return {
+        id: coaching.id,
+        code: coaching.code,
+        coachingName: coaching.coachingName,
+        mobile: coaching.mobile,
+        address: coaching.address,
+        ownerName: coaching.ownerName,
+        logo: coaching.logo,
+        logoPublicId: coaching.logoPublicId,
+        logoResourceType: coaching.logoResourceType,
+        idProof: coaching.idProof,
+        idProofPublicId: coaching.idProofPublicId,
+        idProofResourceType: coaching.idProofResourceType,
+        idNumber: coaching.idNumber,
+        isActive: coaching.isActive,
+        createdAt: coaching.createdAt,
+        updatedAt: coaching.updatedAt,
+        totalUsers: coaching._count.users,
+        email: coachingUser?.email ?? null,
+        userId: coachingUser?.id ?? null,
+        userIsActive: coachingUser?.isActive ?? false,
+      };
+    });
 
     return {
       success: true,
@@ -355,10 +389,6 @@ export async function getCoachings() {
   }
 }
 
-/* =========================================================
-   GET BY ID
-========================================================= */
-
 export async function getCoachingById(id: string) {
   try {
     const session = await auth();
@@ -370,7 +400,7 @@ export async function getCoachingById(id: string) {
       };
     }
 
-    if (!id) {
+    if (!id?.trim()) {
       return {
         success: false,
         error: "Coaching ID is required",
@@ -381,19 +411,22 @@ export async function getCoachingById(id: string) {
       where: {
         id,
       },
-
       include: {
         users: {
           where: {
-            role: Role.COACHING,
+            user: {
+              role: Role.COACHING,
+            },
           },
-
           select: {
-            id: true,
-            email: true,
-            isActive: true,
+            user: {
+              select: {
+                id: true,
+                email: true,
+                isActive: true,
+              },
+            },
           },
-
           take: 1,
         },
       },
@@ -406,9 +439,10 @@ export async function getCoachingById(id: string) {
       };
     }
 
+    const coachingUser = coaching.users[0]?.user ?? null;
+
     return {
       success: true,
-
       data: {
         id: coaching.id,
         code: coaching.code,
@@ -417,26 +451,16 @@ export async function getCoachingById(id: string) {
         address: coaching.address,
         ownerName: coaching.ownerName,
         idNumber: coaching.idNumber,
-
         isActive: coaching.isActive,
-
         logo: coaching.logo,
-
         logoPublicId: coaching.logoPublicId,
-
         logoResourceType: coaching.logoResourceType,
-
         idProof: coaching.idProof,
-
         idProofPublicId: coaching.idProofPublicId,
-
         idProofResourceType: coaching.idProofResourceType,
-
-        email: coaching.users[0]?.email ?? "",
-
-        userId: coaching.users[0]?.id ?? null,
-
-        userIsActive: coaching.users[0]?.isActive ?? false,
+        email: coachingUser?.email ?? "",
+        userId: coachingUser?.id ?? null,
+        userIsActive: coachingUser?.isActive ?? false,
       },
     };
   } catch (error) {
@@ -449,25 +473,13 @@ export async function getCoachingById(id: string) {
   }
 }
 
-/* =========================================================
-   UPDATE
-========================================================= */
-
 export async function updateCoaching(formData: FormData) {
-  let newLogoData: {
-    secure_url: string;
-    public_id: string;
-    resource_type: string;
-  } | null = null;
-
-  let newIdProofData: {
-    secure_url: string;
-    public_id: string;
-    resource_type: string;
-  } | null = null;
+  let newLogoData: UploadData | null = null;
+  let newIdProofData: UploadData | null = null;
 
   try {
     const session = await auth();
+
     if (session?.user?.role !== Role.ADMIN) {
       return {
         success: false,
@@ -475,7 +487,6 @@ export async function updateCoaching(formData: FormData) {
       };
     }
 
-    const isActive = formData.get("isActive") === "true";
     const rawData = {
       id: getString(formData, "id"),
       code: getString(formData, "code"),
@@ -486,7 +497,7 @@ export async function updateCoaching(formData: FormData) {
       mobile: getString(formData, "mobile"),
       address: getString(formData, "address"),
       idNumber: getString(formData, "idNumber"),
-      isActive,
+      isActive: formData.get("isActive") === "true",
     };
 
     const parsed = updateCoachingSchema.safeParse(rawData);
@@ -504,18 +515,22 @@ export async function updateCoaching(formData: FormData) {
       where: {
         id: data.id,
       },
-
       include: {
         users: {
           where: {
-            role: Role.COACHING,
+            user: {
+              role: Role.COACHING,
+            },
           },
-
           select: {
-            id: true,
-            email: true,
+            user: {
+              select: {
+                id: true,
+                email: true,
+                isActive: true,
+              },
+            },
           },
-
           take: 1,
         },
       },
@@ -528,59 +543,7 @@ export async function updateCoaching(formData: FormData) {
       };
     }
 
-    /* -----------------------------------------
-       Duplicate checks
-    ----------------------------------------- */
-
-    const duplicateCode = await prisma.coaching.findFirst({
-      where: {
-        code: data.code,
-        NOT: {
-          id: data.id,
-        },
-      },
-    });
-
-    if (duplicateCode) {
-      return {
-        success: false,
-        error: "Coaching code already exists",
-      };
-    }
-
-    const duplicateMobile = await prisma.coaching.findFirst({
-      where: {
-        mobile: data.mobile,
-        NOT: {
-          id: data.id,
-        },
-      },
-    });
-
-    if (duplicateMobile) {
-      return {
-        success: false,
-        error: "Mobile number already exists",
-      };
-    }
-
-    const duplicateIdNumber = await prisma.coaching.findFirst({
-      where: {
-        idNumber: data.idNumber,
-        NOT: {
-          id: data.id,
-        },
-      },
-    });
-
-    if (duplicateIdNumber) {
-      return {
-        success: false,
-        error: "ID number already exists",
-      };
-    }
-
-    const coachingUser = existing.users[0];
+    const coachingUser = existing.users[0]?.user ?? null;
 
     if (!coachingUser) {
       return {
@@ -589,15 +552,77 @@ export async function updateCoaching(formData: FormData) {
       };
     }
 
-    const duplicateEmail = await prisma.user.findFirst({
-      where: {
-        email: data.email,
+    const [duplicateCode, duplicateMobile, duplicateIdNumber, duplicateEmail] =
+      await Promise.all([
+        prisma.coaching.findFirst({
+          where: {
+            code: data.code,
+            NOT: {
+              id: data.id,
+            },
+          },
+          select: {
+            id: true,
+          },
+        }),
 
-        NOT: {
-          id: coachingUser.id,
-        },
-      },
-    });
+        prisma.coaching.findFirst({
+          where: {
+            mobile: data.mobile,
+            NOT: {
+              id: data.id,
+            },
+          },
+          select: {
+            id: true,
+          },
+        }),
+
+        prisma.coaching.findFirst({
+          where: {
+            idNumber: data.idNumber,
+            NOT: {
+              id: data.id,
+            },
+          },
+          select: {
+            id: true,
+          },
+        }),
+
+        prisma.user.findFirst({
+          where: {
+            email: data.email,
+            NOT: {
+              id: coachingUser.id,
+            },
+          },
+          select: {
+            id: true,
+          },
+        }),
+      ]);
+
+    if (duplicateCode) {
+      return {
+        success: false,
+        error: "Coaching code already exists",
+      };
+    }
+
+    if (duplicateMobile) {
+      return {
+        success: false,
+        error: "Mobile number already exists",
+      };
+    }
+
+    if (duplicateIdNumber) {
+      return {
+        success: false,
+        error: "ID number already exists",
+      };
+    }
 
     if (duplicateEmail) {
       return {
@@ -606,25 +631,11 @@ export async function updateCoaching(formData: FormData) {
       };
     }
 
-    /* -----------------------------------------
-       New files
-    ----------------------------------------- */
-
     const logoFile = getFile(formData, "logo");
-
     const idProofFile = getFile(formData, "idProof");
 
     if (logoFile) {
-      const logoForm = new FormData();
-
-      logoForm.append("file", logoFile);
-
-      const result = await uploadFile(logoForm, {
-        folder: "coaching/logos",
-        maxSizeMB: 2,
-        resourceType: "image",
-        allowedTypes: ["image/jpeg", "image/png", "image/webp"],
-      });
+      const result = await uploadLogo(logoFile);
 
       if (!result.success) {
         return result;
@@ -634,21 +645,7 @@ export async function updateCoaching(formData: FormData) {
     }
 
     if (idProofFile) {
-      const proofForm = new FormData();
-
-      proofForm.append("file", idProofFile);
-
-      const result = await uploadFile(proofForm, {
-        folder: "coaching/id-proofs",
-        maxSizeMB: 5,
-        resourceType: "auto",
-        allowedTypes: [
-          "application/pdf",
-          "image/jpeg",
-          "image/png",
-          "image/webp",
-        ],
-      });
+      const result = await uploadIdProof(idProofFile);
 
       if (!result.success) {
         if (newLogoData) {
@@ -664,19 +661,11 @@ export async function updateCoaching(formData: FormData) {
       newIdProofData = result.data;
     }
 
-    /* -----------------------------------------
-       Password
-    ----------------------------------------- */
-
     let hashedPassword: string | undefined;
 
-    if (data.password) {
+    if (data.password?.trim()) {
       hashedPassword = await bcrypt.hash(data.password, 12);
     }
-
-    /* -----------------------------------------
-       Update transaction
-    ----------------------------------------- */
 
     try {
       await prisma.$transaction(async (tx) => {
@@ -684,38 +673,25 @@ export async function updateCoaching(formData: FormData) {
           where: {
             id: data.id,
           },
-
           data: {
             code: data.code,
-
             coachingName: data.coachingName,
-
             ownerName: data.ownerName,
-
             mobile: data.mobile,
-
             address: data.address,
-
             idNumber: data.idNumber,
-
             isActive: data.isActive,
-
             ...(newLogoData
               ? {
                   logo: newLogoData.secure_url,
-
                   logoPublicId: newLogoData.public_id,
-
                   logoResourceType: newLogoData.resource_type,
                 }
               : {}),
-
             ...(newIdProofData
               ? {
                   idProof: newIdProofData.secure_url,
-
                   idProofPublicId: newIdProofData.public_id,
-
                   idProofResourceType: newIdProofData.resource_type,
                 }
               : {}),
@@ -726,12 +702,9 @@ export async function updateCoaching(formData: FormData) {
           where: {
             id: coachingUser.id,
           },
-
           data: {
             email: data.email,
-
             isActive: data.isActive,
-
             ...(hashedPassword
               ? {
                   password: hashedPassword,
@@ -763,26 +736,18 @@ export async function updateCoaching(formData: FormData) {
       };
     }
 
-    /* -----------------------------------------
-       Delete old files AFTER DB success
-    ----------------------------------------- */
-
-    if (newLogoData) {
-      if (existing.logoPublicId) {
-        await deleteCloudinaryFile(
-          existing.logoPublicId,
-          existing.logoResourceType ?? "image",
-        );
-      }
+    if (newLogoData && existing.logoPublicId) {
+      await deleteCloudinaryFile(
+        existing.logoPublicId,
+        existing.logoResourceType ?? "image",
+      );
     }
 
-    if (newIdProofData) {
-      if (existing.idProofPublicId) {
-        await deleteCloudinaryFile(
-          existing.idProofPublicId,
-          existing.idProofResourceType ?? "raw",
-        );
-      }
+    if (newIdProofData && existing.idProofPublicId) {
+      await deleteCloudinaryFile(
+        existing.idProofPublicId,
+        existing.idProofResourceType ?? "raw",
+      );
     }
 
     return {
@@ -815,10 +780,6 @@ export async function updateCoaching(formData: FormData) {
   }
 }
 
-/* =========================================================
-   SOFT DELETE / DEACTIVATE
-========================================================= */
-
 export async function deleteCoaching(id: string) {
   try {
     const session = await auth();
@@ -830,7 +791,7 @@ export async function deleteCoaching(id: string) {
       };
     }
 
-    if (!id) {
+    if (!id?.trim()) {
       return {
         success: false,
         error: "Coaching ID is required",
@@ -840,6 +801,10 @@ export async function deleteCoaching(id: string) {
     const coaching = await prisma.coaching.findUnique({
       where: {
         id,
+      },
+      select: {
+        id: true,
+        isActive: true,
       },
     });
 
@@ -855,26 +820,45 @@ export async function deleteCoaching(id: string) {
         where: {
           id,
         },
-
         data: {
           isActive: false,
         },
       });
 
-      await tx.user.updateMany({
+      const memberships = await tx.userCoaching.findMany({
         where: {
           coachingId: id,
-          role: Role.COACHING,
+          user: {
+            role: Role.COACHING,
+          },
         },
-
-        data: {
-          isActive: false,
+        select: {
+          userId: true,
         },
       });
+
+      const userIds = memberships.map((membership) => membership.userId);
+
+      if (userIds.length > 0) {
+        await tx.user.updateMany({
+          where: {
+            id: {
+              in: userIds,
+            },
+            role: Role.COACHING,
+          },
+          data: {
+            isActive: false,
+          },
+        });
+      }
     });
 
     return {
       success: true,
+      data: {
+        id,
+      },
     };
   } catch (error) {
     console.error("deleteCoaching:", error);
@@ -886,3 +870,224 @@ export async function deleteCoaching(id: string) {
   }
 }
 
+export async function activateCoaching(id: string) {
+  try {
+    const session = await auth();
+
+    if (session?.user?.role !== Role.ADMIN) {
+      return {
+        success: false,
+        error: "Only admin can activate coaching",
+      };
+    }
+
+    if (!id?.trim()) {
+      return {
+        success: false,
+        error: "Coaching ID is required",
+      };
+    }
+
+    const coaching = await prisma.coaching.findUnique({
+      where: {
+        id,
+      },
+      select: {
+        id: true,
+      },
+    });
+
+    if (!coaching) {
+      return {
+        success: false,
+        error: "Coaching not found",
+      };
+    }
+
+    await prisma.$transaction(async (tx) => {
+      await tx.coaching.update({
+        where: {
+          id,
+        },
+        data: {
+          isActive: true,
+        },
+      });
+
+      const memberships = await tx.userCoaching.findMany({
+        where: {
+          coachingId: id,
+          user: {
+            role: Role.COACHING,
+          },
+        },
+        select: {
+          userId: true,
+        },
+      });
+
+      const userIds = memberships.map((membership) => membership.userId);
+
+      if (userIds.length > 0) {
+        await tx.user.updateMany({
+          where: {
+            id: {
+              in: userIds,
+            },
+            role: Role.COACHING,
+          },
+          data: {
+            isActive: true,
+          },
+        });
+      }
+    });
+
+    return {
+      success: true,
+      data: {
+        id,
+      },
+    };
+  } catch (error) {
+    console.error("activateCoaching:", error);
+
+    return {
+      success: false,
+      error: "Failed to activate coaching",
+    };
+  }
+}
+
+export async function joinCoachingByCode(code: string) {
+  try {
+    const session = await auth();
+
+    if (!session?.user?.id) {
+      return {
+        success: false,
+        error: "Unauthorized",
+      };
+    }
+
+    if (session.user.role !== Role.STUDENT) {
+      return {
+        success: false,
+        error: "Only students can join a coaching",
+      };
+    }
+
+    const normalizedCode = code?.trim();
+
+    if (!normalizedCode) {
+      return {
+        success: false,
+        error: "Coaching code is required",
+      };
+    }
+
+    const coaching = await prisma.coaching.findUnique({
+      where: {
+        code: normalizedCode,
+      },
+      select: {
+        id: true,
+        code: true,
+        coachingName: true,
+        logo: true,
+        address: true,
+        ownerName: true,
+        isActive: true,
+      },
+    });
+
+    if (!coaching) {
+      return {
+        success: false,
+        error: "Invalid coaching code",
+      };
+    }
+
+    if (!coaching.isActive) {
+      return {
+        success: false,
+        error: "This coaching is currently inactive",
+      };
+    }
+
+    const student = await prisma.student.findUnique({
+      where: {
+        userId: session.user.id,
+      },
+      select: {
+        id: true,
+        userId: true,
+      },
+    });
+
+    if (!student) {
+      return {
+        success: false,
+        error: "Student profile not found",
+      };
+    }
+
+    const existingMembership = await prisma.userCoaching.findUnique({
+      where: {
+        userId_coachingId: {
+          userId: session.user.id,
+          coachingId: coaching.id,
+        },
+      },
+      select: {
+        id: true,
+      },
+    });
+
+    if (existingMembership) {
+      return {
+        success: false,
+        error: "You have already joined this coaching",
+      };
+    }
+
+    const membership = await prisma.userCoaching.create({
+      data: {
+        userId: session.user.id,
+        coachingId: coaching.id,
+      },
+      select: {
+        id: true,
+        createdAt: true,
+        coaching: {
+          select: {
+            id: true,
+            code: true,
+            coachingName: true,
+            logo: true,
+            address: true,
+            ownerName: true,
+            isActive: true,
+          },
+        },
+      },
+    });
+
+    return {
+      success: true,
+      message: "Successfully joined coaching",
+      data: {
+        membershipId: membership.id,
+        joinedAt: membership.createdAt,
+        coaching: membership.coaching,
+      },
+    };
+  } catch (error) {
+    console.error("joinCoachingByCode:", error);
+
+    return {
+      success: false,
+      error: "Failed to join coaching",
+    };
+  }
+}

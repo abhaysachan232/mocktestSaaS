@@ -1,8 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { Users, Plus, Building2, BookOpen, FileQuestion } from "lucide-react";
-import { ROUTES } from "@/lib/constans";
+import {
+  Building2,
+  BookOpen,
+  FileQuestion,
+  Plus,
+  Users,
+} from "lucide-react";
+
 import { DataTable } from "../ui/DataTable";
 import { StatsGrid } from "../ui/StatsGrid";
 
@@ -17,6 +23,12 @@ type Coaching = {
   email: string | null;
 };
 
+type StudentCoaching = {
+  id: string;
+  code: string;
+  coachingName: string;
+};
+
 type Student = {
   id: string;
   name: string;
@@ -27,11 +39,9 @@ type Student = {
     email: string;
     role: string;
     isActive: boolean;
-    coaching?: {
-      id: string;
-      code: string;
-      coachingName: string;
-    } | null;
+    coachings?: Array<{
+      coaching: StudentCoaching;
+    }>;
   };
 };
 
@@ -54,41 +64,41 @@ type Props = {
 };
 
 export default function AdminDashboardPage({ data }: Props) {
-  console.log(data, data.stats);
   const stats = [
     {
       title: "Total Students",
-      value: data?.stats?.totalStudents ?? data?.students?.length ?? 0,
+      value: data.stats.totalStudents,
       icon: Users,
       iconBg: "bg-green-100",
       iconColor: "text-green-600",
     },
     {
       title: "Total Coachings",
-      value: data?.stats?.totalCoachings ?? data?.coachings?.length ?? 0,
+      value: data.stats.totalCoachings,
       icon: Building2,
       iconBg: "bg-blue-100",
       iconColor: "text-blue-600",
     },
     {
       title: "Total Tests",
-      value: data?.stats?.totalTests ?? 0,
+      value: data.stats.totalTests,
       icon: BookOpen,
       iconBg: "bg-purple-100",
       iconColor: "text-purple-600",
     },
     {
       title: "Total Questions",
-      value: data?.stats?.totalQuestions ?? 0,
+      value: data.stats.totalQuestions,
       icon: FileQuestion,
       iconBg: "bg-orange-100",
       iconColor: "text-orange-600",
     },
   ];
 
-  const formatDate = (value: string | Date) => {
-    if (!value) return "-";
+  const students = data.students ?? [];
+  const coachings = data.coachings ?? [];
 
+  const formatDate = (value: string | Date) => {
     const date = new Date(value);
 
     if (Number.isNaN(date.getTime())) {
@@ -102,29 +112,30 @@ export default function AdminDashboardPage({ data }: Props) {
     });
   };
 
-  const students = data?.students ?? [];
-  const coachings = data?.coachings ?? [];
+  const getCoachingName = (student: Student) => {
+    const coaching = student.user.coachings?.[0]?.coaching;
+
+    return coaching?.coachingName ?? "Independent";
+  };
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      {/* Header */}
-      <header className="bg-white border-b shadow-sm px-4 md:px-10 py-5">
-        <div className="flex flex-col lg:flex-row justify-between lg:items-center gap-5">
+    <main className="min-h-screen bg-gray-100">
+      <header className="border-b bg-white px-4 py-5 shadow-sm md:px-10">
+        <div className="flex flex-col justify-between gap-5 lg:flex-row lg:items-center">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">
               Admin Dashboard
             </h1>
 
-            <p className="text-gray-500 mt-1">
+            <p className="mt-1 text-gray-500">
               Manage your examination platform
             </p>
           </div>
 
-          {/* Quick Actions */}
           <div className="flex flex-wrap gap-3">
             <Link
               href="/subjects"
-              className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-3 rounded-xl flex items-center gap-2 transition"
+              className="flex items-center gap-2 rounded-xl bg-blue-600 px-5 py-3 text-white transition hover:bg-blue-700"
             >
               <Plus size={18} />
               Subjects
@@ -132,7 +143,7 @@ export default function AdminDashboardPage({ data }: Props) {
 
             <Link
               href="/questions"
-              className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-3 rounded-xl flex items-center gap-2 transition"
+              className="flex items-center gap-2 rounded-xl bg-blue-600 px-5 py-3 text-white transition hover:bg-blue-700"
             >
               <Plus size={18} />
               Questions
@@ -140,7 +151,7 @@ export default function AdminDashboardPage({ data }: Props) {
 
             <Link
               href="/exams"
-              className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-3 rounded-xl flex items-center gap-2 transition"
+              className="flex items-center gap-2 rounded-xl bg-blue-600 px-5 py-3 text-white transition hover:bg-blue-700"
             >
               <Plus size={18} />
               Exams
@@ -148,7 +159,7 @@ export default function AdminDashboardPage({ data }: Props) {
 
             <Link
               href="/tests"
-              className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-3 rounded-xl flex items-center gap-2 transition"
+              className="flex items-center gap-2 rounded-xl bg-blue-600 px-5 py-3 text-white transition hover:bg-blue-700"
             >
               <Plus size={18} />
               Tests
@@ -157,24 +168,24 @@ export default function AdminDashboardPage({ data }: Props) {
         </div>
       </header>
 
-      {/* Main */}
-      <main className="p-4 md:p-10 space-y-10">
-        {/* Stats */}
+      <section className="space-y-10 p-4 md:p-10">
         <StatsGrid stats={stats} />
 
-        {/* Coachings */}
-        <section className="bg-white rounded-3xl shadow-sm p-6">
-          <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-3 mb-6">
+        <section className="rounded-3xl bg-white p-6 shadow-sm">
+          <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <h2 className="text-2xl font-bold text-gray-900">Coachings</h2>
-              <p className="text-sm text-gray-500 mt-1">
+              <h2 className="text-2xl font-bold text-gray-900">
+                Coachings
+              </h2>
+
+              <p className="mt-1 text-sm text-gray-500">
                 Manage registered coaching institutes
               </p>
             </div>
 
             <Link
-              href={`${ROUTES.DASHBOARD}${'/coachings'}`}
-              className="inline-flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition"
+              href="/dashboard/coachings"
+              className="inline-flex items-center justify-center gap-2 rounded-lg bg-green-600 px-4 py-2 text-white transition hover:bg-green-700"
             >
               <Plus size={16} />
               View all
@@ -231,16 +242,20 @@ export default function AdminDashboardPage({ data }: Props) {
                     <div className="flex items-center gap-2">
                       <button
                         type="button"
-                        onClick={() => console.log("Edit Coaching:", row.id)}
-                        className="px-3 py-1.5 text-sm rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100"
+                        onClick={() =>
+                          console.log("Edit Coaching:", row.id)
+                        }
+                        className="rounded-lg bg-blue-50 px-3 py-1.5 text-sm text-blue-600 hover:bg-blue-100"
                       >
                         Edit
                       </button>
 
                       <button
                         type="button"
-                        onClick={() => console.log("Delete Coaching:", row.id)}
-                        className="px-3 py-1.5 text-sm rounded-lg bg-red-50 text-red-600 hover:bg-red-100"
+                        onClick={() =>
+                          console.log("Delete Coaching:", row.id)
+                        }
+                        className="rounded-lg bg-red-50 px-3 py-1.5 text-sm text-red-600 hover:bg-red-100"
                       >
                         Delete
                       </button>
@@ -256,12 +271,14 @@ export default function AdminDashboardPage({ data }: Props) {
           </div>
         </section>
 
-        {/* Students */}
-        <section className="bg-white rounded-3xl shadow-sm p-6">
-          <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-3 mb-6">
+        <section className="rounded-3xl bg-white p-6 shadow-sm">
+          <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <h2 className="text-2xl font-bold text-gray-900">Students</h2>
-              <p className="text-sm text-gray-500 mt-1">
+              <h2 className="text-2xl font-bold text-gray-900">
+                Students
+              </h2>
+
+              <p className="mt-1 text-sm text-gray-500">
                 Manage registered students
               </p>
             </div>
@@ -269,7 +286,7 @@ export default function AdminDashboardPage({ data }: Props) {
             <span className="text-sm text-gray-500">
               Total:{" "}
               <span className="font-semibold text-gray-900">
-                {students.length}
+                {data.stats.totalStudents}
               </span>
             </span>
           </div>
@@ -287,7 +304,7 @@ export default function AdminDashboardPage({ data }: Props) {
                   key: "email",
                   header: "Email",
                   sortable: true,
-                  render: (row) => row.user?.email ?? "-",
+                  render: (row) => row.user.email ?? "-",
                 },
                 {
                   key: "mobile",
@@ -299,21 +316,20 @@ export default function AdminDashboardPage({ data }: Props) {
                   key: "coaching",
                   header: "Coaching",
                   sortable: true,
-                  render: (row) =>
-                    row.user?.coaching?.coachingName ?? "Independent",
+                  render: (row) => getCoachingName(row),
                 },
                 {
                   key: "status",
                   header: "Status",
                   render: (row) => (
                     <span
-                      className={`inline-flex px-2.5 py-1 rounded-full text-xs font-medium ${
-                        row.user?.isActive
+                      className={`inline-flex rounded-full px-2.5 py-1 text-xs font-medium ${
+                        row.user.isActive
                           ? "bg-green-100 text-green-700"
                           : "bg-red-100 text-red-700"
                       }`}
                     >
-                      {row.user?.isActive ? "Active" : "Inactive"}
+                      {row.user.isActive ? "Active" : "Inactive"}
                     </span>
                   ),
                 },
@@ -330,15 +346,20 @@ export default function AdminDashboardPage({ data }: Props) {
                     <div className="flex items-center gap-2">
                       <button
                         type="button"
-                        onClick={() => console.log("Edit Student:", row.id)}
-                        className="px-3 py-1.5 text-sm rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100"
+                        onClick={() =>
+                          console.log("Edit Student:", row.id)
+                        }
+                        className="rounded-lg bg-blue-50 px-3 py-1.5 text-sm text-blue-600 hover:bg-blue-100"
                       >
                         Edit
                       </button>
+
                       <button
                         type="button"
-                        onClick={() => console.log("Delete Student:", row.id)}
-                        className="px-3 py-1.5 text-sm rounded-lg bg-red-50 text-red-600 hover:bg-red-100"
+                        onClick={() =>
+                          console.log("Delete Student:", row.id)
+                        }
+                        className="rounded-lg bg-red-50 px-3 py-1.5 text-sm text-red-600 hover:bg-red-100"
                       >
                         Delete
                       </button>
@@ -353,7 +374,7 @@ export default function AdminDashboardPage({ data }: Props) {
             />
           </div>
         </section>
-      </main>
-    </div>
+      </section>
+    </main>
   );
 }

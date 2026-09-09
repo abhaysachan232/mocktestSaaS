@@ -400,6 +400,7 @@ export const ModelName = {
   User: 'User',
   Student: 'Student',
   Coaching: 'Coaching',
+  UserCoaching: 'UserCoaching',
   Coupon: 'Coupon',
   Subject: 'Subject',
   Topic: 'Topic',
@@ -428,7 +429,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "student" | "coaching" | "coupon" | "subject" | "topic" | "examSubject" | "examTopic" | "exam" | "question" | "questionOption" | "test" | "testQuestion" | "testAttempt" | "attemptAnswer" | "result"
+    modelProps: "user" | "student" | "coaching" | "userCoaching" | "coupon" | "subject" | "topic" | "examSubject" | "examTopic" | "exam" | "question" | "questionOption" | "test" | "testQuestion" | "testAttempt" | "attemptAnswer" | "result"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -651,6 +652,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.CoachingCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.CoachingCountAggregateOutputType> | number
+        }
+      }
+    }
+    UserCoaching: {
+      payload: Prisma.$UserCoachingPayload<ExtArgs>
+      fields: Prisma.UserCoachingFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.UserCoachingFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserCoachingPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.UserCoachingFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserCoachingPayload>
+        }
+        findFirst: {
+          args: Prisma.UserCoachingFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserCoachingPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.UserCoachingFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserCoachingPayload>
+        }
+        findMany: {
+          args: Prisma.UserCoachingFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserCoachingPayload>[]
+        }
+        create: {
+          args: Prisma.UserCoachingCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserCoachingPayload>
+        }
+        createMany: {
+          args: Prisma.UserCoachingCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.UserCoachingCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserCoachingPayload>[]
+        }
+        delete: {
+          args: Prisma.UserCoachingDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserCoachingPayload>
+        }
+        update: {
+          args: Prisma.UserCoachingUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserCoachingPayload>
+        }
+        deleteMany: {
+          args: Prisma.UserCoachingDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.UserCoachingUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.UserCoachingUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserCoachingPayload>[]
+        }
+        upsert: {
+          args: Prisma.UserCoachingUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserCoachingPayload>
+        }
+        aggregate: {
+          args: Prisma.UserCoachingAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateUserCoaching>
+        }
+        groupBy: {
+          args: Prisma.UserCoachingGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.UserCoachingGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.UserCoachingCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.UserCoachingCountAggregateOutputType> | number
         }
       }
     }
@@ -1662,8 +1737,7 @@ export const UserScalarFieldEnum = {
   role: 'role',
   isActive: 'isActive',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt',
-  coachingId: 'coachingId'
+  updatedAt: 'updatedAt'
 } as const
 
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
@@ -1700,6 +1774,16 @@ export const CoachingScalarFieldEnum = {
 } as const
 
 export type CoachingScalarFieldEnum = (typeof CoachingScalarFieldEnum)[keyof typeof CoachingScalarFieldEnum]
+
+
+export const UserCoachingScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  coachingId: 'coachingId',
+  createdAt: 'createdAt'
+} as const
+
+export type UserCoachingScalarFieldEnum = (typeof UserCoachingScalarFieldEnum)[keyof typeof UserCoachingScalarFieldEnum]
 
 
 export const CouponScalarFieldEnum = {
@@ -1786,6 +1870,7 @@ export type QuestionOptionScalarFieldEnum = (typeof QuestionOptionScalarFieldEnu
 
 export const TestScalarFieldEnum = {
   id: 'id',
+  userId: 'userId',
   name: 'name',
   slug: 'slug',
   description: 'description',
@@ -2222,6 +2307,7 @@ export type GlobalOmitConfig = {
   user?: Prisma.UserOmit
   student?: Prisma.StudentOmit
   coaching?: Prisma.CoachingOmit
+  userCoaching?: Prisma.UserCoachingOmit
   coupon?: Prisma.CouponOmit
   subject?: Prisma.SubjectOmit
   topic?: Prisma.TopicOmit

@@ -2,61 +2,124 @@
 
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { QuestionFormValues, questionSchema } from "@/schemas/question";
+import { type QuestionFormValues, questionSchema } from "@/schemas/question";
 import { revalidatePath } from "next/cache";
 
-async function getUserId() {
+type ActionResponse<T = unknown> = {
+  success: boolean;
+  error?: string;
+  data?: T;
+};
+
+type UserContext = {
+  id: string;
+  role: string;
+};
+
+async function getUserContext(): Promise<UserContext | null> {
   const session = await auth();
-  return session?.user?.id;
-}
 
-export async function getQuestionSubjects() {
-  const userId = await getUserId();
-
-  if (!userId) {
-    return {
-      success: false,
-      error: "Unauthorized",
-      data: [],
-    };
+  if (!session?.user?.id || !session.user.role) {
+    return null;
   }
 
-  const subjects = await prisma.subject.findMany({
-    orderBy: {
-      name: "asc",
-    },
-
-    select: {
-      id: true,
-      name: true,
-
-      topics: {
-        orderBy: {
-          name: "asc",
-        },
-
-        select: {
-          id: true,
-          name: true,
-        },
-      },
-    },
-  });
-
   return {
-    success: true,
-    data: subjects,
+    id: session.user.id,
+    role: session.user.role,
   };
 }
 
-export async function createQuestion(payload: QuestionFormValues) {
-  try {
-    const userId = await getUserId();
+function canManageQuestions(role: string) {
+  return role === "ADMIN" || role === "COACHING";
+}
 
-    if (!userId) {
+/**
+ * Returns all global Subjects + Topics.
+ *
+ * Subjects are NOT owned by Coaching.
+ * Both Admin and Coaching can use them while creating Questions.
+ */
+export async function getQuestionSubjects(): Promise<ActionResponse> {
+  try {
+    const user = await getUserContext();
+
+    if (!user) {
       return {
         success: false,
         error: "Unauthorized",
+        data: [],
+      };
+    }
+
+    if (!canManageQuestions(user.role)) {
+      return {
+        success: false,
+        error: "You are not allowed to manage questions",
+        data: [],
+      };
+    }
+
+    const subjects = await prisma.subject.findMany({
+      orderBy: {
+        name: "asc",
+      },
+
+      select: {
+        id: true,
+        name: true,
+
+        topics: {
+          orderBy: {
+            name: "asc",
+          },
+
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+      },
+    });
+
+    return {
+      success: true,
+      data: subjects,
+    };
+  } catch (error) {
+    console.error("GET_QUESTION_SUBJECTS_ERROR:", error);
+
+    return {
+      success: false,
+      error: "Failed to load subjects",
+      data: [],
+    };
+  }
+}
+
+/**
+ * Create Question
+ *
+ * ADMIN    -> can create
+ * COACHING -> can create
+ * STUDENT  -> cannot create
+ */
+export async function createQuestion(
+  payload: QuestionFormValues,
+): Promise<ActionResponse> {
+  try {
+    const user = await getUserContext();
+
+    if (!user) {
+      return {
+        success: false,
+        error: "Unauthorized",
+      };
+    }
+
+    if (!canManageQuestions(user.role)) {
+      return {
+        success: false,
+        error: "You are not allowed to create questions",
       };
     }
 
@@ -64,17 +127,27 @@ export async function createQuestion(payload: QuestionFormValues) {
 
     if (!parsed.success) {
       console.error("Question validation error:", parsed.error.flatten());
+
       return {
         success: false,
         error: parsed.error.issues[0]?.message ?? "Invalid question",
       };
     }
 
-    const { subjectId, topicId, type, content, solution, options } = payload;
+    const { subjectId, topicId, type, content, solution, options } =
+      parsed.data;
+
+    /**
+     * Make sure selected Topic belongs to selected Subject.
+     */
     const topic = await prisma.topic.findFirst({
       where: {
         id: topicId,
         subjectId,
+      },
+
+      select: {
+        id: true,
       },
     });
 
@@ -87,18 +160,25 @@ export async function createQuestion(payload: QuestionFormValues) {
 
     const question = await prisma.question.create({
       data: {
-        userId,
+        userId: user.id,
         subjectId,
         topicId,
         type,
         content,
         solution,
+
         options: {
           create: options.map((option) => ({
             content: option.content,
             isCorrect: option.isCorrect,
           })),
         },
+      },
+
+      include: {
+        subject: true,
+        topic: true,
+        options: true,
       },
     });
 
@@ -109,7 +189,7 @@ export async function createQuestion(payload: QuestionFormValues) {
       data: question,
     };
   } catch (error) {
-    console.error(error);
+    console.error("CREATE_QUESTION_ERROR:", error);
 
     return {
       success: false,
@@ -118,90 +198,177 @@ export async function createQuestion(payload: QuestionFormValues) {
   }
 }
 
-export async function getQuestions() {
-  const userId = await getUserId();
-
-  if (!userId) {
-    return {
-      success: false,
-      error: "Unauthorized",
-      data: [],
-    };
-  }
-
-  const questions = await prisma.question.findMany({
-    where: {
-      userId,
-    },
-
-    orderBy: {
-      createdAt: "desc",
-    },
-
-    include: {
-      subject: true,
-      topic: true,
-      options: true,
-    },
-  });
-
-  return {
-    success: true,
-    data: questions,
-  };
-}
-
-export async function getQuestionById(id: string) {
-  const userId = await getUserId();
-
-  if (!userId) {
-    return {
-      success: false,
-      error: "Unauthorized",
-      data: null,
-    };
-  }
-
-  const question = await prisma.question.findFirst({
-    where: {
-      id,
-      userId,
-    },
-
-    include: {
-      subject: true,
-      topic: true,
-
-      options: {
-        orderBy: {
-          id: "asc",
-        },
-      },
-    },
-  });
-
-  if (!question) {
-    return {
-      success: false,
-      error: "Question not found",
-      data: null,
-    };
-  }
-
-  return {
-    success: true,
-    data: question,
-  };
-}
-
-export async function updateQuestion(id: string, input: QuestionFormValues) {
+/**
+ * Get Questions
+ *
+ * ADMIN    -> all questions
+ * COACHING -> only own questions
+ */
+export async function getQuestions(): Promise<ActionResponse> {
   try {
-    const userId = await getUserId();
+    const user = await getUserContext();
 
-    if (!userId) {
+    if (!user) {
       return {
         success: false,
         error: "Unauthorized",
+        data: [],
+      };
+    }
+
+    if (!canManageQuestions(user.role)) {
+      return {
+        success: false,
+        error: "You are not allowed to view questions",
+        data: [],
+      };
+    }
+
+    const questions = await prisma.question.findMany({
+      where:
+        user.role === "ADMIN"
+          ? {}
+          : {
+              userId: user.id,
+            },
+
+      orderBy: {
+        createdAt: "desc",
+      },
+
+      include: {
+        subject: true,
+        topic: true,
+        options: true,
+        user: {
+          select: {
+            id: true,
+            email: true,
+            role: true,
+          },
+        },
+      },
+    });
+
+    return {
+      success: true,
+      data: questions,
+    };
+  } catch (error) {
+    console.error("GET_QUESTIONS_ERROR:", error);
+
+    return {
+      success: false,
+      error: "Failed to load questions",
+      data: [],
+    };
+  }
+}
+
+/**
+ * Get Question By ID
+ *
+ * ADMIN    -> any question
+ * COACHING -> own question only
+ */
+export async function getQuestionById(id: string): Promise<ActionResponse> {
+  try {
+    const user = await getUserContext();
+
+    if (!user) {
+      return {
+        success: false,
+        error: "Unauthorized",
+        data: null,
+      };
+    }
+
+    if (!canManageQuestions(user.role)) {
+      return {
+        success: false,
+        error: "You are not allowed to view questions",
+        data: null,
+      };
+    }
+
+    const question = await prisma.question.findFirst({
+      where: {
+        id,
+
+        ...(user.role === "ADMIN"
+          ? {}
+          : {
+              userId: user.id,
+            }),
+      },
+
+      include: {
+        subject: true,
+        topic: true,
+
+        options: {
+          orderBy: {
+            id: "asc",
+          },
+        },
+
+        user: {
+          select: {
+            id: true,
+            email: true,
+            role: true,
+          },
+        },
+      },
+    });
+
+    if (!question) {
+      return {
+        success: false,
+        error: "Question not found",
+        data: null,
+      };
+    }
+
+    return {
+      success: true,
+      data: question,
+    };
+  } catch (error) {
+    console.error("GET_QUESTION_BY_ID_ERROR:", error);
+
+    return {
+      success: false,
+      error: "Failed to load question",
+      data: null,
+    };
+  }
+}
+
+/**
+ * Update Question
+ *
+ * ADMIN    -> can update any question
+ * COACHING -> can update own question only
+ */
+export async function updateQuestion(
+  id: string,
+  input: QuestionFormValues,
+): Promise<ActionResponse> {
+  try {
+    const user = await getUserContext();
+
+    if (!user) {
+      return {
+        success: false,
+        error: "Unauthorized",
+      };
+    }
+
+    if (!canManageQuestions(user.role)) {
+      return {
+        success: false,
+        error: "You are not allowed to update questions",
       };
     }
 
@@ -214,10 +381,25 @@ export async function updateQuestion(id: string, input: QuestionFormValues) {
       };
     }
 
+    /**
+     * Ownership check.
+     *
+     * Admin can update any question.
+     * Coaching can update only its own question.
+     */
     const existing = await prisma.question.findFirst({
       where: {
         id,
-        userId,
+
+        ...(user.role === "ADMIN"
+          ? {}
+          : {
+              userId: user.id,
+            }),
+      },
+
+      select: {
+        id: true,
       },
     });
 
@@ -228,12 +410,20 @@ export async function updateQuestion(id: string, input: QuestionFormValues) {
       };
     }
 
-    const { subjectId, topicId, type, content, solution, options } = parsed.data;
+    const { subjectId, topicId, type, content, solution, options } =
+      parsed.data;
 
+    /**
+     * Validate Topic -> Subject relation.
+     */
     const topic = await prisma.topic.findFirst({
       where: {
         id: topicId,
         subjectId,
+      },
+
+      select: {
+        id: true,
       },
     });
 
@@ -262,6 +452,7 @@ export async function updateQuestion(id: string, input: QuestionFormValues) {
           type,
           content,
           solution,
+
           options: {
             create: options.map((option) => ({
               content: option.content,
@@ -271,6 +462,8 @@ export async function updateQuestion(id: string, input: QuestionFormValues) {
         },
 
         include: {
+          subject: true,
+          topic: true,
           options: true,
         },
       });
@@ -284,7 +477,7 @@ export async function updateQuestion(id: string, input: QuestionFormValues) {
       data: question,
     };
   } catch (error) {
-    console.error(error);
+    console.error("UPDATE_QUESTION_ERROR:", error);
 
     return {
       success: false,
@@ -293,21 +486,39 @@ export async function updateQuestion(id: string, input: QuestionFormValues) {
   }
 }
 
-export async function deleteQuestion(id: string) {
+/**
+ * Delete Question
+ *
+ * ADMIN    -> can delete any question
+ * COACHING -> can delete own question only
+ */
+export async function deleteQuestion(id: string): Promise<ActionResponse> {
   try {
-    const userId = await getUserId();
+    const user = await getUserContext();
 
-    if (!userId) {
+    if (!user) {
       return {
         success: false,
         error: "Unauthorized",
       };
     }
 
+    if (!canManageQuestions(user.role)) {
+      return {
+        success: false,
+        error: "You are not allowed to delete questions",
+      };
+    }
+
     const question = await prisma.question.findFirst({
       where: {
         id,
-        userId,
+
+        ...(user.role === "ADMIN"
+          ? {}
+          : {
+              userId: user.id,
+            }),
       },
 
       select: {
@@ -322,20 +533,10 @@ export async function deleteQuestion(id: string) {
       };
     }
 
-    await prisma.$transaction(async (tx) => {
-      // Delete options first
-      await tx.questionOption.deleteMany({
-        where: {
-          questionId: id,
-        },
-      });
-
-      // Then delete question
-      await tx.question.delete({
-        where: {
-          id,
-        },
-      });
+    await prisma.question.delete({
+      where: {
+        id,
+      },
     });
 
     revalidatePath("/questions");
@@ -344,7 +545,7 @@ export async function deleteQuestion(id: string) {
       success: true,
     };
   } catch (error) {
-    console.error("deleteQuestion error:", error);
+    console.error("DELETE_QUESTION_ERROR:", error);
 
     return {
       success: false,

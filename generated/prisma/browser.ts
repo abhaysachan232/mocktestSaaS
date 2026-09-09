@@ -33,6 +33,11 @@ export type Student = Prisma.StudentModel
  */
 export type Coaching = Prisma.CoachingModel
 /**
+ * Model UserCoaching
+ * 
+ */
+export type UserCoaching = Prisma.UserCoachingModel
+/**
  * Model Coupon
  * 
  */

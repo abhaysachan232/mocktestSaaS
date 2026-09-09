@@ -260,7 +260,7 @@ export default function PricingPage() {
                 {/* Features */}
                 <div className="mt-8 border-t border-slate-100 pt-7">
                   <p className="mb-4 text-sm font-bold text-slate-900">
-                    What's included
+                    What&apos;s included
                   </p>
 
                   <div className="space-y-3">

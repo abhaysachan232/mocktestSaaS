@@ -21,6 +21,7 @@ export default async function DashboardPage() {
 
   const userId = session.user.id;
   const role = session.user.role;
+  console.log('role', role, userId, session)
 
   if (!userId || !role) {
     notFound();
@@ -45,7 +46,8 @@ export default async function DashboardPage() {
   // COACHING
   // -------------------------
   if (role === ROLES.COACHING) {
-    const result = await getCoachingDashboard(userId);
+    const result = await getCoachingDashboard();
+    console.log('result', result)
     if (!result.success || !result.data) {
     notFound();
   }
@@ -61,13 +63,13 @@ export default async function DashboardPage() {
   // STUDENT
   // -------------------------
   if (role === ROLES.STUDENT) {
-    const data = await getStudentDashboard(userId);
-    if (!data) {
+    const result = await getStudentDashboard();
+    if (!result) {
       notFound();
     }
     return (
       <main className="min-h-screen bg-slate-50">
-        <StudentDashboard userId={userId} data={data} />
+        <StudentDashboard data={result.data} />
       </main>
     );
   }

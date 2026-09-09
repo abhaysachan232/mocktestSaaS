@@ -11,6 +11,7 @@
 export type * from './models/User'
 export type * from './models/Student'
 export type * from './models/Coaching'
+export type * from './models/UserCoaching'
 export type * from './models/Coupon'
 export type * from './models/Subject'
 export type * from './models/Topic'

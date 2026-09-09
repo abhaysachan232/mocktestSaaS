@@ -1,16 +1,20 @@
 "use server";
 
+import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { AttemptStatus, TestStatus } from "@/generated/prisma/enums";
-
-/*
-|--------------------------------------------------------------------------
-| ADMIN DASHBOARD
-|--------------------------------------------------------------------------
-*/
+import { AttemptStatus, Role, TestStatus } from "@/generated/prisma/enums";
 
 export async function getAdminDashboard() {
   try {
+    const session = await auth();
+
+    if (!session?.user?.id || session.user.role !== Role.ADMIN) {
+      return {
+        success: false,
+        error: "Unauthorized.",
+      };
+    }
+
     const [
       totalStudents,
       totalCoachings,
@@ -29,29 +33,40 @@ export async function getAdminDashboard() {
       }),
     ]);
 
-    // ==================================================
-    // STUDENTS
-    // ==================================================
-
     const students = await prisma.student.findMany({
-      include: {
+      select: {
+        id: true,
+        userId: true,
+        name: true,
+        dob: true,
+        mobile: true,
         user: {
           select: {
             id: true,
             email: true,
             role: true,
             isActive: true,
-            coaching: {
+            createdAt: true,
+            coachings: {
               select: {
-                id: true,
-                code: true,
-                coachingName: true,
+                createdAt: true,
+                coaching: {
+                  select: {
+                    id: true,
+                    code: true,
+                    coachingName: true,
+                    logo: true,
+                    ownerName: true,
+                    mobile: true,
+                    address: true,
+                    isActive: true,
+                  },
+                },
               },
             },
           },
         },
       },
-
       orderBy: {
         user: {
           createdAt: "desc",
@@ -59,21 +74,40 @@ export async function getAdminDashboard() {
       },
     });
 
-    // ==================================================
-    // COACHINGS
-    // ==================================================
-
     const coachings = await prisma.coaching.findMany({
-      include: {
+      select: {
+        id: true,
+        code: true,
+        coachingName: true,
+        ownerName: true,
+        mobile: true,
+        address: true,
+        logo: true,
+        isActive: true,
+        createdAt: true,
         users: {
           where: {
-            role: "COACHING",
+            user: {
+              role: Role.COACHING,
+            },
           },
-
           select: {
-            id: true,
-            email: true,
-            isActive: true,
+            user: {
+              select: {
+                id: true,
+                email: true,
+                isActive: true,
+              },
+            },
+          },
+          orderBy: {
+            createdAt: "asc",
+          },
+          take: 1,
+        },
+        _count: {
+          select: {
+            users: true,
           },
         },
       },
@@ -92,7 +126,9 @@ export async function getAdminDashboard() {
           publishedTests,
           totalQuestions,
         },
+
         students,
+
         coachings: coachings.map((coaching) => ({
           id: coaching.id,
           code: coaching.code,
@@ -101,13 +137,16 @@ export async function getAdminDashboard() {
           mobile: coaching.mobile,
           address: coaching.address,
           logo: coaching.logo,
-          email: coaching.users[0]?.email ?? null,
-          usersCount: coaching.users.length,
+          isActive: coaching.isActive,
+          email: coaching.users[0]?.user.email ?? null,
+          userIsActive: coaching.users[0]?.user.isActive ?? false,
+          usersCount: coaching._count.users,
         })),
       },
     };
   } catch (error) {
     console.error("GET_ADMIN_DASHBOARD_ERROR:", error);
+
     return {
       success: false,
       error: "Unable to load admin dashboard.",
@@ -115,37 +154,98 @@ export async function getAdminDashboard() {
   }
 }
 
-/*
-|--------------------------------------------------------------------------
-| COACHING DASHBOARD
-|--------------------------------------------------------------------------
-*/
-
-export async function getCoachingDashboard(coachingId: string) {
+export async function getCoachingDashboard() {
   try {
-    if (!coachingId) {
+    const session = await auth();
+
+    if (!session?.user?.id) {
       return {
         success: false,
-        error: "Coaching ID is required.",
+        error: "Unauthorized.",
       };
     }
 
-    const coaching = await prisma.coaching.findUnique({
+    const user = await prisma.user.findUnique({
       where: {
-        id: coachingId,
+        id: session?.user?.id,
       },
       select: {
         id: true,
-        code: true,
-        coachingName: true,
-        ownerName: true,
-        mobile: true,
-        address: true,
-        logo: true,
-        users: {
-          where: {
-            role: "COACHING",
+        email: true,
+        role: true,
+        isActive: true,
+        coachings: {
+          select: {
+            createdAt: true,
+            coaching: {
+              select: {
+                id: true,
+                code: true,
+                coachingName: true,
+                ownerName: true,
+                mobile: true,
+                address: true,
+                logo: true,
+                isActive: true,
+              },
+            },
           },
+          orderBy: {
+            createdAt: "asc",
+          },
+          take: 1,
+        },
+      },
+    });
+
+    if (!user) {
+      return {
+        success: false,
+        error: "User not found.",
+      };
+    }
+
+    if (user.role !== Role.COACHING) {
+      return {
+        success: false,
+        error: "User is not a coaching user.",
+      };
+    }
+
+    if (!user.isActive) {
+      return {
+        success: false,
+        error: "Coaching account is inactive.",
+      };
+    }
+
+    const coaching = user.coachings[0]?.coaching;
+
+    if (!coaching) {
+      return {
+        success: false,
+        error: "Coaching is not assigned to this user.",
+      };
+    }
+
+    if (!coaching.isActive) {
+      return {
+        success: false,
+        error: "Coaching is inactive.",
+      };
+    }
+
+    const coachingId = coaching.id;
+
+    const coachingUsers = await prisma.userCoaching.findMany({
+      where: {
+        coachingId,
+        user: {
+          role: Role.COACHING,
+        },
+      },
+      select: {
+        user: {
           select: {
             id: true,
             email: true,
@@ -153,26 +253,34 @@ export async function getCoachingDashboard(coachingId: string) {
           },
         },
       },
+      orderBy: {
+        createdAt: "asc",
+      },
     });
-    if (!coaching) {
-      return {
-        success: false,
-        error: "Coaching not found.",
-      };
-    }
 
     const students = await prisma.student.findMany({
       where: {
         user: {
-          coachingId,
+          coachings: {
+            some: {
+              coachingId,
+            },
+          },
         },
       },
-      include: {
+      select: {
+        id: true,
+        userId: true,
+        name: true,
+        dob: true,
+        mobile: true,
         user: {
           select: {
             id: true,
             email: true,
+            role: true,
             isActive: true,
+            createdAt: true,
           },
         },
       },
@@ -186,7 +294,11 @@ export async function getCoachingDashboard(coachingId: string) {
     const attempts = await prisma.testAttempt.findMany({
       where: {
         user: {
-          coachingId,
+          coachings: {
+            some: {
+              coachingId,
+            },
+          },
         },
       },
       select: {
@@ -208,6 +320,7 @@ export async function getCoachingDashboard(coachingId: string) {
         },
         user: {
           select: {
+            id: true,
             student: {
               select: {
                 name: true,
@@ -217,6 +330,7 @@ export async function getCoachingDashboard(coachingId: string) {
         },
         result: {
           select: {
+            id: true,
             marksObtained: true,
             percentage: true,
             accuracy: true,
@@ -229,6 +343,7 @@ export async function getCoachingDashboard(coachingId: string) {
         createdAt: "desc",
       },
     });
+
     const publishedTests = await prisma.test.findMany({
       where: {
         status: TestStatus.PUBLISHED,
@@ -237,11 +352,15 @@ export async function getCoachingDashboard(coachingId: string) {
         id: true,
         name: true,
         slug: true,
+        description: true,
         testType: true,
         duration: true,
         totalMarks: true,
         totalQuestions: true,
+        negativeMarking: true,
+        negativeMarks: true,
         publishedAt: true,
+        createdAt: true,
         exam: {
           select: {
             id: true,
@@ -250,39 +369,49 @@ export async function getCoachingDashboard(coachingId: string) {
           },
         },
       },
-      orderBy: {
-        publishedAt: "desc",
-      },
+      orderBy: [
+        {
+          publishedAt: "desc",
+        },
+        {
+          createdAt: "desc",
+        },
+      ],
     });
 
-    const totalStudents = students.length;
-    const totalAttempts = attempts.length;
     const completedAttempts = attempts.filter(
       (attempt) =>
         attempt.status === AttemptStatus.SUBMITTED ||
         attempt.status === AttemptStatus.EXPIRED,
     );
+
     const inProgressAttempts = attempts.filter(
       (attempt) => attempt.status === AttemptStatus.IN_PROGRESS,
     );
+
     const results = completedAttempts
       .filter((attempt) => attempt.result !== null)
-      .map((attempt) => ({
-        attemptId: attempt.id,
-        userId: attempt.userId,
-        studentName: attempt.user.student?.name ?? "Student",
-        testId: attempt.testId,
-        testName: attempt.test.name,
-        status: attempt.status,
-        marksObtained: attempt.result!.marksObtained,
-        percentage: attempt.result!.percentage,
-        accuracy: attempt.result!.accuracy,
-        rank: attempt.result!.rank,
-        percentile: attempt.result!.percentile,
-        startedAt: attempt.startedAt,
-        submittedAt: attempt.submittedAt,
-        createdAt: attempt.createdAt,
-      }));
+      .map((attempt) => {
+        const result = attempt.result!;
+
+        return {
+          resultId: result.id,
+          attemptId: attempt.id,
+          userId: attempt.userId,
+          studentName: attempt.user.student?.name ?? "Student",
+          testId: attempt.testId,
+          testName: attempt.test.name,
+          status: attempt.status,
+          marksObtained: result.marksObtained,
+          percentage: result.percentage,
+          accuracy: result.accuracy,
+          rank: result.rank,
+          percentile: result.percentile,
+          startedAt: attempt.startedAt,
+          submittedAt: attempt.submittedAt,
+          createdAt: attempt.createdAt,
+        };
+      });
 
     const averagePercentage =
       results.length > 0
@@ -309,16 +438,20 @@ export async function getCoachingDashboard(coachingId: string) {
           mobile: coaching.mobile,
           address: coaching.address,
           logo: coaching.logo,
-          email: coaching.users[0]?.email ?? null,
+          email: coachingUsers[0]?.user.email ?? user.email,
+          isActive: coaching.isActive,
         },
+
         stats: {
-          totalStudents,
-          totalAttempts,
+          totalStudents: students.length,
+          totalAttempts: attempts.length,
           completedAttempts: completedAttempts.length,
           inProgressAttempts: inProgressAttempts.length,
+          totalTests: publishedTests.length,
           averagePercentage: Number(averagePercentage.toFixed(2)),
           averageAccuracy: Number(averageAccuracy.toFixed(2)),
         },
+
         students,
         tests: publishedTests,
         attempts,
@@ -328,6 +461,7 @@ export async function getCoachingDashboard(coachingId: string) {
     };
   } catch (error) {
     console.error("GET_COACHING_DASHBOARD_ERROR:", error);
+
     return {
       success: false,
       error: "Unable to load coaching dashboard.",
@@ -335,20 +469,25 @@ export async function getCoachingDashboard(coachingId: string) {
   }
 }
 
-/*
-|--------------------------------------------------------------------------
-| STUDENT DASHBOARD
-|--------------------------------------------------------------------------
-*/
-
-export async function getStudentDashboard(userId: string) {
+export async function getStudentDashboard() {
   try {
-    if (!userId) {
+    const session = await auth();
+
+    if (!session?.user?.id) {
       return {
         success: false,
-        error: "User ID is required.",
+        error: "Unauthorized.",
       };
     }
+
+    if (session.user.role !== Role.STUDENT) {
+      return {
+        success: false,
+        error: "Only students can access this dashboard.",
+      };
+    }
+
+    const userId = session.user.id;
 
     const student = await prisma.student.findUnique({
       where: {
@@ -366,21 +505,33 @@ export async function getStudentDashboard(userId: string) {
             email: true,
             role: true,
             isActive: true,
-            coaching: {
+            coachings: {
               select: {
                 id: true,
-                code: true,
-                coachingName: true,
-                ownerName: true,
-                mobile: true,
-                address: true,
-                logo: true,
+                coachingId: true,
+                createdAt: true,
+                coaching: {
+                  select: {
+                    id: true,
+                    code: true,
+                    coachingName: true,
+                    ownerName: true,
+                    mobile: true,
+                    address: true,
+                    logo: true,
+                    isActive: true,
+                  },
+                },
+              },
+              orderBy: {
+                createdAt: "asc",
               },
             },
           },
         },
       },
     });
+
     if (!student) {
       return {
         success: false,
@@ -388,153 +539,60 @@ export async function getStudentDashboard(userId: string) {
       };
     }
 
-    const attempts = await prisma.testAttempt.findMany({
-      where: {
-        userId,
-      },
-      select: {
-        id: true,
-        testId: true,
-        status: true,
-        startedAt: true,
-        submittedAt: true,
-        createdAt: true,
-        test: {
-          select: {
-            id: true,
-            name: true,
-            slug: true,
-            description: true,
-            testType: true,
-            status: true,
-            duration: true,
-            totalMarks: true,
-            totalQuestions: true,
-            negativeMarking: true,
-            negativeMarks: true,
-            exam: {
-              select: {
-                id: true,
-                name: true,
-                slug: true,
-              },
-            },
-          },
-        },
-        result: {
-          select: {
-            id: true,
-            totalQuestions: true,
-            attempted: true,
-            correct: true,
-            incorrect: true,
-            skipped: true,
-            totalMarks: true,
-            marksObtained: true,
-            positiveMarks: true,
-            negativeMarks: true,
-            percentage: true,
-            accuracy: true,
-            timeTaken: true,
-            rank: true,
-            percentile: true,
-            createdAt: true,
-            updatedAt: true,
-          },
-        },
-      },
-      orderBy: {
-        createdAt: "desc",
-      },
-    });
+    if (student.user.role !== Role.STUDENT) {
+      return {
+        success: false,
+        error: "User is not a student.",
+      };
+    }
 
-    const completedAttempts = attempts.filter(
-      (attempt) =>
-        attempt.status === AttemptStatus.SUBMITTED ||
-        attempt.status === AttemptStatus.EXPIRED,
+    if (!student.user.isActive) {
+      return {
+        success: false,
+        error: "Student account is inactive.",
+      };
+    }
+
+    const coachings = student.user.coachings.map(
+      (membership) => membership.coaching,
     );
 
-    const inProgressAttempts = attempts.filter(
-      (attempt) => attempt.status === AttemptStatus.IN_PROGRESS,
-    );
+    const coachingIds = student.user.coachings
+      .filter((membership) => membership.coaching.isActive)
+      .map((membership) => membership.coachingId);
 
-    const results = completedAttempts
-      .filter((attempt) => attempt.result !== null)
-      .map((attempt) => {
-        const result = attempt.result!;
-        return {
-          resultId: result.id,
-          attemptId: attempt.id,
-          testId: attempt.testId,
-          testName: attempt.test.name,
-          testSlug: attempt.test.slug,
-          testType: attempt.test.testType,
-          exam: attempt.test.exam,
-          status: attempt.status,
-          totalQuestions: result.totalQuestions,
-          attempted: result.attempted,
-          correct: result.correct,
-          incorrect: result.incorrect,
-          skipped: result.skipped,
-          totalMarks: result.totalMarks,
-          marksObtained: result.marksObtained,
-          positiveMarks: result.positiveMarks,
-          negativeMarks: result.negativeMarks,
-          percentage: result.percentage,
-          accuracy: result.accuracy,
-          timeTaken: result.timeTaken,
-          rank: result.rank,
-          percentile: result.percentile,
-          startedAt: attempt.startedAt,
-          submittedAt: attempt.submittedAt,
-          createdAt: result.createdAt,
-        };
-      });
+    /*
+     * ---------------------------------------------------------
+     * PUBLISHED TESTS
+     * ---------------------------------------------------------
+     */
 
-    const recentResults = results.slice(0, 5);
-    const completedResultCount = results.length;
-    const totalTests = attempts.length;
-    const attemptedTests = completedAttempts.length;
-    const inProgressTests = inProgressAttempts.length;
-    const averageScore =
-      completedResultCount > 0
-        ? results.reduce((sum, result) => sum + result.marksObtained, 0) /
-          completedResultCount
-        : 0;
-    const bestScore =
-      completedResultCount > 0
-        ? Math.max(...results.map((result) => result.marksObtained))
-        : 0;
-    const averagePercentage =
-      completedResultCount > 0
-        ? results.reduce((sum, result) => sum + result.percentage, 0) /
-          completedResultCount
-        : 0;
-    const averageAccuracy =
-      completedResultCount > 0
-        ? results.reduce((sum, result) => sum + result.accuracy, 0) /
-          completedResultCount
-        : 0;
-    const latestRankedResult = results.find(
-      (result) => result.rank !== null || result.percentile !== null,
-    );
-    const overallRank = latestRankedResult?.rank ?? null;
-    const overallPercentile = latestRankedResult?.percentile ?? null;
-    const continueTests = inProgressAttempts.map((attempt) => ({
-      attemptId: attempt.id,
-      testId: attempt.testId,
-      testName: attempt.test.name,
-      testSlug: attempt.test.slug,
-      testType: attempt.test.testType,
-      duration: attempt.test.duration,
-      totalQuestions: attempt.test.totalQuestions,
-      totalMarks: attempt.test.totalMarks,
-      startedAt: attempt.startedAt,
-      exam: attempt.test.exam,
-    }));
-    const publishedTests = await prisma.test.findMany({
+    const tests = await prisma.test.findMany({
       where: {
         status: TestStatus.PUBLISHED,
+        OR: [
+          {
+            user: {
+              role: Role.ADMIN,
+            },
+          },
+          ...(coachingIds.length > 0
+            ? [
+                {
+                  user: {
+                    role: Role.COACHING,
+                    coachings: {
+                      some: {
+                        coachingId: {
+                          in: coachingIds,
+                        },
+                      },
+                    },
+                  },
+                },
+              ]
+            : []),
+        ],
       },
       select: {
         id: true,
@@ -548,6 +606,7 @@ export async function getStudentDashboard(userId: string) {
         negativeMarking: true,
         negativeMarks: true,
         publishedAt: true,
+
         exam: {
           select: {
             id: true,
@@ -555,7 +614,46 @@ export async function getStudentDashboard(userId: string) {
             slug: true,
           },
         },
+
+        attempts: {
+          where: {
+            userId,
+          },
+          select: {
+            id: true,
+            status: true,
+            startedAt: true,
+            submittedAt: true,
+            expiresAt: true,
+            createdAt: true,
+
+            answers: {
+              select: {
+                selectedOptionIds: true,
+                isAttempted: true,
+                markedForReview: true,
+
+                question: {
+                  select: {
+                    id: true,
+                    type: true,
+                    options: {
+                      select: {
+                        id: true,
+                        isCorrect: true,
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+          orderBy: {
+            createdAt: "desc",
+          },
+        },
       },
+
       orderBy: [
         {
           publishedAt: "desc",
@@ -566,80 +664,441 @@ export async function getStudentDashboard(userId: string) {
       ],
     });
 
-    const latestAttemptByTest = new Map<string, (typeof attempts)[number]>();
+    /*
+     * ---------------------------------------------------------
+     * CALCULATE ATTEMPT RESULT
+     * ---------------------------------------------------------
+     */
 
-    for (const attempt of attempts) {
-      if (!latestAttemptByTest.has(attempt.testId)) {
-        latestAttemptByTest.set(attempt.testId, attempt);
+    type CalculatedResult = {
+      attemptId: string;
+      testId: string;
+      testName: string;
+      examName: string;
+      testType:
+        | "PRACTICE"
+        | "MOCK"
+        | "FULL_LENGTH"
+        | "SUBJECT_WISE"
+        | "TOPIC_WISE";
+      attemptedAt: Date;
+      totalQuestions: number;
+      attempted: number;
+      correct: number;
+      incorrect: number;
+      skipped: number;
+      totalMarks: number;
+      marksObtained: number;
+      positiveMarks: number;
+      negativeMarks: number;
+      percentage: number;
+      accuracy: number;
+      duration: number;
+      timeTaken: number;
+    };
+
+    const calculateAttemptResult = (
+      test: (typeof tests)[number],
+      attempt: (typeof tests)[number]["attempts"][number],
+    ): CalculatedResult => {
+      const attemptedAnswers = attempt.answers.filter(
+        (answer) => answer.isAttempted,
+      );
+
+      let correct = 0;
+      let incorrect = 0;
+
+      for (const answer of attemptedAnswers) {
+        const correctOptionIds = answer.question.options
+          .filter((option) => option.isCorrect)
+          .map((option) => option.id)
+          .sort();
+
+        const selectedOptionIds = [...answer.selectedOptionIds].sort();
+
+        const isCorrect =
+          correctOptionIds.length === selectedOptionIds.length &&
+          correctOptionIds.every(
+            (optionId, index) =>
+              optionId === selectedOptionIds[index],
+          );
+
+        if (isCorrect) {
+          correct += 1;
+        } else {
+          incorrect += 1;
+        }
+      }
+
+      const attempted = attemptedAnswers.length;
+
+      const skipped = Math.max(
+        test.totalQuestions - attempted,
+        0,
+      );
+
+      const marksPerQuestion =
+        test.totalQuestions > 0
+          ? test.totalMarks / test.totalQuestions
+          : 0;
+
+      const negativeMarksPerQuestion =
+        test.negativeMarking && test.negativeMarks
+          ? test.negativeMarks
+          : 0;
+
+      const positiveMarks = correct * marksPerQuestion;
+
+      const negativeMarks =
+        incorrect * negativeMarksPerQuestion;
+
+      const marksObtained =
+        positiveMarks - negativeMarks;
+
+      const percentage =
+        test.totalMarks > 0
+          ? (marksObtained / test.totalMarks) * 100
+          : 0;
+
+      const accuracy =
+        attempted > 0
+          ? (correct / attempted) * 100
+          : 0;
+
+      const endTime =
+        attempt.submittedAt ?? attempt.expiresAt;
+
+      const timeTaken = Math.max(
+        0,
+        Math.floor(
+          (endTime.getTime() - attempt.startedAt.getTime()) /
+            1000,
+        ),
+      );
+
+      return {
+        attemptId: attempt.id,
+        testId: test.id,
+        testName: test.name,
+        examName: test.exam.name,
+        testType: test.testType,
+
+        attemptedAt:
+          attempt.submittedAt ?? attempt.createdAt,
+
+        totalQuestions: test.totalQuestions,
+        attempted,
+        correct,
+        incorrect,
+        skipped,
+
+        totalMarks: test.totalMarks,
+        marksObtained,
+        positiveMarks,
+        negativeMarks,
+
+        percentage,
+        accuracy,
+
+        duration: test.duration,
+        timeTaken,
+      };
+    };
+
+    /*
+     * ---------------------------------------------------------
+     * ALL STUDENT RESULTS
+     * ---------------------------------------------------------
+     */
+
+    const results: CalculatedResult[] = [];
+
+    for (const test of tests) {
+      const submittedAttempts = test.attempts.filter(
+        (attempt) => attempt.status === "SUBMITTED",
+      );
+
+      for (const attempt of submittedAttempts) {
+        results.push(
+          calculateAttemptResult(test, attempt),
+        );
       }
     }
 
-    const tests = publishedTests.map((test) => {
-      const latestAttempt = latestAttemptByTest.get(test.id);
-      let attemptStatus: "NOT_ATTEMPTED" | "IN_PROGRESS" | "COMPLETED" =
-        "NOT_ATTEMPTED";
+    /*
+     * Latest result first
+     */
 
-      let attemptId: string | null = null;
-      let resultId: string | null = null;
-      if (latestAttempt) {
-        attemptId = latestAttempt.id;
+    results.sort(
+      (a, b) =>
+        b.attemptedAt.getTime() -
+        a.attemptedAt.getTime(),
+    );
 
-        if (latestAttempt.status === AttemptStatus.IN_PROGRESS) {
-          attemptStatus = "IN_PROGRESS";
-        }
+    /*
+     * ---------------------------------------------------------
+     * FORMAT TESTS
+     * ---------------------------------------------------------
+     */
 
-        if (
-          latestAttempt.status === AttemptStatus.SUBMITTED ||
-          latestAttempt.status === AttemptStatus.EXPIRED
-        ) {
-          attemptStatus = "COMPLETED";
-          resultId = latestAttempt.result?.id ?? null;
-        }
+    const formattedTests = tests.map((test) => {
+      const attempts = test.attempts;
+
+      const inProgressAttempt = attempts.find(
+        (attempt) => attempt.status === "IN_PROGRESS",
+      );
+
+      const submittedAttempts = attempts.filter(
+        (attempt) => attempt.status === "SUBMITTED",
+      );
+
+      const calculatedAttempts =
+        submittedAttempts.map((attempt) =>
+          calculateAttemptResult(test, attempt),
+        );
+
+      const latestSubmittedAttempt =
+        calculatedAttempts[0] ?? null;
+
+      const bestAttempt =
+        calculatedAttempts.reduce<
+          CalculatedResult | null
+        >((best, current) => {
+          if (!best) {
+            return current;
+          }
+
+          return current.marksObtained >
+            best.marksObtained
+            ? current
+            : best;
+        }, null);
+
+      let status:
+        | "NOT_STARTED"
+        | "IN_PROGRESS"
+        | "COMPLETED" = "NOT_STARTED";
+
+      if (inProgressAttempt) {
+        status = "IN_PROGRESS";
+      } else if (submittedAttempts.length > 0) {
+        status = "COMPLETED";
       }
 
       return {
         id: test.id,
-        name: test.name,
-        slug: test.slug,
-        description: test.description,
-        testType: test.testType,
+        title: test.name,
+
+        exam: {
+          id: test.exam.id,
+          name: test.exam.name,
+        },
+
+        subject: null,
+
+        type: test.testType,
+
+        questions: test.totalQuestions,
         duration: test.duration,
         totalMarks: test.totalMarks,
-        totalQuestions: test.totalQuestions,
+
+        language: "English",
+
+        isFree: true,
+        price: null,
+
+        attempts: submittedAttempts.length,
+
+        lastScore:
+          latestSubmittedAttempt?.marksObtained ?? null,
+
+        bestScore:
+          bestAttempt?.marksObtained ?? null,
+
+        status,
+
         negativeMarking: test.negativeMarking,
         negativeMarks: test.negativeMarks,
-        publishedAt: test.publishedAt,
-        exam: test.exam,
-        attemptStatus,
-        attemptId,
-        resultId,
+
+        inProgressAttemptId:
+          inProgressAttempt?.id ?? null,
+
+        lastResult: latestSubmittedAttempt
+          ? {
+              attemptId:
+                latestSubmittedAttempt.attemptId,
+
+              totalQuestions:
+                latestSubmittedAttempt.totalQuestions,
+
+              attempted:
+                latestSubmittedAttempt.attempted,
+
+              correct:
+                latestSubmittedAttempt.correct,
+
+              incorrect:
+                latestSubmittedAttempt.incorrect,
+
+              skipped:
+                latestSubmittedAttempt.skipped,
+
+              totalMarks:
+                latestSubmittedAttempt.totalMarks,
+
+              marksObtained:
+                latestSubmittedAttempt.marksObtained,
+
+              positiveMarks:
+                latestSubmittedAttempt.positiveMarks,
+
+              negativeMarks:
+                latestSubmittedAttempt.negativeMarks,
+
+              percentage:
+                latestSubmittedAttempt.percentage,
+
+              accuracy:
+                latestSubmittedAttempt.accuracy,
+
+              duration:
+                latestSubmittedAttempt.duration,
+
+              timeTaken:
+                latestSubmittedAttempt.timeTaken,
+
+              attemptedAt:
+                latestSubmittedAttempt.attemptedAt,
+            }
+          : null,
       };
     });
 
+    /*
+     * ---------------------------------------------------------
+     * EXAMS
+     * ---------------------------------------------------------
+     */
+
+    const exams = Array.from(
+      new Map(
+        tests.map((test) => [
+          test.exam.id,
+          {
+            id: test.exam.id,
+            name: test.exam.name,
+          },
+        ]),
+      ).values(),
+    );
+
+    /*
+     * ---------------------------------------------------------
+     * RESULT SUMMARY
+     * ---------------------------------------------------------
+     */
+
+    const totalTestsAttempted = results.length;
+
+    const totalPercentage = results.reduce(
+      (sum, result) => sum + result.percentage,
+      0,
+    );
+
+    const totalAccuracy = results.reduce(
+      (sum, result) => sum + result.accuracy,
+      0,
+    );
+
+    const averagePercentage =
+      totalTestsAttempted > 0
+        ? totalPercentage / totalTestsAttempted
+        : 0;
+
+    const averageAccuracy =
+      totalTestsAttempted > 0
+        ? totalAccuracy / totalTestsAttempted
+        : 0;
+
+    const bestResult =
+      results.length > 0
+        ? results.reduce((best, current) =>
+            current.marksObtained >
+            best.marksObtained
+              ? current
+              : best,
+          )
+        : null;
+
+    const totalAttempted = results.reduce(
+      (sum, result) => sum + result.attempted,
+      0,
+    );
+
+    const totalCorrect = results.reduce(
+      (sum, result) => sum + result.correct,
+      0,
+    );
+
+    const totalIncorrect = results.reduce(
+      (sum, result) => sum + result.incorrect,
+      0,
+    );
+
+    const totalSkipped = results.reduce(
+      (sum, result) => sum + result.skipped,
+      0,
+    );
+
     return {
       success: true,
+
       data: {
-        student,
-        stats: {
-          totalTests,
-          attemptedTests,
-          completedTests: completedResultCount,
-          inProgressTests,
-          averageScore: Number(averageScore.toFixed(2)),
-          bestScore: Number(bestScore.toFixed(2)),
-          averagePercentage: Number(averagePercentage.toFixed(2)),
-          averageAccuracy: Number(averageAccuracy.toFixed(2)),
-          overallRank,
-          overallPercentile,
+        student: {
+          name: student.name,
+          dob: student.dob,
+          mobile: student.mobile,
+          email: student.user.email,
         },
-        tests,
-        continueTests,
+
+        coachings: coachings.map((coaching) => ({
+          id: coaching.id,
+          code: coaching.code,
+          name: coaching.coachingName,
+          logo: coaching.logo,
+          mobile: coaching.mobile,
+          address: coaching.address,
+        })),
+
+        exams,
+
+        tests: formattedTests,
+
+        /*
+         * Results.tsx props
+         */
         results,
-        recentResults,
+
+        resultSummary: {
+          totalTestsAttempted,
+          averagePercentage,
+          bestScore:
+            bestResult?.marksObtained ?? 0,
+          averageAccuracy,
+
+          totalAttempted,
+          totalCorrect,
+          totalIncorrect,
+          totalSkipped,
+        },
       },
     };
   } catch (error) {
-    console.error("GET_STUDENT_DASHBOARD_ERROR:", error);
+    console.error(
+      "GET_STUDENT_DASHBOARD_ERROR:",
+      error,
+    );
+
     return {
       success: false,
       error: "Unable to load student dashboard.",

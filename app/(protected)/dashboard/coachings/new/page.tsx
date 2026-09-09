@@ -1,5 +1,5 @@
 import Link from "next/link";
-import CoachingForm from "@/components/coaching/CoachingForm";
+import CoachingForm from "@/components/dashboard/coaching/CoachingForm";
 
 export default function NewCoachingPage() {
   return (
