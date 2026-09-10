@@ -9,7 +9,7 @@ import {
   getAdminDashboard,
   getCoachingDashboard,
   getStudentDashboard,
-} from "@/actions/dashboard.actions";
+} from "@/lib/actions/dashboard.actions";
 import { notFound, redirect } from "next/navigation";
 
 export default async function DashboardPage() {
@@ -64,8 +64,8 @@ export default async function DashboardPage() {
   // -------------------------
   if (role === ROLES.STUDENT) {
     const result = await getStudentDashboard();
-    if (!result) {
-      notFound();
+    if (!result.success || !result.data) {
+      return <div>Unable to load dashboard.</div>;
     }
     return (
       <main className="min-h-screen bg-slate-50">

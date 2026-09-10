@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getCoachingById } from "@/actions/coaching.actions";
+import { getCoachingById } from "@/lib/actions/coaching.actions";
 import CoachingForm from "@/components/dashboard/coaching/CoachingForm";
 
 type Props = {

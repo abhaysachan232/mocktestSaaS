@@ -17,7 +17,7 @@
     "prisma:status": "node --env-file=.env ./node_modules/prisma/build/index.js migrate status",
     "prisma:reset": "node --env-file=.env ./node_modules/prisma/build/index.js migrate reset",
     "prisma:studio": "node --env-file=.env ./node_modules/prisma/build/index.js studio",
-    "seed": "tsx --env-file=.env prisma/seed.ts",
+    "seed": "tsx --env-file=.env prisma/user-seed.ts",
     "seed:undo": "tsx --env-file=.env prisma/seed.undo.ts"
   },
   "dependencies": {

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
-import { deleteCoaching } from "@/actions/coaching.actions";
+import { deleteCoaching } from "@/lib/actions/coaching.actions";
 
 type Props = {
   id: string;

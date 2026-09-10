@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import {
   getQuestionById,
   getQuestionSubjects,
-} from "@/actions/question.actions";
+} from "@/lib/actions/question.actions";
 import QuestionForm from "@/components/questions/QuestionForm";
 import type { JSONContent } from "@tiptap/core";
 

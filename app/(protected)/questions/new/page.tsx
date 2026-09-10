@@ -1,4 +1,4 @@
-import { getQuestionSubjects } from "@/actions/question.actions";
+import { getQuestionSubjects } from "@/lib/actions/question.actions";
 import QuestionForm from "@/components/questions/QuestionForm";
 
 export default async function NewQuestionPage() {

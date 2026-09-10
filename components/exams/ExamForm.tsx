@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ExamFormValues, examSchema } from "@/schemas/exam";
-import { createExam, updateExam } from "@/actions/exam.actions";
+import { createExam, updateExam } from "@/lib/actions/exam.actions";
 import BasicDetails from "./BasicDetails";
 import SubjectTopicSelector from "./SubjectTopicSelector";
 

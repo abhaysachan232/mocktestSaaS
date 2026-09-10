@@ -1,5 +1,5 @@
 import ExamForm from "@/components/exams/ExamForm";
-import { getSubjectsWithTopics } from "@/actions/exam.actions";
+import { getSubjectsWithTopics } from "@/lib/actions/exam.actions";
 
 export default async function NewExamPage() {
   const subjects = await getSubjectsWithTopics();

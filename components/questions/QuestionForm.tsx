@@ -10,7 +10,7 @@ import {
   createQuestion,
   updateQuestion,
   getQuestionSubjects,
-} from "@/actions/question.actions";
+} from "@/lib/actions/question.actions";
 import {
   questionFormSchema,
   type QuestionFormValues,

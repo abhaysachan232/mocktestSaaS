@@ -3,7 +3,7 @@
 import Link from "next/link";
 import type { JSONContent } from "@tiptap/react";
 
-import { getQuestions } from "@/actions/question.actions";
+import { getQuestions } from "@/lib/actions/question.actions";
 import DeleteQuestionButton from "@/components/questions/DeleteQuestionButton";
 import RichContentRenderer from "@/components/editor/RichContentRenderer";
 

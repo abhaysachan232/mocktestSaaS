@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { deleteSubject } from "@/actions/subject.actions";
+import { deleteSubject } from "@/lib/actions/subject.actions";
 
 type Subject = {
   id: string;

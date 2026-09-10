@@ -7,7 +7,7 @@ import {
   type FieldErrors,
 } from "react-hook-form";
 
-import { getQuestionsForTest } from "@/actions/test.actions";
+import { getQuestionsForTest } from "@/lib/actions/test.actions";
 import type { TestFormValues } from "@/schemas/test";
 
 type Question = {

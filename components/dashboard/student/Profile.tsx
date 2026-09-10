@@ -17,7 +17,7 @@ import {
   X,
 } from "lucide-react";
 
-import { joinCoachingByCode } from "@/actions/coaching.actions";
+import { joinCoachingByCode } from "@/lib/actions/coaching.actions";
 import LogOutButton from "../../ui/LogOutButton";
 
 interface StudentProps {

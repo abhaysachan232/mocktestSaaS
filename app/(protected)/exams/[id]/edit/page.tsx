@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import ExamForm from "@/components/exams/ExamForm";
-import { getExamById, getSubjectsWithTopics } from "@/actions/exam.actions";
+import { getExamById, getSubjectsWithTopics } from "@/lib/actions/exam.actions";
 
 type Props = {
   params: Promise<{

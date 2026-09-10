@@ -36,7 +36,7 @@ import {
   X,
 } from "lucide-react";
 
-import { uploadFile } from "@/actions/upload.actions";
+import { uploadFile } from "@/lib/actions/upload.actions";
 
 type Props = {
   editor: Editor;

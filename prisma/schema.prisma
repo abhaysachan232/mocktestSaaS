@@ -306,26 +306,16 @@ model AttemptAnswer {
 }
 
 model Result {
-  id             String      @id @default(cuid())
-  attemptId      String      @unique
-  totalQuestions Int
-  attempted      Int
-  correct        Int
-  incorrect      Int
-  skipped        Int
-  totalMarks     Float
-  marksObtained  Float
-  positiveMarks  Float
-  negativeMarks  Float
-  percentage     Float
-  accuracy       Float
-  timeTaken      Int
-  rank           Int?
-  percentile     Float?
-  attempt        TestAttempt @relation(fields: [attemptId], references: [id], onDelete: Cascade)
-  createdAt      DateTime    @default(now())
-  updatedAt      DateTime    @updatedAt
+  id                String      @id @default(cuid())
+  attemptId         String      @unique
+  attempt           TestAttempt @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+  score             Float
+  totalMarks        Int
+  correctCount      Int
+  wrongCount        Int
+  unattemptedCount  Int
+  accuracy          Float // percentage, 0-100
+  createdAt         DateTime    @default(now())
 
-  @@index([marksObtained])
-  @@index([percentage])
+  @@index([attemptId])
 }

@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { useState } from "react";
-import { createSubject, updateSubject } from "@/actions/subject.actions";
+import { createSubject, updateSubject } from "@/lib/actions/subject.actions";
 import type { SubjectInput } from "@/schemas/subject";
 
 type Props = {

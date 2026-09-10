@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { createCoaching, updateCoaching } from "@/actions/coaching.actions";
+import { createCoaching, updateCoaching } from "@/lib/actions/coaching.actions";
 import Image from "next/image";
 
 type CoachingFormData = {

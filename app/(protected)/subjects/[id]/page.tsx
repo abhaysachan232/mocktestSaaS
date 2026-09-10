@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { getSubject } from "@/actions/subject.actions";
+import { getSubject } from "@/lib/actions/subject.actions";
 import TopicManager from "@/components/subjects/TopicManager";
 
 type Props = {

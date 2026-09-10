@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { deleteExam, getExams } from "@/actions/exam.actions";
+import { deleteExam, getExams } from "@/lib/actions/exam.actions";
 export default async function ExamsPage() {
   const exams = await getExams();
 

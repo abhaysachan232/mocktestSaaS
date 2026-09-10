@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getCoachings } from "@/actions/coaching.actions";
+import { getCoachings } from "@/lib/actions/coaching.actions";
 import CoachingTable from "@/components/dashboard/coaching/CoachingTable";
 
 export default async function CoachingsPage() {

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-import { createTopic, updateTopic, deleteTopic } from "@/actions/topic.actions";
+import { createTopic, updateTopic, deleteTopic } from "@/lib/actions/topic.actions";
 
 type Topic = {
   id: string;

@@ -27,199 +27,113 @@ export type AggregateResult = {
 }
 
 export type ResultAvgAggregateOutputType = {
-  totalQuestions: number | null
-  attempted: number | null
-  correct: number | null
-  incorrect: number | null
-  skipped: number | null
+  score: number | null
   totalMarks: number | null
-  marksObtained: number | null
-  positiveMarks: number | null
-  negativeMarks: number | null
-  percentage: number | null
+  correctCount: number | null
+  wrongCount: number | null
+  unattemptedCount: number | null
   accuracy: number | null
-  timeTaken: number | null
-  rank: number | null
-  percentile: number | null
 }
 
 export type ResultSumAggregateOutputType = {
-  totalQuestions: number | null
-  attempted: number | null
-  correct: number | null
-  incorrect: number | null
-  skipped: number | null
+  score: number | null
   totalMarks: number | null
-  marksObtained: number | null
-  positiveMarks: number | null
-  negativeMarks: number | null
-  percentage: number | null
+  correctCount: number | null
+  wrongCount: number | null
+  unattemptedCount: number | null
   accuracy: number | null
-  timeTaken: number | null
-  rank: number | null
-  percentile: number | null
 }
 
 export type ResultMinAggregateOutputType = {
   id: string | null
   attemptId: string | null
-  totalQuestions: number | null
-  attempted: number | null
-  correct: number | null
-  incorrect: number | null
-  skipped: number | null
+  score: number | null
   totalMarks: number | null
-  marksObtained: number | null
-  positiveMarks: number | null
-  negativeMarks: number | null
-  percentage: number | null
+  correctCount: number | null
+  wrongCount: number | null
+  unattemptedCount: number | null
   accuracy: number | null
-  timeTaken: number | null
-  rank: number | null
-  percentile: number | null
   createdAt: Date | null
-  updatedAt: Date | null
 }
 
 export type ResultMaxAggregateOutputType = {
   id: string | null
   attemptId: string | null
-  totalQuestions: number | null
-  attempted: number | null
-  correct: number | null
-  incorrect: number | null
-  skipped: number | null
+  score: number | null
   totalMarks: number | null
-  marksObtained: number | null
-  positiveMarks: number | null
-  negativeMarks: number | null
-  percentage: number | null
+  correctCount: number | null
+  wrongCount: number | null
+  unattemptedCount: number | null
   accuracy: number | null
-  timeTaken: number | null
-  rank: number | null
-  percentile: number | null
   createdAt: Date | null
-  updatedAt: Date | null
 }
 
 export type ResultCountAggregateOutputType = {
   id: number
   attemptId: number
-  totalQuestions: number
-  attempted: number
-  correct: number
-  incorrect: number
-  skipped: number
+  score: number
   totalMarks: number
-  marksObtained: number
-  positiveMarks: number
-  negativeMarks: number
-  percentage: number
+  correctCount: number
+  wrongCount: number
+  unattemptedCount: number
   accuracy: number
-  timeTaken: number
-  rank: number
-  percentile: number
   createdAt: number
-  updatedAt: number
   _all: number
 }
 
 
 export type ResultAvgAggregateInputType = {
-  totalQuestions?: true
-  attempted?: true
-  correct?: true
-  incorrect?: true
-  skipped?: true
+  score?: true
   totalMarks?: true
-  marksObtained?: true
-  positiveMarks?: true
-  negativeMarks?: true
-  percentage?: true
+  correctCount?: true
+  wrongCount?: true
+  unattemptedCount?: true
   accuracy?: true
-  timeTaken?: true
-  rank?: true
-  percentile?: true
 }
 
 export type ResultSumAggregateInputType = {
-  totalQuestions?: true
-  attempted?: true
-  correct?: true
-  incorrect?: true
-  skipped?: true
+  score?: true
   totalMarks?: true
-  marksObtained?: true
-  positiveMarks?: true
-  negativeMarks?: true
-  percentage?: true
+  correctCount?: true
+  wrongCount?: true
+  unattemptedCount?: true
   accuracy?: true
-  timeTaken?: true
-  rank?: true
-  percentile?: true
 }
 
 export type ResultMinAggregateInputType = {
   id?: true
   attemptId?: true
-  totalQuestions?: true
-  attempted?: true
-  correct?: true
-  incorrect?: true
-  skipped?: true
+  score?: true
   totalMarks?: true
-  marksObtained?: true
-  positiveMarks?: true
-  negativeMarks?: true
-  percentage?: true
+  correctCount?: true
+  wrongCount?: true
+  unattemptedCount?: true
   accuracy?: true
-  timeTaken?: true
-  rank?: true
-  percentile?: true
   createdAt?: true
-  updatedAt?: true
 }
 
 export type ResultMaxAggregateInputType = {
   id?: true
   attemptId?: true
-  totalQuestions?: true
-  attempted?: true
-  correct?: true
-  incorrect?: true
-  skipped?: true
+  score?: true
   totalMarks?: true
-  marksObtained?: true
-  positiveMarks?: true
-  negativeMarks?: true
-  percentage?: true
+  correctCount?: true
+  wrongCount?: true
+  unattemptedCount?: true
   accuracy?: true
-  timeTaken?: true
-  rank?: true
-  percentile?: true
   createdAt?: true
-  updatedAt?: true
 }
 
 export type ResultCountAggregateInputType = {
   id?: true
   attemptId?: true
-  totalQuestions?: true
-  attempted?: true
-  correct?: true
-  incorrect?: true
-  skipped?: true
+  score?: true
   totalMarks?: true
-  marksObtained?: true
-  positiveMarks?: true
-  negativeMarks?: true
-  percentage?: true
+  correctCount?: true
+  wrongCount?: true
+  unattemptedCount?: true
   accuracy?: true
-  timeTaken?: true
-  rank?: true
-  percentile?: true
   createdAt?: true
-  updatedAt?: true
   _all?: true
 }
 
@@ -312,22 +226,13 @@ export type ResultGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalA
 export type ResultGroupByOutputType = {
   id: string
   attemptId: string
-  totalQuestions: number
-  attempted: number
-  correct: number
-  incorrect: number
-  skipped: number
+  score: number
   totalMarks: number
-  marksObtained: number
-  positiveMarks: number
-  negativeMarks: number
-  percentage: number
+  correctCount: number
+  wrongCount: number
+  unattemptedCount: number
   accuracy: number
-  timeTaken: number
-  rank: number | null
-  percentile: number | null
   createdAt: Date
-  updatedAt: Date
   _count: ResultCountAggregateOutputType | null
   _avg: ResultAvgAggregateOutputType | null
   _sum: ResultSumAggregateOutputType | null
@@ -356,44 +261,26 @@ export type ResultWhereInput = {
   NOT?: Prisma.ResultWhereInput | Prisma.ResultWhereInput[]
   id?: Prisma.StringFilter<"Result"> | string
   attemptId?: Prisma.StringFilter<"Result"> | string
-  totalQuestions?: Prisma.IntFilter<"Result"> | number
-  attempted?: Prisma.IntFilter<"Result"> | number
-  correct?: Prisma.IntFilter<"Result"> | number
-  incorrect?: Prisma.IntFilter<"Result"> | number
-  skipped?: Prisma.IntFilter<"Result"> | number
-  totalMarks?: Prisma.FloatFilter<"Result"> | number
-  marksObtained?: Prisma.FloatFilter<"Result"> | number
-  positiveMarks?: Prisma.FloatFilter<"Result"> | number
-  negativeMarks?: Prisma.FloatFilter<"Result"> | number
-  percentage?: Prisma.FloatFilter<"Result"> | number
+  score?: Prisma.FloatFilter<"Result"> | number
+  totalMarks?: Prisma.IntFilter<"Result"> | number
+  correctCount?: Prisma.IntFilter<"Result"> | number
+  wrongCount?: Prisma.IntFilter<"Result"> | number
+  unattemptedCount?: Prisma.IntFilter<"Result"> | number
   accuracy?: Prisma.FloatFilter<"Result"> | number
-  timeTaken?: Prisma.IntFilter<"Result"> | number
-  rank?: Prisma.IntNullableFilter<"Result"> | number | null
-  percentile?: Prisma.FloatNullableFilter<"Result"> | number | null
   createdAt?: Prisma.DateTimeFilter<"Result"> | Date | string
-  updatedAt?: Prisma.DateTimeFilter<"Result"> | Date | string
   attempt?: Prisma.XOR<Prisma.TestAttemptScalarRelationFilter, Prisma.TestAttemptWhereInput>
 }
 
 export type ResultOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   attemptId?: Prisma.SortOrder
-  totalQuestions?: Prisma.SortOrder
-  attempted?: Prisma.SortOrder
-  correct?: Prisma.SortOrder
-  incorrect?: Prisma.SortOrder
-  skipped?: Prisma.SortOrder
+  score?: Prisma.SortOrder
   totalMarks?: Prisma.SortOrder
-  marksObtained?: Prisma.SortOrder
-  positiveMarks?: Prisma.SortOrder
-  negativeMarks?: Prisma.SortOrder
-  percentage?: Prisma.SortOrder
+  correctCount?: Prisma.SortOrder
+  wrongCount?: Prisma.SortOrder
+  unattemptedCount?: Prisma.SortOrder
   accuracy?: Prisma.SortOrder
-  timeTaken?: Prisma.SortOrder
-  rank?: Prisma.SortOrderInput | Prisma.SortOrder
-  percentile?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
-  updatedAt?: Prisma.SortOrder
   attempt?: Prisma.TestAttemptOrderByWithRelationInput
 }
 
@@ -403,44 +290,26 @@ export type ResultWhereUniqueInput = Prisma.AtLeast<{
   AND?: Prisma.ResultWhereInput | Prisma.ResultWhereInput[]
   OR?: Prisma.ResultWhereInput[]
   NOT?: Prisma.ResultWhereInput | Prisma.ResultWhereInput[]
-  totalQuestions?: Prisma.IntFilter<"Result"> | number
-  attempted?: Prisma.IntFilter<"Result"> | number
-  correct?: Prisma.IntFilter<"Result"> | number
-  incorrect?: Prisma.IntFilter<"Result"> | number
-  skipped?: Prisma.IntFilter<"Result"> | number
-  totalMarks?: Prisma.FloatFilter<"Result"> | number
-  marksObtained?: Prisma.FloatFilter<"Result"> | number
-  positiveMarks?: Prisma.FloatFilter<"Result"> | number
-  negativeMarks?: Prisma.FloatFilter<"Result"> | number
-  percentage?: Prisma.FloatFilter<"Result"> | number
+  score?: Prisma.FloatFilter<"Result"> | number
+  totalMarks?: Prisma.IntFilter<"Result"> | number
+  correctCount?: Prisma.IntFilter<"Result"> | number
+  wrongCount?: Prisma.IntFilter<"Result"> | number
+  unattemptedCount?: Prisma.IntFilter<"Result"> | number
   accuracy?: Prisma.FloatFilter<"Result"> | number
-  timeTaken?: Prisma.IntFilter<"Result"> | number
-  rank?: Prisma.IntNullableFilter<"Result"> | number | null
-  percentile?: Prisma.FloatNullableFilter<"Result"> | number | null
   createdAt?: Prisma.DateTimeFilter<"Result"> | Date | string
-  updatedAt?: Prisma.DateTimeFilter<"Result"> | Date | string
   attempt?: Prisma.XOR<Prisma.TestAttemptScalarRelationFilter, Prisma.TestAttemptWhereInput>
 }, "id" | "attemptId">
 
 export type ResultOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   attemptId?: Prisma.SortOrder
-  totalQuestions?: Prisma.SortOrder
-  attempted?: Prisma.SortOrder
-  correct?: Prisma.SortOrder
-  incorrect?: Prisma.SortOrder
-  skipped?: Prisma.SortOrder
+  score?: Prisma.SortOrder
   totalMarks?: Prisma.SortOrder
-  marksObtained?: Prisma.SortOrder
-  positiveMarks?: Prisma.SortOrder
-  negativeMarks?: Prisma.SortOrder
-  percentage?: Prisma.SortOrder
+  correctCount?: Prisma.SortOrder
+  wrongCount?: Prisma.SortOrder
+  unattemptedCount?: Prisma.SortOrder
   accuracy?: Prisma.SortOrder
-  timeTaken?: Prisma.SortOrder
-  rank?: Prisma.SortOrderInput | Prisma.SortOrder
-  percentile?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
-  updatedAt?: Prisma.SortOrder
   _count?: Prisma.ResultCountOrderByAggregateInput
   _avg?: Prisma.ResultAvgOrderByAggregateInput
   _max?: Prisma.ResultMaxOrderByAggregateInput
@@ -454,168 +323,96 @@ export type ResultScalarWhereWithAggregatesInput = {
   NOT?: Prisma.ResultScalarWhereWithAggregatesInput | Prisma.ResultScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"Result"> | string
   attemptId?: Prisma.StringWithAggregatesFilter<"Result"> | string
-  totalQuestions?: Prisma.IntWithAggregatesFilter<"Result"> | number
-  attempted?: Prisma.IntWithAggregatesFilter<"Result"> | number
-  correct?: Prisma.IntWithAggregatesFilter<"Result"> | number
-  incorrect?: Prisma.IntWithAggregatesFilter<"Result"> | number
-  skipped?: Prisma.IntWithAggregatesFilter<"Result"> | number
-  totalMarks?: Prisma.FloatWithAggregatesFilter<"Result"> | number
-  marksObtained?: Prisma.FloatWithAggregatesFilter<"Result"> | number
-  positiveMarks?: Prisma.FloatWithAggregatesFilter<"Result"> | number
-  negativeMarks?: Prisma.FloatWithAggregatesFilter<"Result"> | number
-  percentage?: Prisma.FloatWithAggregatesFilter<"Result"> | number
+  score?: Prisma.FloatWithAggregatesFilter<"Result"> | number
+  totalMarks?: Prisma.IntWithAggregatesFilter<"Result"> | number
+  correctCount?: Prisma.IntWithAggregatesFilter<"Result"> | number
+  wrongCount?: Prisma.IntWithAggregatesFilter<"Result"> | number
+  unattemptedCount?: Prisma.IntWithAggregatesFilter<"Result"> | number
   accuracy?: Prisma.FloatWithAggregatesFilter<"Result"> | number
-  timeTaken?: Prisma.IntWithAggregatesFilter<"Result"> | number
-  rank?: Prisma.IntNullableWithAggregatesFilter<"Result"> | number | null
-  percentile?: Prisma.FloatNullableWithAggregatesFilter<"Result"> | number | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Result"> | Date | string
-  updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Result"> | Date | string
 }
 
 export type ResultCreateInput = {
   id?: string
-  totalQuestions: number
-  attempted: number
-  correct: number
-  incorrect: number
-  skipped: number
+  score: number
   totalMarks: number
-  marksObtained: number
-  positiveMarks: number
-  negativeMarks: number
-  percentage: number
+  correctCount: number
+  wrongCount: number
+  unattemptedCount: number
   accuracy: number
-  timeTaken: number
-  rank?: number | null
-  percentile?: number | null
   createdAt?: Date | string
-  updatedAt?: Date | string
   attempt: Prisma.TestAttemptCreateNestedOneWithoutResultInput
 }
 
 export type ResultUncheckedCreateInput = {
   id?: string
   attemptId: string
-  totalQuestions: number
-  attempted: number
-  correct: number
-  incorrect: number
-  skipped: number
+  score: number
   totalMarks: number
-  marksObtained: number
-  positiveMarks: number
-  negativeMarks: number
-  percentage: number
+  correctCount: number
+  wrongCount: number
+  unattemptedCount: number
   accuracy: number
-  timeTaken: number
-  rank?: number | null
-  percentile?: number | null
   createdAt?: Date | string
-  updatedAt?: Date | string
 }
 
 export type ResultUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  totalQuestions?: Prisma.IntFieldUpdateOperationsInput | number
-  attempted?: Prisma.IntFieldUpdateOperationsInput | number
-  correct?: Prisma.IntFieldUpdateOperationsInput | number
-  incorrect?: Prisma.IntFieldUpdateOperationsInput | number
-  skipped?: Prisma.IntFieldUpdateOperationsInput | number
-  totalMarks?: Prisma.FloatFieldUpdateOperationsInput | number
-  marksObtained?: Prisma.FloatFieldUpdateOperationsInput | number
-  positiveMarks?: Prisma.FloatFieldUpdateOperationsInput | number
-  negativeMarks?: Prisma.FloatFieldUpdateOperationsInput | number
-  percentage?: Prisma.FloatFieldUpdateOperationsInput | number
+  score?: Prisma.FloatFieldUpdateOperationsInput | number
+  totalMarks?: Prisma.IntFieldUpdateOperationsInput | number
+  correctCount?: Prisma.IntFieldUpdateOperationsInput | number
+  wrongCount?: Prisma.IntFieldUpdateOperationsInput | number
+  unattemptedCount?: Prisma.IntFieldUpdateOperationsInput | number
   accuracy?: Prisma.FloatFieldUpdateOperationsInput | number
-  timeTaken?: Prisma.IntFieldUpdateOperationsInput | number
-  rank?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  percentile?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   attempt?: Prisma.TestAttemptUpdateOneRequiredWithoutResultNestedInput
 }
 
 export type ResultUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   attemptId?: Prisma.StringFieldUpdateOperationsInput | string
-  totalQuestions?: Prisma.IntFieldUpdateOperationsInput | number
-  attempted?: Prisma.IntFieldUpdateOperationsInput | number
-  correct?: Prisma.IntFieldUpdateOperationsInput | number
-  incorrect?: Prisma.IntFieldUpdateOperationsInput | number
-  skipped?: Prisma.IntFieldUpdateOperationsInput | number
-  totalMarks?: Prisma.FloatFieldUpdateOperationsInput | number
-  marksObtained?: Prisma.FloatFieldUpdateOperationsInput | number
-  positiveMarks?: Prisma.FloatFieldUpdateOperationsInput | number
-  negativeMarks?: Prisma.FloatFieldUpdateOperationsInput | number
-  percentage?: Prisma.FloatFieldUpdateOperationsInput | number
+  score?: Prisma.FloatFieldUpdateOperationsInput | number
+  totalMarks?: Prisma.IntFieldUpdateOperationsInput | number
+  correctCount?: Prisma.IntFieldUpdateOperationsInput | number
+  wrongCount?: Prisma.IntFieldUpdateOperationsInput | number
+  unattemptedCount?: Prisma.IntFieldUpdateOperationsInput | number
   accuracy?: Prisma.FloatFieldUpdateOperationsInput | number
-  timeTaken?: Prisma.IntFieldUpdateOperationsInput | number
-  rank?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  percentile?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type ResultCreateManyInput = {
   id?: string
   attemptId: string
-  totalQuestions: number
-  attempted: number
-  correct: number
-  incorrect: number
-  skipped: number
+  score: number
   totalMarks: number
-  marksObtained: number
-  positiveMarks: number
-  negativeMarks: number
-  percentage: number
+  correctCount: number
+  wrongCount: number
+  unattemptedCount: number
   accuracy: number
-  timeTaken: number
-  rank?: number | null
-  percentile?: number | null
   createdAt?: Date | string
-  updatedAt?: Date | string
 }
 
 export type ResultUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  totalQuestions?: Prisma.IntFieldUpdateOperationsInput | number
-  attempted?: Prisma.IntFieldUpdateOperationsInput | number
-  correct?: Prisma.IntFieldUpdateOperationsInput | number
-  incorrect?: Prisma.IntFieldUpdateOperationsInput | number
-  skipped?: Prisma.IntFieldUpdateOperationsInput | number
-  totalMarks?: Prisma.FloatFieldUpdateOperationsInput | number
-  marksObtained?: Prisma.FloatFieldUpdateOperationsInput | number
-  positiveMarks?: Prisma.FloatFieldUpdateOperationsInput | number
-  negativeMarks?: Prisma.FloatFieldUpdateOperationsInput | number
-  percentage?: Prisma.FloatFieldUpdateOperationsInput | number
+  score?: Prisma.FloatFieldUpdateOperationsInput | number
+  totalMarks?: Prisma.IntFieldUpdateOperationsInput | number
+  correctCount?: Prisma.IntFieldUpdateOperationsInput | number
+  wrongCount?: Prisma.IntFieldUpdateOperationsInput | number
+  unattemptedCount?: Prisma.IntFieldUpdateOperationsInput | number
   accuracy?: Prisma.FloatFieldUpdateOperationsInput | number
-  timeTaken?: Prisma.IntFieldUpdateOperationsInput | number
-  rank?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  percentile?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type ResultUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   attemptId?: Prisma.StringFieldUpdateOperationsInput | string
-  totalQuestions?: Prisma.IntFieldUpdateOperationsInput | number
-  attempted?: Prisma.IntFieldUpdateOperationsInput | number
-  correct?: Prisma.IntFieldUpdateOperationsInput | number
-  incorrect?: Prisma.IntFieldUpdateOperationsInput | number
-  skipped?: Prisma.IntFieldUpdateOperationsInput | number
-  totalMarks?: Prisma.FloatFieldUpdateOperationsInput | number
-  marksObtained?: Prisma.FloatFieldUpdateOperationsInput | number
-  positiveMarks?: Prisma.FloatFieldUpdateOperationsInput | number
-  negativeMarks?: Prisma.FloatFieldUpdateOperationsInput | number
-  percentage?: Prisma.FloatFieldUpdateOperationsInput | number
+  score?: Prisma.FloatFieldUpdateOperationsInput | number
+  totalMarks?: Prisma.IntFieldUpdateOperationsInput | number
+  correctCount?: Prisma.IntFieldUpdateOperationsInput | number
+  wrongCount?: Prisma.IntFieldUpdateOperationsInput | number
+  unattemptedCount?: Prisma.IntFieldUpdateOperationsInput | number
   accuracy?: Prisma.FloatFieldUpdateOperationsInput | number
-  timeTaken?: Prisma.IntFieldUpdateOperationsInput | number
-  rank?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  percentile?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type ResultNullableScalarRelationFilter = {
@@ -626,98 +423,55 @@ export type ResultNullableScalarRelationFilter = {
 export type ResultCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   attemptId?: Prisma.SortOrder
-  totalQuestions?: Prisma.SortOrder
-  attempted?: Prisma.SortOrder
-  correct?: Prisma.SortOrder
-  incorrect?: Prisma.SortOrder
-  skipped?: Prisma.SortOrder
+  score?: Prisma.SortOrder
   totalMarks?: Prisma.SortOrder
-  marksObtained?: Prisma.SortOrder
-  positiveMarks?: Prisma.SortOrder
-  negativeMarks?: Prisma.SortOrder
-  percentage?: Prisma.SortOrder
+  correctCount?: Prisma.SortOrder
+  wrongCount?: Prisma.SortOrder
+  unattemptedCount?: Prisma.SortOrder
   accuracy?: Prisma.SortOrder
-  timeTaken?: Prisma.SortOrder
-  rank?: Prisma.SortOrder
-  percentile?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
-  updatedAt?: Prisma.SortOrder
 }
 
 export type ResultAvgOrderByAggregateInput = {
-  totalQuestions?: Prisma.SortOrder
-  attempted?: Prisma.SortOrder
-  correct?: Prisma.SortOrder
-  incorrect?: Prisma.SortOrder
-  skipped?: Prisma.SortOrder
+  score?: Prisma.SortOrder
   totalMarks?: Prisma.SortOrder
-  marksObtained?: Prisma.SortOrder
-  positiveMarks?: Prisma.SortOrder
-  negativeMarks?: Prisma.SortOrder
-  percentage?: Prisma.SortOrder
+  correctCount?: Prisma.SortOrder
+  wrongCount?: Prisma.SortOrder
+  unattemptedCount?: Prisma.SortOrder
   accuracy?: Prisma.SortOrder
-  timeTaken?: Prisma.SortOrder
-  rank?: Prisma.SortOrder
-  percentile?: Prisma.SortOrder
 }
 
 export type ResultMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   attemptId?: Prisma.SortOrder
-  totalQuestions?: Prisma.SortOrder
-  attempted?: Prisma.SortOrder
-  correct?: Prisma.SortOrder
-  incorrect?: Prisma.SortOrder
-  skipped?: Prisma.SortOrder
+  score?: Prisma.SortOrder
   totalMarks?: Prisma.SortOrder
-  marksObtained?: Prisma.SortOrder
-  positiveMarks?: Prisma.SortOrder
-  negativeMarks?: Prisma.SortOrder
-  percentage?: Prisma.SortOrder
+  correctCount?: Prisma.SortOrder
+  wrongCount?: Prisma.SortOrder
+  unattemptedCount?: Prisma.SortOrder
   accuracy?: Prisma.SortOrder
-  timeTaken?: Prisma.SortOrder
-  rank?: Prisma.SortOrder
-  percentile?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
-  updatedAt?: Prisma.SortOrder
 }
 
 export type ResultMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   attemptId?: Prisma.SortOrder
-  totalQuestions?: Prisma.SortOrder
-  attempted?: Prisma.SortOrder
-  correct?: Prisma.SortOrder
-  incorrect?: Prisma.SortOrder
-  skipped?: Prisma.SortOrder
+  score?: Prisma.SortOrder
   totalMarks?: Prisma.SortOrder
-  marksObtained?: Prisma.SortOrder
-  positiveMarks?: Prisma.SortOrder
-  negativeMarks?: Prisma.SortOrder
-  percentage?: Prisma.SortOrder
+  correctCount?: Prisma.SortOrder
+  wrongCount?: Prisma.SortOrder
+  unattemptedCount?: Prisma.SortOrder
   accuracy?: Prisma.SortOrder
-  timeTaken?: Prisma.SortOrder
-  rank?: Prisma.SortOrder
-  percentile?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
-  updatedAt?: Prisma.SortOrder
 }
 
 export type ResultSumOrderByAggregateInput = {
-  totalQuestions?: Prisma.SortOrder
-  attempted?: Prisma.SortOrder
-  correct?: Prisma.SortOrder
-  incorrect?: Prisma.SortOrder
-  skipped?: Prisma.SortOrder
+  score?: Prisma.SortOrder
   totalMarks?: Prisma.SortOrder
-  marksObtained?: Prisma.SortOrder
-  positiveMarks?: Prisma.SortOrder
-  negativeMarks?: Prisma.SortOrder
-  percentage?: Prisma.SortOrder
+  correctCount?: Prisma.SortOrder
+  wrongCount?: Prisma.SortOrder
+  unattemptedCount?: Prisma.SortOrder
   accuracy?: Prisma.SortOrder
-  timeTaken?: Prisma.SortOrder
-  rank?: Prisma.SortOrder
-  percentile?: Prisma.SortOrder
 }
 
 export type ResultCreateNestedOneWithoutAttemptInput = {
@@ -760,52 +514,26 @@ export type FloatFieldUpdateOperationsInput = {
   divide?: number
 }
 
-export type NullableIntFieldUpdateOperationsInput = {
-  set?: number | null
-  increment?: number
-  decrement?: number
-  multiply?: number
-  divide?: number
-}
-
 export type ResultCreateWithoutAttemptInput = {
   id?: string
-  totalQuestions: number
-  attempted: number
-  correct: number
-  incorrect: number
-  skipped: number
+  score: number
   totalMarks: number
-  marksObtained: number
-  positiveMarks: number
-  negativeMarks: number
-  percentage: number
+  correctCount: number
+  wrongCount: number
+  unattemptedCount: number
   accuracy: number
-  timeTaken: number
-  rank?: number | null
-  percentile?: number | null
   createdAt?: Date | string
-  updatedAt?: Date | string
 }
 
 export type ResultUncheckedCreateWithoutAttemptInput = {
   id?: string
-  totalQuestions: number
-  attempted: number
-  correct: number
-  incorrect: number
-  skipped: number
+  score: number
   totalMarks: number
-  marksObtained: number
-  positiveMarks: number
-  negativeMarks: number
-  percentage: number
+  correctCount: number
+  wrongCount: number
+  unattemptedCount: number
   accuracy: number
-  timeTaken: number
-  rank?: number | null
-  percentile?: number | null
   createdAt?: Date | string
-  updatedAt?: Date | string
 }
 
 export type ResultCreateOrConnectWithoutAttemptInput = {
@@ -826,42 +554,24 @@ export type ResultUpdateToOneWithWhereWithoutAttemptInput = {
 
 export type ResultUpdateWithoutAttemptInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  totalQuestions?: Prisma.IntFieldUpdateOperationsInput | number
-  attempted?: Prisma.IntFieldUpdateOperationsInput | number
-  correct?: Prisma.IntFieldUpdateOperationsInput | number
-  incorrect?: Prisma.IntFieldUpdateOperationsInput | number
-  skipped?: Prisma.IntFieldUpdateOperationsInput | number
-  totalMarks?: Prisma.FloatFieldUpdateOperationsInput | number
-  marksObtained?: Prisma.FloatFieldUpdateOperationsInput | number
-  positiveMarks?: Prisma.FloatFieldUpdateOperationsInput | number
-  negativeMarks?: Prisma.FloatFieldUpdateOperationsInput | number
-  percentage?: Prisma.FloatFieldUpdateOperationsInput | number
+  score?: Prisma.FloatFieldUpdateOperationsInput | number
+  totalMarks?: Prisma.IntFieldUpdateOperationsInput | number
+  correctCount?: Prisma.IntFieldUpdateOperationsInput | number
+  wrongCount?: Prisma.IntFieldUpdateOperationsInput | number
+  unattemptedCount?: Prisma.IntFieldUpdateOperationsInput | number
   accuracy?: Prisma.FloatFieldUpdateOperationsInput | number
-  timeTaken?: Prisma.IntFieldUpdateOperationsInput | number
-  rank?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  percentile?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type ResultUncheckedUpdateWithoutAttemptInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  totalQuestions?: Prisma.IntFieldUpdateOperationsInput | number
-  attempted?: Prisma.IntFieldUpdateOperationsInput | number
-  correct?: Prisma.IntFieldUpdateOperationsInput | number
-  incorrect?: Prisma.IntFieldUpdateOperationsInput | number
-  skipped?: Prisma.IntFieldUpdateOperationsInput | number
-  totalMarks?: Prisma.FloatFieldUpdateOperationsInput | number
-  marksObtained?: Prisma.FloatFieldUpdateOperationsInput | number
-  positiveMarks?: Prisma.FloatFieldUpdateOperationsInput | number
-  negativeMarks?: Prisma.FloatFieldUpdateOperationsInput | number
-  percentage?: Prisma.FloatFieldUpdateOperationsInput | number
+  score?: Prisma.FloatFieldUpdateOperationsInput | number
+  totalMarks?: Prisma.IntFieldUpdateOperationsInput | number
+  correctCount?: Prisma.IntFieldUpdateOperationsInput | number
+  wrongCount?: Prisma.IntFieldUpdateOperationsInput | number
+  unattemptedCount?: Prisma.IntFieldUpdateOperationsInput | number
   accuracy?: Prisma.FloatFieldUpdateOperationsInput | number
-  timeTaken?: Prisma.IntFieldUpdateOperationsInput | number
-  rank?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  percentile?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 
@@ -869,91 +579,55 @@ export type ResultUncheckedUpdateWithoutAttemptInput = {
 export type ResultSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   attemptId?: boolean
-  totalQuestions?: boolean
-  attempted?: boolean
-  correct?: boolean
-  incorrect?: boolean
-  skipped?: boolean
+  score?: boolean
   totalMarks?: boolean
-  marksObtained?: boolean
-  positiveMarks?: boolean
-  negativeMarks?: boolean
-  percentage?: boolean
+  correctCount?: boolean
+  wrongCount?: boolean
+  unattemptedCount?: boolean
   accuracy?: boolean
-  timeTaken?: boolean
-  rank?: boolean
-  percentile?: boolean
   createdAt?: boolean
-  updatedAt?: boolean
   attempt?: boolean | Prisma.TestAttemptDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["result"]>
 
 export type ResultSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   attemptId?: boolean
-  totalQuestions?: boolean
-  attempted?: boolean
-  correct?: boolean
-  incorrect?: boolean
-  skipped?: boolean
+  score?: boolean
   totalMarks?: boolean
-  marksObtained?: boolean
-  positiveMarks?: boolean
-  negativeMarks?: boolean
-  percentage?: boolean
+  correctCount?: boolean
+  wrongCount?: boolean
+  unattemptedCount?: boolean
   accuracy?: boolean
-  timeTaken?: boolean
-  rank?: boolean
-  percentile?: boolean
   createdAt?: boolean
-  updatedAt?: boolean
   attempt?: boolean | Prisma.TestAttemptDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["result"]>
 
 export type ResultSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   attemptId?: boolean
-  totalQuestions?: boolean
-  attempted?: boolean
-  correct?: boolean
-  incorrect?: boolean
-  skipped?: boolean
+  score?: boolean
   totalMarks?: boolean
-  marksObtained?: boolean
-  positiveMarks?: boolean
-  negativeMarks?: boolean
-  percentage?: boolean
+  correctCount?: boolean
+  wrongCount?: boolean
+  unattemptedCount?: boolean
   accuracy?: boolean
-  timeTaken?: boolean
-  rank?: boolean
-  percentile?: boolean
   createdAt?: boolean
-  updatedAt?: boolean
   attempt?: boolean | Prisma.TestAttemptDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["result"]>
 
 export type ResultSelectScalar = {
   id?: boolean
   attemptId?: boolean
-  totalQuestions?: boolean
-  attempted?: boolean
-  correct?: boolean
-  incorrect?: boolean
-  skipped?: boolean
+  score?: boolean
   totalMarks?: boolean
-  marksObtained?: boolean
-  positiveMarks?: boolean
-  negativeMarks?: boolean
-  percentage?: boolean
+  correctCount?: boolean
+  wrongCount?: boolean
+  unattemptedCount?: boolean
   accuracy?: boolean
-  timeTaken?: boolean
-  rank?: boolean
-  percentile?: boolean
   createdAt?: boolean
-  updatedAt?: boolean
 }
 
-export type ResultOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "attemptId" | "totalQuestions" | "attempted" | "correct" | "incorrect" | "skipped" | "totalMarks" | "marksObtained" | "positiveMarks" | "negativeMarks" | "percentage" | "accuracy" | "timeTaken" | "rank" | "percentile" | "createdAt" | "updatedAt", ExtArgs["result"]["result"]>
+export type ResultOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "attemptId" | "score" | "totalMarks" | "correctCount" | "wrongCount" | "unattemptedCount" | "accuracy" | "createdAt", ExtArgs["result"]["result"]>
 export type ResultInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   attempt?: boolean | Prisma.TestAttemptDefaultArgs<ExtArgs>
 }
@@ -972,22 +646,13 @@ export type $ResultPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     attemptId: string
-    totalQuestions: number
-    attempted: number
-    correct: number
-    incorrect: number
-    skipped: number
+    score: number
     totalMarks: number
-    marksObtained: number
-    positiveMarks: number
-    negativeMarks: number
-    percentage: number
+    correctCount: number
+    wrongCount: number
+    unattemptedCount: number
     accuracy: number
-    timeTaken: number
-    rank: number | null
-    percentile: number | null
     createdAt: Date
-    updatedAt: Date
   }, ExtArgs["result"]["result"]>
   composites: {}
 }
@@ -1414,22 +1079,13 @@ export interface Prisma__ResultClient<T, Null = never, ExtArgs extends runtime.T
 export interface ResultFieldRefs {
   readonly id: Prisma.FieldRef<"Result", 'String'>
   readonly attemptId: Prisma.FieldRef<"Result", 'String'>
-  readonly totalQuestions: Prisma.FieldRef<"Result", 'Int'>
-  readonly attempted: Prisma.FieldRef<"Result", 'Int'>
-  readonly correct: Prisma.FieldRef<"Result", 'Int'>
-  readonly incorrect: Prisma.FieldRef<"Result", 'Int'>
-  readonly skipped: Prisma.FieldRef<"Result", 'Int'>
-  readonly totalMarks: Prisma.FieldRef<"Result", 'Float'>
-  readonly marksObtained: Prisma.FieldRef<"Result", 'Float'>
-  readonly positiveMarks: Prisma.FieldRef<"Result", 'Float'>
-  readonly negativeMarks: Prisma.FieldRef<"Result", 'Float'>
-  readonly percentage: Prisma.FieldRef<"Result", 'Float'>
+  readonly score: Prisma.FieldRef<"Result", 'Float'>
+  readonly totalMarks: Prisma.FieldRef<"Result", 'Int'>
+  readonly correctCount: Prisma.FieldRef<"Result", 'Int'>
+  readonly wrongCount: Prisma.FieldRef<"Result", 'Int'>
+  readonly unattemptedCount: Prisma.FieldRef<"Result", 'Int'>
   readonly accuracy: Prisma.FieldRef<"Result", 'Float'>
-  readonly timeTaken: Prisma.FieldRef<"Result", 'Int'>
-  readonly rank: Prisma.FieldRef<"Result", 'Int'>
-  readonly percentile: Prisma.FieldRef<"Result", 'Float'>
   readonly createdAt: Prisma.FieldRef<"Result", 'DateTime'>
-  readonly updatedAt: Prisma.FieldRef<"Result", 'DateTime'>
 }
     
 

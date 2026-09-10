@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getTests } from "@/actions/test.actions";
+import { getTests } from "@/lib/actions/test.actions";
 import TestTable from "@/components/tests/TestTable";
 
 export default async function TestsPage() {

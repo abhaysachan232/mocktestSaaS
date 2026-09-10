@@ -7,7 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 
 import { testSchema, type TestFormValues } from "@/schemas/test";
 
-import { createTest, updateTest } from "@/actions/test.actions";
+import { createTest, updateTest } from "@/lib/actions/test.actions";
 
 import TestBasicDetails from "./TestBasicDetails";
 import TestExamSelector from "./TestExamSelector";

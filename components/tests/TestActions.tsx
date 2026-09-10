@@ -8,7 +8,7 @@ import {
   deleteTest,
   publishTest,
   unpublishTest,
-} from "@/actions/test.actions";
+} from "@/lib/actions/test.actions";
 
 type Props = {
   id: string;

@@ -1,5 +1,5 @@
 import TestForm from "@/components/tests/TestForm";
-import { getTestExams } from "@/actions/test.actions";
+import { getTestExams } from "@/lib/actions/test.actions";
 
 export default async function NewTestPage() {
   const exams = await getTestExams();

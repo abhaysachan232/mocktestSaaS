@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { getTestById, getTestExams } from "@/actions/test.actions";
+import { getTestById, getTestExams } from "@/lib/actions/test.actions";
 import TestForm from "@/components/tests/TestForm";
 
 type Props = {

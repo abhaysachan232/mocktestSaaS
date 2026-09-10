@@ -2,7 +2,7 @@
 
 import { useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { deleteQuestion } from "@/actions/question.actions";
+import { deleteQuestion } from "@/lib/actions/question.actions";
 
 export default function DeleteQuestionButton({ id }: { id: string }) {
   const router = useRouter();

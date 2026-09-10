@@ -288,22 +288,13 @@ export type AttemptAnswerScalarFieldEnum = (typeof AttemptAnswerScalarFieldEnum)
 export const ResultScalarFieldEnum = {
   id: 'id',
   attemptId: 'attemptId',
-  totalQuestions: 'totalQuestions',
-  attempted: 'attempted',
-  correct: 'correct',
-  incorrect: 'incorrect',
-  skipped: 'skipped',
+  score: 'score',
   totalMarks: 'totalMarks',
-  marksObtained: 'marksObtained',
-  positiveMarks: 'positiveMarks',
-  negativeMarks: 'negativeMarks',
-  percentage: 'percentage',
+  correctCount: 'correctCount',
+  wrongCount: 'wrongCount',
+  unattemptedCount: 'unattemptedCount',
   accuracy: 'accuracy',
-  timeTaken: 'timeTaken',
-  rank: 'rank',
-  percentile: 'percentile',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  createdAt: 'createdAt'
 } as const
 
 export type ResultScalarFieldEnum = (typeof ResultScalarFieldEnum)[keyof typeof ResultScalarFieldEnum]

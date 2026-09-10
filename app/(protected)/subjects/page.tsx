@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getSubjects } from "@/actions/subject.actions";
+import { getSubjects } from "@/lib/actions/subject.actions";
 import SubjectTable from "@/components/subjects/SubjectTable";
 
 export default async function SubjectsPage() {
