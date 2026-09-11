@@ -666,6 +666,23 @@ export async function getStudentDashboard() {
 
     /*
      * ---------------------------------------------------------
+     * TEST TYPE MAP (Prisma enum -> frontend TestItem type)
+     * ---------------------------------------------------------
+     */
+
+    const testTypeMap: Record<
+      (typeof tests)[number]["testType"],
+      "MOCK_TEST" | "PRACTICE" | "PREVIOUS_YEAR" | "SECTIONAL" | "FULL_LENGTH"
+    > = {
+      MOCK: "MOCK_TEST",
+      PRACTICE: "PRACTICE",
+      FULL_LENGTH: "FULL_LENGTH",
+      SUBJECT_WISE: "SECTIONAL",
+      TOPIC_WISE: "SECTIONAL",
+    };
+
+    /*
+     * ---------------------------------------------------------
      * CALCULATE ATTEMPT RESULT
      * ---------------------------------------------------------
      */
@@ -719,8 +736,7 @@ export async function getStudentDashboard() {
         const isCorrect =
           correctOptionIds.length === selectedOptionIds.length &&
           correctOptionIds.every(
-            (optionId, index) =>
-              optionId === selectedOptionIds[index],
+            (optionId, index) => optionId === selectedOptionIds[index],
           );
 
         if (isCorrect) {
@@ -732,48 +748,30 @@ export async function getStudentDashboard() {
 
       const attempted = attemptedAnswers.length;
 
-      const skipped = Math.max(
-        test.totalQuestions - attempted,
-        0,
-      );
+      const skipped = Math.max(test.totalQuestions - attempted, 0);
 
       const marksPerQuestion =
-        test.totalQuestions > 0
-          ? test.totalMarks / test.totalQuestions
-          : 0;
+        test.totalQuestions > 0 ? test.totalMarks / test.totalQuestions : 0;
 
       const negativeMarksPerQuestion =
-        test.negativeMarking && test.negativeMarks
-          ? test.negativeMarks
-          : 0;
+        test.negativeMarking && test.negativeMarks ? test.negativeMarks : 0;
 
       const positiveMarks = correct * marksPerQuestion;
 
-      const negativeMarks =
-        incorrect * negativeMarksPerQuestion;
+      const negativeMarks = incorrect * negativeMarksPerQuestion;
 
-      const marksObtained =
-        positiveMarks - negativeMarks;
+      const marksObtained = positiveMarks - negativeMarks;
 
       const percentage =
-        test.totalMarks > 0
-          ? (marksObtained / test.totalMarks) * 100
-          : 0;
+        test.totalMarks > 0 ? (marksObtained / test.totalMarks) * 100 : 0;
 
-      const accuracy =
-        attempted > 0
-          ? (correct / attempted) * 100
-          : 0;
+      const accuracy = attempted > 0 ? (correct / attempted) * 100 : 0;
 
-      const endTime =
-        attempt.submittedAt ?? attempt.expiresAt;
+      const endTime = attempt.submittedAt ?? attempt.expiresAt;
 
       const timeTaken = Math.max(
         0,
-        Math.floor(
-          (endTime.getTime() - attempt.startedAt.getTime()) /
-            1000,
-        ),
+        Math.floor((endTime.getTime() - attempt.startedAt.getTime()) / 1000),
       );
 
       return {
@@ -783,8 +781,7 @@ export async function getStudentDashboard() {
         examName: test.exam.name,
         testType: test.testType,
 
-        attemptedAt:
-          attempt.submittedAt ?? attempt.createdAt,
+        attemptedAt: attempt.submittedAt ?? attempt.createdAt,
 
         totalQuestions: test.totalQuestions,
         attempted,
@@ -807,7 +804,7 @@ export async function getStudentDashboard() {
 
     /*
      * ---------------------------------------------------------
-     * ALL STUDENT RESULTS
+     * ALL STUDENT RESULTS (for Results.tsx)
      * ---------------------------------------------------------
      */
 
@@ -819,25 +816,15 @@ export async function getStudentDashboard() {
       );
 
       for (const attempt of submittedAttempts) {
-        results.push(
-          calculateAttemptResult(test, attempt),
-        );
+        results.push(calculateAttemptResult(test, attempt));
       }
     }
 
-    /*
-     * Latest result first
-     */
-
-    results.sort(
-      (a, b) =>
-        b.attemptedAt.getTime() -
-        a.attemptedAt.getTime(),
-    );
+    results.sort((a, b) => b.attemptedAt.getTime() - a.attemptedAt.getTime());
 
     /*
      * ---------------------------------------------------------
-     * FORMAT TESTS
+     * FORMAT TESTS (for Tests.tsx / TestItem)
      * ---------------------------------------------------------
      */
 
@@ -852,38 +839,31 @@ export async function getStudentDashboard() {
         (attempt) => attempt.status === "SUBMITTED",
       );
 
-      const calculatedAttempts =
-        submittedAttempts.map((attempt) =>
-          calculateAttemptResult(test, attempt),
-        );
+      const calculatedAttempts = submittedAttempts.map((attempt) =>
+        calculateAttemptResult(test, attempt),
+      );
 
-      const latestSubmittedAttempt =
-        calculatedAttempts[0] ?? null;
+      const latestSubmittedAttempt = calculatedAttempts[0] ?? null;
 
-      const bestAttempt =
-        calculatedAttempts.reduce<
-          CalculatedResult | null
-        >((best, current) => {
-          if (!best) {
-            return current;
-          }
+      const bestAttempt = calculatedAttempts.reduce<CalculatedResult | null>(
+        (best, current) => {
+          if (!best) return current;
+          return current.marksObtained > best.marksObtained ? current : best;
+        },
+        null,
+      );
 
-          return current.marksObtained >
-            best.marksObtained
-            ? current
-            : best;
-        }, null);
-
-      let status:
-        | "NOT_STARTED"
-        | "IN_PROGRESS"
-        | "COMPLETED" = "NOT_STARTED";
+      let status: "NOT_STARTED" | "IN_PROGRESS" | "COMPLETED" = "NOT_STARTED";
 
       if (inProgressAttempt) {
         status = "IN_PROGRESS";
       } else if (submittedAttempts.length > 0) {
         status = "COMPLETED";
       }
+
+      // Single source of truth for "which attempt to open on View Result"
+      const attemptIdToReview =
+        inProgressAttempt?.id ?? bestAttempt?.attemptId ?? null;
 
       return {
         id: test.id,
@@ -896,7 +876,7 @@ export async function getStudentDashboard() {
 
         subject: null,
 
-        type: test.testType,
+        type: testTypeMap[test.testType],
 
         questions: test.totalQuestions,
         duration: test.duration,
@@ -909,68 +889,16 @@ export async function getStudentDashboard() {
 
         attempts: submittedAttempts.length,
 
-        lastScore:
-          latestSubmittedAttempt?.marksObtained ?? null,
-
-        bestScore:
-          bestAttempt?.marksObtained ?? null,
+        lastScore: latestSubmittedAttempt?.marksObtained ?? null,
+        bestScore: bestAttempt?.marksObtained ?? null,
 
         status,
 
+        // Top-level field TestItem/onViewResult expects
+        attemptId: attemptIdToReview ?? undefined,
+
         negativeMarking: test.negativeMarking,
         negativeMarks: test.negativeMarks,
-
-        inProgressAttemptId:
-          inProgressAttempt?.id ?? null,
-
-        lastResult: latestSubmittedAttempt
-          ? {
-              attemptId:
-                latestSubmittedAttempt.attemptId,
-
-              totalQuestions:
-                latestSubmittedAttempt.totalQuestions,
-
-              attempted:
-                latestSubmittedAttempt.attempted,
-
-              correct:
-                latestSubmittedAttempt.correct,
-
-              incorrect:
-                latestSubmittedAttempt.incorrect,
-
-              skipped:
-                latestSubmittedAttempt.skipped,
-
-              totalMarks:
-                latestSubmittedAttempt.totalMarks,
-
-              marksObtained:
-                latestSubmittedAttempt.marksObtained,
-
-              positiveMarks:
-                latestSubmittedAttempt.positiveMarks,
-
-              negativeMarks:
-                latestSubmittedAttempt.negativeMarks,
-
-              percentage:
-                latestSubmittedAttempt.percentage,
-
-              accuracy:
-                latestSubmittedAttempt.accuracy,
-
-              duration:
-                latestSubmittedAttempt.duration,
-
-              timeTaken:
-                latestSubmittedAttempt.timeTaken,
-
-              attemptedAt:
-                latestSubmittedAttempt.attemptedAt,
-            }
-          : null,
       };
     });
 
@@ -994,6 +922,96 @@ export async function getStudentDashboard() {
 
     /*
      * ---------------------------------------------------------
+     * LEADERBOARD (all-time, across the same test pool this
+     * student can see — admin tests + their coaching's tests)
+     * ---------------------------------------------------------
+     */
+
+    const testIds = tests.map((test) => test.id);
+
+    const leaderboardAttempts =
+      testIds.length > 0
+        ? await prisma.testAttempt.findMany({
+            where: {
+              status: "SUBMITTED",
+              testId: { in: testIds },
+              result: { isNot: null },
+            },
+            select: {
+              userId: true,
+              user: {
+                select: {
+                  student: {
+                    select: { name: true },
+                  },
+                  coachings: {
+                    select: {
+                      coaching: { select: { coachingName: true } },
+                    },
+                    orderBy: { createdAt: "asc" },
+                    take: 1,
+                  },
+                },
+              },
+              result: {
+                select: {
+                  score: true,
+                },
+              },
+            },
+          })
+        : [];
+
+    type LeaderboardAgg = {
+      userId: string;
+      studentName: string;
+      coachingName: string | null;
+      totalScore: number;
+      totalTests: number;
+    };
+
+    const leaderboardByUser = new Map<string, LeaderboardAgg>();
+
+    for (const attempt of leaderboardAttempts) {
+      if (!attempt.result) continue;
+
+      const existing = leaderboardByUser.get(attempt.userId);
+      const marks = attempt.result.score;
+
+      if (existing) {
+        existing.totalScore += marks;
+        existing.totalTests += 1;
+      } else {
+        leaderboardByUser.set(attempt.userId, {
+          userId: attempt.userId,
+          studentName: attempt.user.student?.name ?? "Student",
+          coachingName:
+            attempt.user.coachings[0]?.coaching.coachingName ?? null,
+          totalScore: marks,
+          totalTests: 1,
+        });
+      }
+    }
+
+    const leaderboardEntries = Array.from(leaderboardByUser.values())
+      .sort((a, b) => b.totalScore - a.totalScore)
+      .map((entry, index) => ({
+        rank: index + 1,
+        studentId: entry.userId,
+        studentName: entry.studentName,
+        avatarUrl: null,
+        coachingName: entry.coachingName,
+        score: Math.round(entry.totalScore * 100) / 100,
+        totalTests: entry.totalTests,
+        isCurrentUser: entry.userId === userId,
+        trend: "SAME" as const,
+      }));
+
+    const leaderboardCurrentUserEntry =
+      leaderboardEntries.find((entry) => entry.isCurrentUser) ?? null;
+
+    /*
+     * ---------------------------------------------------------
      * RESULT SUMMARY
      * ---------------------------------------------------------
      */
@@ -1011,22 +1029,15 @@ export async function getStudentDashboard() {
     );
 
     const averagePercentage =
-      totalTestsAttempted > 0
-        ? totalPercentage / totalTestsAttempted
-        : 0;
+      totalTestsAttempted > 0 ? totalPercentage / totalTestsAttempted : 0;
 
     const averageAccuracy =
-      totalTestsAttempted > 0
-        ? totalAccuracy / totalTestsAttempted
-        : 0;
+      totalTestsAttempted > 0 ? totalAccuracy / totalTestsAttempted : 0;
 
     const bestResult =
       results.length > 0
         ? results.reduce((best, current) =>
-            current.marksObtained >
-            best.marksObtained
-              ? current
-              : best,
+            current.marksObtained > best.marksObtained ? current : best,
           )
         : null;
 
@@ -1075,6 +1086,15 @@ export async function getStudentDashboard() {
         tests: formattedTests,
 
         /*
+         * Leaderboard.tsx props
+         */
+        leaderboard: {
+          entries: leaderboardEntries,
+          currentUserEntry: leaderboardCurrentUserEntry,
+          period: "ALL_TIME" as const,
+        },
+
+        /*
          * Results.tsx props
          */
         results,
@@ -1082,8 +1102,7 @@ export async function getStudentDashboard() {
         resultSummary: {
           totalTestsAttempted,
           averagePercentage,
-          bestScore:
-            bestResult?.marksObtained ?? 0,
+          bestScore: bestResult?.marksObtained ?? 0,
           averageAccuracy,
 
           totalAttempted,
@@ -1094,10 +1113,7 @@ export async function getStudentDashboard() {
       },
     };
   } catch (error) {
-    console.error(
-      "GET_STUDENT_DASHBOARD_ERROR:",
-      error,
-    );
+    console.error("GET_STUDENT_DASHBOARD_ERROR:", error);
 
     return {
       success: false,

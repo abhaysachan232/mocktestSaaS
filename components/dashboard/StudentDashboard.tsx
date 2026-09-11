@@ -9,7 +9,7 @@ import Results, {
   StudentResultItem,
   StudentResultSummary,
 } from "./student/Results";
-import Leaderboard from "./Leaderboard";
+import Leaderboard, { LeaderboardData } from "./student/Leaderboard";
 import Profile, { ProfileProps } from "./student/Profile";
 import ResultView from "../testResult/ResultView";
 
@@ -18,6 +18,7 @@ interface studentDashboardProps extends ProfileProps {
   tests: TestItem[];
   results: StudentResultItem[];
   resultSummary: StudentResultSummary;
+  leaderboard: LeaderboardData;
 }
 
 type Props = {
@@ -25,17 +26,24 @@ type Props = {
 };
 
 export default function StudentDashboardPage({ data }: Props) {
+  console.log('data', data)
   const [, startTransition] = useTransition();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { student, coachings, exams, tests, results, resultSummary } = data;
+  const {
+    student,
+    coachings,
+    exams,
+    tests,
+    results,
+    resultSummary,
+    leaderboard,
+  } = data;
   const [activeTab, setActiveTab] = useState("dashboard");
 
   // When set, the dashboard shows ResultView instead of the active tab's
   // normal content — no route change, just an in-place panel swap.
-  const [viewingAttemptId, setViewingAttemptId] = useState<string | null>(
-    null,
-  );
+  const [viewingAttemptId, setViewingAttemptId] = useState<string | null>(null);
 
   const openResult = (attemptId: string) => setViewingAttemptId(attemptId);
   const closeResult = () => setViewingAttemptId(null);
@@ -79,8 +87,13 @@ export default function StudentDashboardPage({ data }: Props) {
               // review) for this to work — it isn't in the type as shared
               // earlier. Add it wherever TestItem is built server-side, or
               // swap this line for however you're identifying the attempt.
-              const attemptId = (test as unknown as { attemptId?: string })
-                .attemptId;
+              const attemptId = (
+                test as {
+                  lastResult?: {
+                    attemptId: string;
+                  };
+                }
+              ).lastResult?.attemptId;
               if (attemptId) openResult(attemptId);
             }}
           />
@@ -101,7 +114,18 @@ export default function StudentDashboardPage({ data }: Props) {
         );
 
       case "leaderboard":
-        return <Leaderboard leaderboard={null} />;
+        return (
+          <Leaderboard
+            leaderboard={leaderboard}
+            exams={exams}
+            onExamChange={(examId) => {
+              /* fetch/filter logic */
+            }}
+            onPeriodChange={(period) => {
+              /* fetch/filter logic */
+            }}
+          />
+        );
 
       case "profile":
         return <Profile student={student} coachings={coachings} />;
