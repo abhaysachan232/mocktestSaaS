@@ -28,7 +28,7 @@ interface StudentProps {
 }
 
 interface CoachingProps {
-  logo: string;
+  logo: string | null;
   name: string;
   mobile: string;
   address: string;

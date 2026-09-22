@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import { getQuestionSubjects } from "@/lib/actions/question.actions";
 import QuestionForm from "@/components/questions/QuestionForm";
 

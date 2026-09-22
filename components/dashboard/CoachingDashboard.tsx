@@ -2,21 +2,11 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { BookOpen, Plus, Users } from "lucide-react";
+import { Plus, Users } from "lucide-react";
 
 import { DataTable } from "../ui/DataTable";
 import { StatsGrid } from "../ui/StatsGrid";
-
-type Coaching = {
-  id: string;
-  code: string;
-  coachingName: string;
-  mobile: string;
-  logo: string | null;
-  address: string;
-  ownerName: string;
-  email: string | null;
-};
+import type { CoachingProps } from "@/types/dashboard";
 
 type CoachingStudent = {
   id: string;
@@ -24,106 +14,15 @@ type CoachingStudent = {
   dob: string | Date;
   mobile: string;
   user: {
-    id: string;
     email: string;
-    role: string;
     isActive: boolean;
   };
 };
 
-type CoachingDashboardStats = {
-  totalStudents: number;
-  totalTests: number;
-  publishedTests: number;
-  totalAttempts: number;
-};
-
-type CoachingTest = {
-  id: string;
-  name: string;
-  slug: string;
-  description: string | null;
-  testType: string;
-  status: string;
-  examId: string;
-  duration: number;
-  totalMarks: number;
-  totalQuestions: number;
-  negativeMarking: boolean;
-  negativeMarks: number | null;
-  publishedAt: string | Date | null;
-  createdAt: string | Date;
-};
-
-type CoachingAttempt = {
-  id: string;
-  testId: string;
-  userId: string;
-  status: string;
-  startedAt: string | Date;
-  submittedAt: string | Date | null;
-  createdAt: string | Date;
-  test: {
-    id: string;
-    name: string;
-    totalMarks: number;
-    totalQuestions: number;
-  };
-  user: {
-    id: string;
-    email: string;
-    student: {
-      id: string;
-      name: string;
-    } | null;
-  };
-};
-
-type CoachingResult = {
-  id: string;
-  attemptId: string;
-  totalQuestions: number;
-  attempted: number;
-  correct: number;
-  incorrect: number;
-  skipped: number;
-  totalMarks: number;
-  marksObtained: number;
-  positiveMarks: number;
-  negativeMarks: number;
-  percentage: number;
-  accuracy: number;
-  timeTaken: number;
-  rank: number | null;
-  percentile: number | null;
-  createdAt: string | Date;
-  attempt: {
-    id: string;
-    testId: string;
-    userId: string;
-    test: {
-      id: string;
-      name: string;
-    };
-    user: {
-      id: string;
-      email: string;
-      student: {
-        id: string;
-        name: string;
-      } | null;
-    };
-  };
-};
 
 type CoachingDashboardData = {
-  coaching: Coaching;
+  coaching: CoachingProps;
   students: CoachingStudent[];
-  stats: CoachingDashboardStats;
-  tests: CoachingTest[];
-  attempts: CoachingAttempt[];
-  results: CoachingResult[];
-  recentResults: CoachingResult[];
 };
 
 type Props = {
@@ -131,38 +30,17 @@ type Props = {
 };
 
 export default function CoachingDashboardPage({ data }: Props) {
+  const { coaching, students} = data;
+  console.log('coaching', data)
   const stats = [
     {
       title: "Total Students",
-      value: data.stats.totalStudents,
+      value: students.length,
       icon: Users,
       iconBg: "bg-green-100",
       iconColor: "text-green-600",
     },
-    {
-      title: "Total Tests",
-      value: data.stats.totalTests,
-      icon: BookOpen,
-      iconBg: "bg-purple-100",
-      iconColor: "text-purple-600",
-    },
-    {
-      title: "Published Tests",
-      value: data.stats.publishedTests,
-      icon: BookOpen,
-      iconBg: "bg-blue-100",
-      iconColor: "text-blue-600",
-    },
-    {
-      title: "Test Attempts",
-      value: data.stats.totalAttempts,
-      icon: Users,
-      iconBg: "bg-orange-100",
-      iconColor: "text-orange-600",
-    },
   ];
-
-  const students = data.students ?? [];
 
   const formatDate = (value: string | Date) => {
     const date = new Date(value);
@@ -183,10 +61,10 @@ export default function CoachingDashboardPage({ data }: Props) {
       <header className="border-b bg-white px-4 py-5 shadow-sm md:px-10">
         <div className="flex flex-col justify-between gap-5 md:flex-row md:items-center">
           <div className="flex items-center gap-4">
-            {data.coaching.logo ? (
+            {coaching.logo ? (
               <Image
-                src={data.coaching.logo}
-                alt={`${data.coaching.coachingName} logo`}
+                src={coaching.logo}
+                alt={`${coaching.name} logo`}
                 width={70}
                 height={70}
                 className="h-[70px] w-[70px] rounded-2xl border object-cover"
@@ -199,13 +77,13 @@ export default function CoachingDashboardPage({ data }: Props) {
 
             <div>
               <h1 className="text-2xl font-bold text-gray-900 md:text-3xl">
-                {data.coaching.coachingName}
+                {coaching.name}
               </h1>
 
               <p className="mt-1 text-gray-500">
                 Code:{" "}
                 <span className="font-semibold text-gray-700">
-                  {data.coaching.code}
+                  {coaching.code}
                 </span>
               </p>
             </div>
@@ -243,22 +121,6 @@ export default function CoachingDashboardPage({ data }: Props) {
         <StatsGrid stats={stats} />
 
         <section className="rounded-3xl bg-white p-6 shadow-sm">
-          <div className="mb-6 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-            <div>
-              <h2 className="text-2xl font-bold text-gray-900">
-                Students
-              </h2>
-
-              <p className="mt-1 text-gray-500">
-                Students registered under this coaching
-              </p>
-            </div>
-
-            <span className="text-sm font-medium text-gray-500">
-              Total: {data.stats.totalStudents}
-            </span>
-          </div>
-
           <div className="overflow-x-auto">
             <DataTable
               data={students}

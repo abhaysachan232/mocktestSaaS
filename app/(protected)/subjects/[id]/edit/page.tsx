@@ -12,7 +12,7 @@ export default async function EditSubjectPage({ params }: Props) {
   const { id } = await params;
   const result = await getSubject(id);
 
-  if (!result.success) {
+  if (!result.success || !result.data) {
     notFound();
   }
 

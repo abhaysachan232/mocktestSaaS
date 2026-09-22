@@ -8,7 +8,6 @@ type Topic = {
   name: string;
 
   _count: {
-    questions: number;
     examTopics: number;
   };
 };
@@ -125,9 +124,6 @@ export default function TopicManager({ subjectId, topics }: Props) {
               >
                 <div>
                   <p className="font-medium">{topic.name}</p>
-                  <p className="text-xs text-gray-500">
-                    {topic._count.questions} questions
-                  </p>
                 </div>
 
                 <div className="flex gap-2">

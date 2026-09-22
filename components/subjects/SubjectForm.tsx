@@ -36,7 +36,7 @@ export default function SubjectForm({ subject }: Props) {
       : await createSubject(data);
 
     if (!result.success) {
-      setServerError(result.error);
+      setServerError(result.error  ?? "Unable to save subject");
       return;
     }
 

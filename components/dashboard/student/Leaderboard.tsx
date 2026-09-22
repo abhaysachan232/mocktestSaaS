@@ -2,7 +2,6 @@
 
 import { useMemo, useState } from "react";
 import {
-  Award,
   ChevronDown,
   Crown,
   Medal,
@@ -64,7 +63,10 @@ export default function Leaderboard({
     onPeriodChange?.(value);
   };
 
-  const entries = leaderboard?.entries ?? [];
+  const entries = useMemo(
+    () => leaderboard?.entries ?? [],
+    [leaderboard?.entries],
+  );
   const topThree = entries.slice(0, 3);
   const rest = entries.slice(3);
 
@@ -140,17 +142,11 @@ export default function Leaderboard({
             {/* Podium */}
             {topThree.length > 0 && (
               <div className="mb-6 grid grid-cols-3 items-end gap-3">
-                {topThree[1] && (
-                  <PodiumCard entry={topThree[1]} place={2} />
-                )}
+                {topThree[1] && <PodiumCard entry={topThree[1]} place={2} />}
 
-                {topThree[0] && (
-                  <PodiumCard entry={topThree[0]} place={1} />
-                )}
+                {topThree[0] && <PodiumCard entry={topThree[0]} place={1} />}
 
-                {topThree[2] && (
-                  <PodiumCard entry={topThree[2]} place={3} />
-                )}
+                {topThree[2] && <PodiumCard entry={topThree[2]} place={3} />}
               </div>
             )}
 
@@ -196,7 +192,9 @@ function PodiumCard({
   return (
     <div
       className={`flex flex-col items-center rounded-2xl border bg-white px-3 shadow-sm ${heightClass} ${
-        entry.isCurrentUser ? "border-indigo-300 ring-2 ring-indigo-100" : "border-slate-200"
+        entry.isCurrentUser
+          ? "border-indigo-300 ring-2 ring-indigo-100"
+          : "border-slate-200"
       }`}
     >
       <div

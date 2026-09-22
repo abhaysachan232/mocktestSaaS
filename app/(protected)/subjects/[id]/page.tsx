@@ -12,11 +12,12 @@ export default async function SubjectPage({ params }: Props) {
   const { id } = await params;
   const result = await getSubject(id);
 
-  if (!result.success) {
+  if (!result.success || !result.data) {
     notFound();
   }
 
   const subject = result.data;
+  console.log('subject', subject.topics)
 
   return (
     <div className="space-y-6 p-6">

@@ -12,9 +12,22 @@ type Props = {
   }>;
 };
 
-function toJSONContent(value: unknown): JSONContent {
-  if (typeof value === "object" && value !== null && !Array.isArray(value)) {
-    return value as JSONContent;
+type RequiredJSONContent = Omit<JSONContent, "type"> & {
+  type: string;
+};
+
+function toJSONContent(value: unknown): RequiredJSONContent {
+  if (
+    typeof value === "object" &&
+    value !== null &&
+    !Array.isArray(value)
+  ) {
+    const content = value as JSONContent;
+
+    return {
+      ...content,
+      type: content.type ?? "doc",
+    };
   }
 
   return {
@@ -31,7 +44,7 @@ export default async function EditQuestionPage({ params }: Props) {
     getQuestionSubjects(),
   ]);
 
-  if (!questionResult.success || !questionResult.data) {
+  if (!questionResult.success) {
     notFound();
   }
 
@@ -59,6 +72,7 @@ export default async function EditQuestionPage({ params }: Props) {
           topicId: question.topicId,
           type: question.type,
           content: toJSONContent(question.content),
+          solution: toJSONContent(question.solution),
           options: question.options.map((option) => ({
             id: option.id,
             content: toJSONContent(option.content),

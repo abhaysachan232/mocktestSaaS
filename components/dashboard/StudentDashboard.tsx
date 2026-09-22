@@ -26,7 +26,7 @@ type Props = {
 };
 
 export default function StudentDashboardPage({ data }: Props) {
-  console.log('data', data)
+  console.log("data", data);
   const [, startTransition] = useTransition();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -48,29 +48,26 @@ export default function StudentDashboardPage({ data }: Props) {
   const openResult = (attemptId: string) => setViewingAttemptId(attemptId);
   const closeResult = () => setViewingAttemptId(null);
 
-  // After a test is submitted (or found expired), the server action
-  // redirects here as /student/dashboard?tab=results&attemptId=xxx.
-  // Pick that up once, open the right tab + result, then clean the URL
-  // so refreshing/back-navigating doesn't re-trigger it.
+  const urlTab = searchParams.get("tab");
+  const urlAttemptId = searchParams.get("attemptId");
+  const displayedTab = urlTab ?? activeTab;
+  const displayedAttemptId = urlAttemptId ?? viewingAttemptId;
+
   useEffect(() => {
     const tab = searchParams.get("tab");
     const attemptId = searchParams.get("attemptId");
 
     if (!tab && !attemptId) return;
 
-    if (tab) setActiveTab(tab);
-    if (attemptId) setViewingAttemptId(attemptId);
-
     router.replace("/dashboard");
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchParams]);
+  }, [searchParams, router]);
 
   const activeContent = useMemo(() => {
-    if (viewingAttemptId) {
-      return <ResultView attemptId={viewingAttemptId} onBack={closeResult} />;
+    if (displayedAttemptId) {
+      return <ResultView attemptId={displayedAttemptId} onBack={closeResult} />;
     }
 
-    switch (activeTab) {
+    switch (displayedTab) {
       case "tests":
         return (
           <Tests
@@ -120,9 +117,11 @@ export default function StudentDashboardPage({ data }: Props) {
             exams={exams}
             onExamChange={(examId) => {
               /* fetch/filter logic */
+              console.log("Exam Id", examId);
             }}
             onPeriodChange={(period) => {
               /* fetch/filter logic */
+              console.log("Period", period);
             }}
           />
         );
@@ -143,8 +142,8 @@ export default function StudentDashboardPage({ data }: Props) {
         );
     }
   }, [
-    viewingAttemptId,
-    activeTab,
+    displayedAttemptId,
+    displayedTab,
     data.student.name,
     student,
     coachings,
@@ -152,13 +151,14 @@ export default function StudentDashboardPage({ data }: Props) {
     tests,
     results,
     resultSummary,
+    leaderboard,
   ]);
 
   return (
     <main className="min-h-screen bg-slate-100">
       {/* Flipkart Style Category Navigation */}
       <CategoryPage
-        activeTab={activeTab}
+        activeTab={displayedTab}
         setActiveTab={(tab) => {
           closeResult(); // leaving a result view when switching tabs
           setActiveTab(tab);

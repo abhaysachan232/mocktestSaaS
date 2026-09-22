@@ -16,6 +16,7 @@ type Props = {
 };
 
 export default function TestActions({ id, status }: Props) {
+  console.log('archiveTest', archiveTest)
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const execute = (

@@ -31,7 +31,12 @@ type QuestionFormProps = {
   initialData?: QuestionFormValues & { id: string };
 };
 
-const emptyContent: JSONContent = {
+type QuestionOptionFormValue = QuestionFormValues["options"][number];
+type RequiredJSONContent = Omit<JSONContent, "type"> & {
+  type: string;
+};
+
+const emptyContent: RequiredJSONContent = {
   type: "doc",
   content: [
     {
@@ -40,7 +45,7 @@ const emptyContent: JSONContent = {
   ],
 };
 
-function createOption() {
+function createOption(): QuestionOptionFormValue {
   return {
     content: structuredClone(emptyContent),
     isCorrect: false,
@@ -284,7 +289,7 @@ export default function QuestionForm({
           control={control}
           render={({ field }) => (
             <RichContentEditor
-              value={field.value}
+              value={field.value ?? emptyContent}
               onChange={field.onChange}
               minHeight="220px"
             />

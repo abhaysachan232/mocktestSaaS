@@ -1,15 +1,22 @@
 "use server";
 
+import { Prisma } from "@/generated/prisma/client";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { type QuestionFormValues, questionSchema } from "@/schemas/question";
 import { revalidatePath } from "next/cache";
 
-type ActionResponse<T = unknown> = {
-  success: boolean;
-  error?: string;
-  data?: T;
-};
+type ActionResponse<T = unknown> =
+  | {
+      success: true;
+      data: T;
+      error?: never;
+    }
+  | {
+      success: false;
+      data?: T;
+      error: string;
+    };
 
 type UserContext = {
   id: string;
@@ -39,7 +46,19 @@ function canManageQuestions(role: string) {
  * Subjects are NOT owned by Coaching.
  * Both Admin and Coaching can use them while creating Questions.
  */
-export async function getQuestionSubjects(): Promise<ActionResponse> {
+
+type QuestionSubject = {
+  id: string;
+  name: string;
+  topics: {
+    id: string;
+    name: string;
+  }[];
+};
+
+export async function getQuestionSubjects(): Promise<
+  ActionResponse<QuestionSubject[]>
+> {
   try {
     const user = await getUserContext();
 
@@ -204,7 +223,34 @@ export async function createQuestion(
  * ADMIN    -> all questions
  * COACHING -> only own questions
  */
-export async function getQuestions(): Promise<ActionResponse> {
+
+type QuestionWithRelations = Prisma.QuestionGetPayload<{
+  include: {
+    subject: true;
+    topic: true;
+    options: true;
+    user: {
+      select: {
+        id: true;
+        email: true;
+        role: true;
+      };
+    };
+  };
+}>;
+
+type GetQuestionsResponse =
+  | {
+      success: true;
+      data: QuestionWithRelations[];
+    }
+  | {
+      success: false;
+      error: string;
+      data: QuestionWithRelations[];
+    };
+
+export async function getQuestions(): Promise<GetQuestionsResponse> {
   try {
     const user = await getUserContext();
 
@@ -271,7 +317,18 @@ export async function getQuestions(): Promise<ActionResponse> {
  * ADMIN    -> any question
  * COACHING -> own question only
  */
-export async function getQuestionById(id: string): Promise<ActionResponse> {
+
+type GetQuestionByIdResponse =
+  | {
+      success: true;
+      data: QuestionWithRelations;
+    }
+  | {
+      success: false;
+      error: string;
+      data: null;
+    };
+export async function getQuestionById(id: string): Promise<GetQuestionByIdResponse> {
   try {
     const user = await getUserContext();
 
@@ -543,6 +600,7 @@ export async function deleteQuestion(id: string): Promise<ActionResponse> {
 
     return {
       success: true,
+      data: undefined,
     };
   } catch (error) {
     console.error("DELETE_QUESTION_ERROR:", error);

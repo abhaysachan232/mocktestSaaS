@@ -9,6 +9,7 @@ import {
   updateCoachingSchema,
 } from "@/schemas/coaching.schema";
 import { deleteCloudinaryFile, uploadFile } from "@/lib/actions/upload.actions";
+import type { CoachingListItem, GetCoachingsResult } from "@/types/coaching";
 
 function getString(formData: FormData, key: string) {
   const value = formData.get(key);
@@ -307,7 +308,10 @@ export async function createCoaching(formData: FormData) {
   }
 }
 
-export async function getCoachings() {
+
+
+
+export async function getCoachings(): Promise<GetCoachingsResult> {
   try {
     const session = await auth();
 
@@ -348,7 +352,7 @@ export async function getCoachings() {
       },
     });
 
-    const data = coachings.map((coaching) => {
+    const data: CoachingListItem[] = coachings.map((coaching) => {
       const coachingUser = coaching.users[0]?.user ?? null;
 
       return {

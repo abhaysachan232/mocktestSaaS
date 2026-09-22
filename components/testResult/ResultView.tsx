@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect, useState } from "react";
@@ -27,44 +28,76 @@ type ResultViewProps = {
   onBack: () => void;
 };
 
-export default function ResultView({ attemptId, onBack }: ResultViewProps) {
-  const [data, setData] = useState<ResultData | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
+type ResultRequestState = {
+  attemptId: string | null;
+  loading: boolean;
+  data: ResultData | null;
+  error: string | null;
+};
+
+export default function ResultView({
+  attemptId,
+  onBack,
+}: ResultViewProps) {
+  const [request, setRequest] = useState<ResultRequestState>({
+    attemptId: null,
+    loading: true,
+    data: null,
+    error: null,
+  });
 
   useEffect(() => {
     let cancelled = false;
-
-    setLoading(true);
-    setError(null);
-    setData(null);
 
     getTestResult(attemptId)
       .then((res) => {
         if (cancelled) return;
 
         if (res.inProgress || !res.result) {
-          setError("This test hasn't been submitted yet.");
+          setRequest({
+            attemptId,
+            loading: false,
+            data: null,
+            error: "This test hasn't been submitted yet.",
+          });
+
           return;
         }
 
-        setData({
-          testName: res.attempt.test.name,
-          result: res.result,
-          questions: res.questions,
+        setRequest({
+          attemptId,
+          loading: false,
+          error: null,
+          data: {
+            testName: res.attempt.test.name,
+            result: res.result,
+            questions: res.questions,
+          },
         });
       })
       .catch(() => {
-        if (!cancelled) setError("Couldn't load this result. Please try again.");
-      })
-      .finally(() => {
-        if (!cancelled) setLoading(false);
+        if (cancelled) return;
+
+        setRequest({
+          attemptId,
+          loading: false,
+          data: null,
+          error: "Couldn't load this result. Please try again.",
+        });
       });
 
     return () => {
       cancelled = true;
     };
   }, [attemptId]);
+
+  const isCurrentRequest = request.attemptId === attemptId;
+
+  const loading = !isCurrentRequest || request.loading;
+
+  const data = isCurrentRequest ? request.data : null;
+
+  const error = isCurrentRequest ? request.error : null;
 
   return (
     <div className="space-y-4">
@@ -101,6 +134,7 @@ export default function ResultView({ attemptId, onBack }: ResultViewProps) {
             unattemptedCount={data.result.unattemptedCount}
             accuracy={data.result.accuracy}
           />
+
           <ResultReview questions={data.questions} />
         </>
       )}

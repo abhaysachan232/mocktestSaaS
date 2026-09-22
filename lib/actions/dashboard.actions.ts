@@ -2,7 +2,7 @@
 
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { AttemptStatus, Role, TestStatus } from "@/generated/prisma/enums";
+import { Role, TestStatus } from "@/generated/prisma/enums";
 
 export async function getAdminDashboard() {
   try {
@@ -291,172 +291,20 @@ export async function getCoachingDashboard() {
       },
     });
 
-    const attempts = await prisma.testAttempt.findMany({
-      where: {
-        user: {
-          coachings: {
-            some: {
-              coachingId,
-            },
-          },
-        },
-      },
-      select: {
-        id: true,
-        testId: true,
-        userId: true,
-        status: true,
-        startedAt: true,
-        submittedAt: true,
-        createdAt: true,
-        test: {
-          select: {
-            id: true,
-            name: true,
-            slug: true,
-            totalQuestions: true,
-            totalMarks: true,
-          },
-        },
-        user: {
-          select: {
-            id: true,
-            student: {
-              select: {
-                name: true,
-              },
-            },
-          },
-        },
-        result: {
-          select: {
-            id: true,
-            marksObtained: true,
-            percentage: true,
-            accuracy: true,
-            rank: true,
-            percentile: true,
-          },
-        },
-      },
-      orderBy: {
-        createdAt: "desc",
-      },
-    });
-
-    const publishedTests = await prisma.test.findMany({
-      where: {
-        status: TestStatus.PUBLISHED,
-      },
-      select: {
-        id: true,
-        name: true,
-        slug: true,
-        description: true,
-        testType: true,
-        duration: true,
-        totalMarks: true,
-        totalQuestions: true,
-        negativeMarking: true,
-        negativeMarks: true,
-        publishedAt: true,
-        createdAt: true,
-        exam: {
-          select: {
-            id: true,
-            name: true,
-            slug: true,
-          },
-        },
-      },
-      orderBy: [
-        {
-          publishedAt: "desc",
-        },
-        {
-          createdAt: "desc",
-        },
-      ],
-    });
-
-    const completedAttempts = attempts.filter(
-      (attempt) =>
-        attempt.status === AttemptStatus.SUBMITTED ||
-        attempt.status === AttemptStatus.EXPIRED,
-    );
-
-    const inProgressAttempts = attempts.filter(
-      (attempt) => attempt.status === AttemptStatus.IN_PROGRESS,
-    );
-
-    const results = completedAttempts
-      .filter((attempt) => attempt.result !== null)
-      .map((attempt) => {
-        const result = attempt.result!;
-
-        return {
-          resultId: result.id,
-          attemptId: attempt.id,
-          userId: attempt.userId,
-          studentName: attempt.user.student?.name ?? "Student",
-          testId: attempt.testId,
-          testName: attempt.test.name,
-          status: attempt.status,
-          marksObtained: result.marksObtained,
-          percentage: result.percentage,
-          accuracy: result.accuracy,
-          rank: result.rank,
-          percentile: result.percentile,
-          startedAt: attempt.startedAt,
-          submittedAt: attempt.submittedAt,
-          createdAt: attempt.createdAt,
-        };
-      });
-
-    const averagePercentage =
-      results.length > 0
-        ? results.reduce((sum, result) => sum + result.percentage, 0) /
-          results.length
-        : 0;
-
-    const averageAccuracy =
-      results.length > 0
-        ? results.reduce((sum, result) => sum + result.accuracy, 0) /
-          results.length
-        : 0;
-
-    const recentResults = results.slice(0, 10);
-
     return {
       success: true,
       data: {
         coaching: {
           id: coaching.id,
           code: coaching.code,
-          coachingName: coaching.coachingName,
+          name: coaching.coachingName,
           ownerName: coaching.ownerName,
           mobile: coaching.mobile,
           address: coaching.address,
           logo: coaching.logo,
           email: coachingUsers[0]?.user.email ?? user.email,
-          isActive: coaching.isActive,
         },
-
-        stats: {
-          totalStudents: students.length,
-          totalAttempts: attempts.length,
-          completedAttempts: completedAttempts.length,
-          inProgressAttempts: inProgressAttempts.length,
-          totalTests: publishedTests.length,
-          averagePercentage: Number(averagePercentage.toFixed(2)),
-          averageAccuracy: Number(averageAccuracy.toFixed(2)),
-        },
-
         students,
-        tests: publishedTests,
-        attempts,
-        results,
-        recentResults,
       },
     };
   } catch (error) {

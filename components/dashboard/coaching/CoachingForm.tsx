@@ -70,7 +70,7 @@ export default function CoachingForm({ mode, initialData }: Props) {
         : await createCoaching(formData);
 
       if (!result.success) {
-        setError(result.error);
+        setError(result.error ?? "Unable to save coaching");
         return;
       }
 
@@ -84,10 +84,10 @@ export default function CoachingForm({ mode, initialData }: Props) {
         formRef.current?.reset();
         setLogoPreview(null);
       }
-    } catch (error) {
-      console.error(error);
+    } catch (error: unknown) {
+      console.error("Coaching form submission failed:", error);
 
-      setError("Something went wrong");
+      setError("Something went wrong. Please try again.");
     } finally {
       setLoading(false);
     }

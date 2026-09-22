@@ -51,7 +51,6 @@ export async function getSubject(id: string) {
           include: {
             _count: {
               select: {
-                // questions: true,
                 examTopics: true,
               },
             },
@@ -61,7 +60,6 @@ export async function getSubject(id: string) {
         _count: {
           select: {
             topics: true,
-            // questions: true,
           },
         },
       },

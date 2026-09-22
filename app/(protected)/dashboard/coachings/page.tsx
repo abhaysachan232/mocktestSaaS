@@ -1,10 +1,11 @@
+export const dynamic = "force-dynamic";
 import Link from "next/link";
 import { getCoachings } from "@/lib/actions/coaching.actions";
 import CoachingTable from "@/components/dashboard/coaching/CoachingTable";
 
 export default async function CoachingsPage() {
   const result = await getCoachings();
-
+  console.log('result', result)
   if (!result.success) {
     return <div className="p-6 text-red-600">{result.error}</div>;
   }
