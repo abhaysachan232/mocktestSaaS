@@ -1,22 +1,17 @@
 export const dynamic = "force-dynamic";
+
 import Link from "next/link";
-import { getCoachings } from "@/lib/actions/coaching.actions";
-import CoachingTable from "@/components/dashboard/coaching/CoachingTable";
 
-export default async function CoachingsPage() {
-  const result = await getCoachings();
-  console.log('result', result)
-  if (!result.success) {
-    return <div className="p-6 text-red-600">{result.error}</div>;
-  }
-
+export default function CoachingsPage() {
   return (
     <div className="space-y-6 p-6">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold">Coachings</h1>
 
-          <p className="text-sm text-gray-500">Manage coaching institutes</p>
+          <p className="text-sm text-gray-500">
+            Manage coaching institutes
+          </p>
         </div>
 
         <Link
@@ -27,7 +22,11 @@ export default async function CoachingsPage() {
         </Link>
       </div>
 
-      <CoachingTable data={result.data} />
+      <div className="rounded-lg border bg-white p-6">
+        <p className="text-gray-600">
+          Coaching data will appear here.
+        </p>
+      </div>
     </div>
   );
 }

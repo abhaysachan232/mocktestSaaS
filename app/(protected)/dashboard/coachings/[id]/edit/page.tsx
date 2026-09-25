@@ -1,4 +1,7 @@
 import Link from "next/link";
+import { notFound } from "next/navigation";
+import { getCoachingById } from "@/lib/actions/coaching.actions";
+import CoachingForm from "@/components/dashboard/coaching/CoachingForm";
 
 type Props = {
   params: Promise<{
@@ -8,6 +11,11 @@ type Props = {
 
 export default async function EditCoachingPage({ params }: Props) {
   const { id } = await params;
+  const result = await getCoachingById(id);
+
+  if (!result.success) {
+    notFound();
+  }
 
   return (
     <div className="p-6">
@@ -15,9 +23,7 @@ export default async function EditCoachingPage({ params }: Props) {
         <div>
           <h1 className="text-2xl font-bold">Edit Coaching</h1>
 
-          <p className="text-sm text-gray-500">
-            Update coaching information
-          </p>
+          <p className="text-sm text-gray-500">Update coaching information</p>
         </div>
 
         <Link
@@ -29,13 +35,7 @@ export default async function EditCoachingPage({ params }: Props) {
       </div>
 
       <div className="rounded-lg border bg-white p-6">
-        <p className="text-sm text-gray-600">
-          Coaching ID:
-        </p>
-
-        <p className="mt-1 font-medium">
-          {id}
-        </p>
+        <CoachingForm mode="edit" initialData={result.data} />
       </div>
     </div>
   );
