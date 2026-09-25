@@ -4,19 +4,24 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "npm run lint && npm run typecheck && next build",
-    "audit": "npm audit --audit-level=high",
+    "build": "npm run prisma:generate && npm run lint && npm run typecheck && next build",
     "start": "next start",
-    "lint": "eslint . --max-warnings=0 && echo \"✔ Lint passed! No errors or warnings found.\"",
-    "typecheck": "tsc --noEmit && echo TypeScript check passed successfully.",
+
+    "lint": "eslint . --max-warnings=0",
+    "typecheck": "tsc --noEmit",
+
+    "audit": "npm audit --audit-level=high",
     "security": "npm run lint && npm run typecheck && npm run audit",
+
     "postinstall": "npm run prisma:generate",
+
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev && npm run prisma:generate",
     "prisma:deploy": "prisma migrate deploy",
     "prisma:status": "prisma migrate status",
     "prisma:reset": "prisma migrate reset",
     "prisma:studio": "prisma studio",
+
     "seed": "tsx --env-file=.env prisma/user-seed.ts",
     "seed:undo": "tsx --env-file=.env prisma/seed.undo.ts"
   },
